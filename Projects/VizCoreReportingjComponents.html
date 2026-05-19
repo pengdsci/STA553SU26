@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Data Visualization Components | Interactive Study Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* CSS Variables for Light/Dark Mode & Accessibility */
+        :root {
+            --bg-body: #f8f5fc;
+            --surface: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #1e1a2f;
+            --text-secondary: #2d2a3e;
+            --border-light: #e2dceb;
+            --accent-purple: #6E3061;
+            --accent-muted: #8b4c7c;
+            --accent-soft: #f1e6ef;
+            --checkbox-bg: #ffffff;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.05);
+            --header-footer-bg: #6E3061;
+            --header-text: #ffffff;
+            --footer-text: #f5eef3;
+            --code-bg: #f3eff7;
+            --hover-check: #e9ddee;
+        }
+
+        body.dark {
+            --bg-body: #121212;
+            --surface: #1e1e2a;
+            --card-bg: #252530;
+            --text-primary: #efecf5;
+            --text-secondary: #cdc9e0;
+            --border-light: #3a3a4a;
+            --accent-soft: #2c2a38;
+            --checkbox-bg: #2d2d3a;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.4);
+            --header-footer-bg: #491f40;
+            --header-text: #f5eaf2;
+            --footer-text: #cfc3db;
+            --code-bg: #2a2736;
+            --hover-check: #3f3b52;
+            --danger-bg: #3b2a2a;
+            --danger-text: #f8a5a5;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            transition: background 0.2s, color 0.2s;
+            padding: 1.5rem;
+        }
+
+        /* Print styles: preserve dark/light for PDF but ensures legibility & page size */
+        @media print {
+            body {
+                background: white;
+                color: black;
+                padding: 0.2in;
+                margin: 0;
+            }
+            body.dark {
+                background: white;
+                color: black;
+            }
+            body.dark .card, 
+            body.dark header, 
+            body.dark footer,
+            body.dark .checklist-item,
+            body.dark .toggle-container {
+                background: white !important;
+                color: black !important;
+                border-color: #ccc !important;
+                box-shadow: none !important;
+            }
+            body.dark .checklist-item label {
+                color: black !important;
+            }
+            body.dark .accent-badge, body.dark .tag-pill {
+                background: #eaeaea !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            button, .toggle-mode-btn, .print-pdf-btn {
+                display: none !important;
+            }
+            .container {
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            .card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            h1, h2, h3 {
+                break-after: avoid;
+            }
+            @page {
+                size: A3;
+            }
+            /* fallback for letter support via page size select */
+        }
+
+        /* A3 & Letter page style hints in screen view via class on body? but printing selected via browser's page setup, we provide meta + manual note */
+        .page-size-hint {
+            font-size: 0.75rem;
+            text-align: right;
+            color: var(--text-secondary);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: transparent;
+        }
+
+        /* Header with purple background */
+        .report-header {
+            background: var(--header-footer-bg);
+            color: var(--header-text);
+            padding: 1.8rem 2rem;
+            border-radius: 28px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: background 0.2s;
+        }
+
+        .report-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .report-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .report-header .subtitle {
+            font-size: 1.4rem;
+            opacity: 0.92;
+            font-weight: 600;
+            border-left: 4px solid rgba(255,255,240,0.6);
+            padding-left: 1rem;
+            text-align: center;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 1rem
+            margin-bottom: 2rem;
+        }
+
+        button {
+            background: var(--accent-purple);
+            border: none;
+            padding: 0.6rem 1.3rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background: #4f2445;
+            transform: scale(0.97);
+        }
+
+        body.dark button {
+            background: #8b5a7c;
+            color: #fff;
+        }
+
+        .print-pdf-btn {
+            background: #2c5f2d;
+        }
+        .print-pdf-btn:hover {
+            background: #1f4720;
+        }
+
+        /* Grid layout cards */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 28px;
+            padding: 1.5rem 1.6rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+
+        .card h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-left: 5px solid var(--accent-purple);
+            padding-left: 1rem;
+            color: var(--text-primary);
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            /*color: var(--accent-purple); */
+            color: var(--danger-text);
+        }
+
+        .checklist {
+            list-style: none;
+            margin-top: 0.8rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 6px 8px;
+            border-radius: 14px;
+            background: var(--accent-soft);
+            transition: background 0.1s;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-top: 3px;
+            accent-color: var(--accent-purple);
+            cursor: pointer;
+            background: var(--checkbox-bg);
+        }
+
+        .checklist-item label {
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        .tag-pill {
+            background: var(--accent-purple);
+            color: white;
+            font-size: 0.7rem;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            display: inline-block;
+            margin-right: 8px;
+            font-weight: 500;
+        }
+
+        .badge-example {
+            font-family: monospace;
+            background: var(--code-bg);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .pitfall-block {
+            background: rgba(110, 48, 97, 0.08);
+            border-left: 4px solid var(--accent-purple);
+            padding: 0.8rem 1rem;
+            border-radius: 16px;
+            margin: 1rem 0 0;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border-color: var(--border-light);
+        }
+
+        footer {
+            margin-top: 3rem;
+            background: var(--header-footer-bg);
+            border-radius: 28px;
+            padding: 1.5rem 2rem;
+            color: var(--footer-text);
+            /*display: flex;*/
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .footer-left p {
+            margin: 0;
+        }
+
+        .site-meter {
+            font-family: monospace;
+            background: rgba(255,255,240,0.1);
+            padding: 0.3rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 1rem;
+            }
+            .report-header h1 {
+                font-size: 1.6rem;
+            }
+            .card {
+                padding: 1.2rem;
+            }
+        }
+
+        .color-note {
+            font-size: 0.7rem;
+            background: var(--surface);
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+        .table-summary {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .table-summary th, .table-summary td {
+            border: 1px solid var(--border-light);
+            padding: 8px;
+            text-align: left;
+        }
+        .table-summary th {
+            background: var(--accent-soft);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- HEADER SECTION: purple background with title & subtitle -->
+    <div class="report-header">
+        <h1>STA 553 DATA VISUALIZATION</h1>
+        <h2>📊 Core Components: Reporting & Data Visualization</h2>
+        <div class="subtitle">Measures • Visual Encodings • Layout • Interactivity — Interactive Study Reference</div>
+    </div>
+
+    <!-- TOOLBAR (dark/light + print) -->
+    <div class="toolbar no-print">
+        <button id="darkModeToggle" class="toggle-mode-btn">🌓 Dark / Light Mode</button>
+        <button id="printPdfBtn" class="print-pdf-btn">🖨️ Print / Save as PDF (A3/Letter ready)</button>
+    </div>
+    <!--div class="page-size-hint no-print">💡 Print tip: In print dialog, choose "A3" or "Letter" for best layout; backgrounds enabled optional.</div-->
+
+        <!-- Design Principle: start with one clear question -->
+    <div class="grid-2col">
+    <div class="card" style="background: var(--accent-soft);">
+        <p style="font-weight: 500;">💡 The core components of reporting data visualization can be broken down into four key areas: data components (what you visualize), visual components (how you encode it), layout & context components (how you structure it), and interactivity components (how users engage with it).</p>
+    </div>
+    </div>
+    
+    <!-- MAIN CONTENT: data components, visual, layout, interactivity with checkboxes -->
+    <div class="grid-2col">
+        <!-- 1) Data Components Card -->
+        <div class="card">
+            <h2>📁 1. Problem & Data Components <span class="tag-pill">Foundation</span></h2>
+            <h3>🎯 Defining Core Objectives</h3>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_measures"><label for="chk_measures">Start with a clear problem statement (not chart request).</label></li>  
+                <li class="checklist-item"><input type="checkbox" id="chk_measures"><label for="chk_measures">Profile audience: Executive / Analyst-Manager / Operator needs.</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_measures"><label for="chk_measures"><strong>Measure impact</strong>: reduce time-to-insight, identify underperformers quickly, increase engagement.</label></li>    
+            </ul>
+            <h3>🧹 Data Cleaning & Transformations</h3>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_measures"><label for="chk_measures"><strong>Measures & Metrics</strong> — Quantitative values (sales revenue, conversion rate).</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_dimensions"><label for="chk_dimensions"><strong>Dimensions</strong> — Categorical/date fields (region, product category, date).</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_granularity"><label for="chk_granularity"><strong>Granularity</strong> — Level of detail: daily sales vs monthly sales.</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_calc"><label for="chk_calc"><strong>Calculated Fields</strong> — Derived data e.g., profit margin = revenue - cost.</label></li>
+            </ul>
+            <div class="pitfall-block">
+                📐 <strong>Granularity matters:</strong> Aggregating too early hides outliers.
+            </div>
+        </div>
+
+        <!-- 2) Visual Components (Chart Types + Encodings) -->
+        <div class="card">
+            <h2>🎨 2. Visual Components <span class="tag-pill">Encoding</span></h2>
+            <h3>📊 Chart Types</h3>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_bar"><label for="chk_bar">Comparison: Bar charts, column charts, bullet graphs</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_trend"><label for="chk_trend">Trends over time: Line charts, area charts</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_composition"><label for="chk_composition">Composition: Pie charts (limited), stacked bars, treemaps, waterfall</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_dist"><label for="chk_dist">Distribution: Histograms, box plots, scatter plots</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_geo"><label for="chk_geo">Geospatial: Choropleth maps, bubble maps</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_target"><label for="chk_target">Performance vs target: Gauges, bullet graphs</label></li>
+            </ul>
+            <h3>🎨 Visual Encodings</h3>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_pos"><label for="chk_pos">Position (x/y axes) · Length, area, angle</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_color"><label for="chk_color">Color (hue for categories, intensity for magnitude)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_shape"><label for="chk_shape">Shape, size, line texture</label></li>
+            </ul>
+        </div>
+
+    </div>
+    
+    <div class="grid-2col">    
+        <!-- 3) Layout & Context Components -->
+        <div class="card">
+            <h2>🗂️ 3. Layout & Context <span class="tag-pill">Structure</span></h2>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_title"><label for="chk_title">Title & Subtitles — States what the visualization answers.</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_axis"><label for="chk_axis">Axis Labels & Scale — units, ranges (linear/log), axis breaks</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_legend"><label for="chk_legend">Legends & Color Keys — maps colors/shapes to categories</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_annotations"><label for="chk_annotations">Annotations & Data Labels — key insights, outliers, thresholds</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_filters"><label for="chk_filters">Filters & Slicers — controls that limit data shown (date range, product line)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_reflines"><label for="chk_reflines">Gridlines & Reference Lines — benchmarks (goal line, average line)</label></li>
+                 <li class="checklist-item"><input type="checkbox" id="chk_reflines"><label for="chk_reflines"><strong>Integrated Layout Principles</strong>: ① <b>Hierarchy</b> — Title dominates → Data focal → Furniture subtle. ② <b>Proximity</b> — Legend adjacent, annotations directly linked. ③ <b>Consistency</b> — Same color/shape/axis = same meaning everywhere. ④ <b>Responsiveness</b> — All text and scales auto-update with slicer changes.</label></li>               
+            </ul>
+            <div class="pitfall-block">
+                ⚠️ <strong>Missing baseline:</strong>Bar charts not starting at zero distort comparison
+            </div>
+        </div>
+
+        <!-- 4) Interactivity & Utility -->
+        <div class="card">
+            <h2>🖱️ 4. Interactivity & Storytelling <span class="tag-pill">Action</span></h2>
+            <h3>⚡ Interactivity</h3>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_tooltips"><label for="chk_tooltips">Tooltips — hover-over details (value, % change, underlying rows)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_drill"><label for="chk_drill">Drill-down / Drill-up — navigate summary → detail (country → region → city)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_crossfilter"><label for="chk_crossfilter">Cross-filtering — selecting in one chart highlights related data</label></li>
+            </ul>
+             <h3>📋 Component Matrix & Story Recipe</h3>
+            <ul class="checklist">    
+                <li class="checklist-item"><input type="checkbox" id="chk_export"><label for="chk_export">Download / Export — PNG, PDF, CSV, Excel</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_refresh"><label for="chk_refresh">Refresh & Parameters — manual/auto data update</label></li>
+            </ul>
+            <div class="pitfall-block">
+                🔍 “A number without a target, trend, or benchmark is meaningless.”
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Summary Table and Pitfalls extra -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <h2>📋 Quick Reference: Component Summary & Pitfalls</h2>
+        <table class="table-summary">
+            <thead>
+                <tr><th>Component Type</th><th>Examples</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Data</td><td>Measures, dimensions, dates, granularity</td></tr>
+                <tr><td>Visual</td><td>Bar/line/scatter, color, size, shape</td></tr>
+                <tr><td>Layout</td><td>Title, axes, legend, filters, annotations</td></tr>
+                <tr><td>Interactivity</td><td>Tooltips, drill-down, cross-filter, export</td></tr>
+            </tbody>
+        </table>
+        <div class="pitfall-block" style="margin-top: 1rem;">
+            🚫 <strong>Avoid common pitfalls:</strong> Overuse of pie charts (>3-4 slices hard to compare) · Ambiguous color coding (red/green colorblind issues) · No context.
+        </div>
+        <div class="color-note" style="margin-top: 12px; display: inline-block;">✅ Purple theme: #6E3061 ensures accessible contrast with light/dark adapt.</div>
+    </div>
+
+    <!-- Design Principle: start with one clear question -->
+    <div class="card" style="background: var(--accent-soft);">
+        <p style="font-weight: 500;">💡 <strong>Pro Tip:</strong> Start with one clear question <em>(e.g., "How did sales trend by region last quarter?")</em> then pick minimal visual components to answer it clearly.</p>
+    </div>
+
+    <!-- FOOTER with copyright and site meter -->
+    <footer>
+        <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+             
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center> 
+        
+    </footer>
+
+    <script>
+         // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();  
+        
+    (function() {
+        // DARK MODE TOGGLE with localStorage persistence
+        const toggleBtn = document.getElementById('darkModeToggle');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const storedTheme = localStorage.getItem('vizTheme');
+        if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+            document.body.classList.add('dark');
+        } else if (storedTheme === 'light') {
+            document.body.classList.remove('dark');
+        } else {
+            // default light but keeps purples accessible
+            document.body.classList.remove('dark');
+        }
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark');
+                localStorage.setItem('vizTheme', 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem('vizTheme', 'light');
+            }
+        }
+        
+        toggleBtn.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
+        });
+        
+        // CHECKBOXES: store state in localStorage so ticks persist across reload/print toggle
+        const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+        function saveCheckboxState() {
+            const states = {};
+            checkboxes.forEach(cb => {
+                states[cb.id] = cb.checked;
+            });
+            localStorage.setItem('checklistStates', JSON.stringify(states));
+        }
+        
+        function loadCheckboxState() {
+            const saved = localStorage.getItem('checklistStates');
+            if (saved) {
+                try {
+                    const states = JSON.parse(saved);
+                    checkboxes.forEach(cb => {
+                        if (states.hasOwnProperty(cb.id)) {
+                            cb.checked = states[cb.id];
+                        }
+                    });
+                } catch(e) {}
+            }
+        }
+        
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', saveCheckboxState);
+        });
+        loadCheckboxState();
+        
+        // PRINT-TO-PDF with correct sizing and support for A3/Letter (user selects in print dialog)
+        const printBtn = document.getElementById('printPdfBtn');
+        printBtn.addEventListener('click', () => {
+            // provide temporary class hints to ensure print layout reflects current dark/light for print
+            // But print media already uses custom overrides to force white background if dark.
+            // ensure that any tooltip hidden or anything no-print won't appear.
+            // Also add meta to recommend page size? manually user selects.
+            window.print();
+        });
+        
+        // Optional: page size reminder dynamic (no overcomplicate)
+        console.log('Ready — checkboxes, dark mode, print, A3/Letter via print setup.');
+        
+        // minor accessibility: set default title for print
+        const style = document.createElement('style');
+        style.textContent = `@media print { body { margin: 0; padding: 0.2in; } .container { max-width: 100%; } .report-header, footer { break-inside: avoid; } }`;
+        document.head.appendChild(style);
+    })();
+</script>
+<!-- Ensure checkbox labels clickable and all content follows purple brand accessibility: links are fine, high contrast ratio satisfied -->
+</body>
+</html>

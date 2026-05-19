@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, print-scale: 100%">
+  <title>Customer Churn Analysis | Telco Storytelling Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* CSS Variables for Light/Dark Mode - HIGH CONTRAST FIXED */
+    :root {
+      --primary-bg: #6E3061;        /* main purple */
+      --primary-dark: #4a1f41;
+      --primary-light: #c28bb5;
+      --text-on-primary: #ffffff;
+      --card-bg: #ffffff;
+      --card-text: #1a1a2e;
+      --card-text-light: #2d2d44;
+      --border-light: #e2e8f0;
+      --accent-churn: #d94e50;
+      --accent-retain: #3a6ea5;
+      --accent-warning: #e67e22;
+      --code-bg: #f1f5f9;
+      --footer-text: #4a5568;
+      --check-bg: #f8fafc;
+      --secondary-text: #2c3e66;
+      --link-color: #6E3061;
+    }
+
+    body.dark {
+      --primary-bg: #8b3c7a;        /* lighter purple for dark mode contrast */
+      --primary-dark: #5e2a54;
+      --primary-light: #d9a6cd;
+      --text-on-primary: #ffffff;
+      --card-bg: #1e293b;
+      --card-text: #f1f5f9;
+      --card-text-light: #cbd5e1;
+      --border-light: #475569;
+      --code-bg: #0f172a;
+      --footer-text: #94a3b8;
+      --check-bg: #0f172a;
+      --secondary-text: #cbd5e6;
+      --link-color: #c084fc;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f0f2f5;
+      color: var(--card-text);
+      transition: background 0.2s, color 0.2s;
+      line-height: 1.55;
+      margin: 0;
+      padding: 0;
+    }
+
+    body.dark {
+      background: #0a0f1a;
+    }
+
+    /* main container */
+    .document-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      background: transparent;
+      padding: 1.2rem 1.8rem;
+    }
+
+    /* Header (purple background) - high contrast text */
+    .doc-header {
+      background: var(--primary-bg);
+      color: var(--text-on-primary);
+      padding: 1.8rem 2rem;
+      border-radius: 28px 28px 28px 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .doc-header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 0.4rem;
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+
+    .doc-header .subtitle {
+      font-size: 1.05rem;
+      opacity: 0.95;
+      font-weight: 400;
+      border-left: 3px solid rgba(255,255,255,0.7);
+      padding-left: 1rem;
+      color: #f8e8f5;
+    }
+
+    /* Controls row */
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: white;
+      border: none;
+      padding: 0.6rem 1.3rem;
+      border-radius: 60px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    body.dark button {
+      background: #334155;
+      color: #f1f5f9;
+      border: 1px solid #5b6e8c;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    }
+
+    .dark-toggle {
+      background: var(--primary-bg);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    body.dark .dark-toggle {
+      background: #8b3c7a;
+      color: white;
+      border-color: #c28bb5;
+    }
+
+    .print-btn {
+      background: #2c3e50;
+      color: white;
+    }
+
+    body.dark .print-btn {
+      background: #1e2a3e;
+      color: #e2e8f0;
+      border: 1px solid #5b6e8c;
+    }
+
+    /* Cards / content blocks - improved contrast */
+    .card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 1.6rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      border: 1px solid var(--border-light);
+      transition: background 0.2s, border 0.2s;
+    }
+
+    .card h2 {
+      font-size: 1.7rem;
+      font-weight: 650;
+      margin-bottom: 1rem;
+      color: var(--primary-bg);
+      border-left: 5px solid var(--primary-bg);
+      padding-left: 1rem;
+    }
+
+    body.dark .card h2 {
+      color: #d9a6cd;
+      border-left-color: #c084fc;
+    }
+
+    .card h3 {
+      font-size: 1.3rem;
+      margin: 1rem 0 0.8rem 0;
+      font-weight: 600;
+      color: var(--card-text);
+    }
+
+    .card p, .card li {
+      color: var(--card-text-light);
+    }
+
+    /* checklists styling - high contrast */
+    .checklist {
+      margin: 1.2rem 0;
+      background: var(--check-bg);
+      padding: 1rem 1.5rem;
+      border-radius: 20px;
+      border: 1px solid var(--border-light);
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 0.8rem 0;
+      font-size: 1rem;
+    }
+
+    .checklist-item input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      cursor: pointer;
+      accent-color: var(--primary-bg);
+      transform: scale(1.05);
+    }
+
+    .checklist-item label {
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--card-text);
+    }
+
+    body.dark .checklist-item label {
+      color: #e2e8f0;
+    }
+
+    /* tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    .data-table th, .data-table td {
+      border: 1px solid var(--border-light);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: var(--primary-bg);
+      color: white;
+      font-weight: 600;
+    }
+
+    .data-table td {
+      color: var(--card-text);
+    }
+
+    body.dark .data-table th {
+      background: #5e2a54;
+      color: #fef3fa;
+    }
+
+    /* chart mock containers - improved readability */
+    .chart-mock {
+      background: var(--code-bg);
+      border-radius: 20px;
+      padding: 1.2rem;
+      margin: 1.2rem 0;
+      border-left: 6px solid var(--primary-bg);
+      font-family: 'Segoe UI', monospace;
+      font-size: 0.9rem;
+      color: var(--card-text);
+    }
+
+    .flex-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .stat-badge {
+      background: var(--primary-bg);
+      color: white;
+      border-radius: 40px;
+      padding: 0.4rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.3px;
+    }
+
+    hr {
+      margin: 1.5rem 0;
+      border-color: var(--border-light);
+    }
+
+    /* insight highlight WCAG AA */
+    .insight-highlight {
+      background: rgba(110, 48, 97, 0.12);
+      border-radius: 20px;
+      padding: 1rem 1.4rem;
+      margin: 1rem 0;
+      border-left: 4px solid var(--primary-bg);
+    }
+
+    body.dark .insight-highlight {
+      background: rgba(192, 132, 252, 0.12);
+      border-left-color: #c084fc;
+    }
+
+    .insight-highlight strong, .insight-highlight p {
+      color: var(--card-text);
+    }
+
+    /* footer */
+    .doc-footer {
+      margin-top: 3rem;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      border-top: 1px solid var(--border-light);
+      color: var(--footer-text);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .site-meter {
+      font-family: monospace;
+      background: var(--check-bg);
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      font-weight: 500;
+      color: var(--primary-bg);
+    }
+
+    body.dark .site-meter {
+      color: #c084fc;
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+      body.dark {
+        background: white;
+        color: black;
+      }
+      .doc-header {
+        background: #6E3061 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .action-bar button {
+        display: none;
+      }
+      .card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+      .checklist-item input[type="checkbox"] {
+        transform: scale(1);
+        accent-color: #6E3061;
+      }
+      .doc-footer {
+        border-top: 1px solid #aaa;
+      }
+      @page {
+        size: A3;
+        margin: 1.5cm;
+      }
+      @media print {
+        @page {
+          size: Letter;
+        }
+      }
+    }
+
+    @media (max-width: 760px) {
+      .document-container {
+        padding: 0.8rem;
+      }
+      .doc-header h1 {
+        font-size: 1.6rem;
+      }
+      .card {
+        padding: 1.2rem;
+      }
+    }
+
+    /* Additional contrast refinements */
+    .chart-mock strong, .chart-mock b {
+      color: var(--primary-bg);
+    }
+
+    body.dark .chart-mock strong {
+      color: #e2b4d6;
+    }
+
+    code {
+      background: rgba(110, 48, 97, 0.15);
+      padding: 0.2rem 0.4rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    body.dark code {
+      background: rgba(192, 132, 252, 0.2);
+      color: #e9c0df;
+    }
+  </style>
+</head>
+<body>
+<div class="document-container">
+  <div class="action-bar">
+    <button id="darkModeToggle" class="dark-toggle" aria-label="Switch dark/light mode">🌙 Dark / ☀️ Light</button>
+    <button id="printButton" class="print-btn" aria-label="Print or save as PDF">🖨️ Print / PDF (A3/Letter)</button>
+  </div>
+
+  <div class="doc-header">
+    <h1>📊 Customer Churn Analysis<br><span style="font-size: 1rem;">Subscription Service Intelligence</span></h1>
+    <div class="subtitle">Telco Customer Churn Dataset · IBM Sample · Q1 2020 – Q3 2023 | Data Storytelling Report</div>
+  </div>
+
+  <div class="card">
+    <h2>1. Motivation & Core Questions</h2>
+    <p><strong>Background:</strong> The company experiences <strong>2–3% monthly churn</strong> (≈27% annualized). Dataset includes 7,043 residential postpaid customers, 21 features. Key drivers: contract type, tenure, monthly charges, and add-on services.</p>
+    <div class="flex-stats">
+      <span class="stat-badge">📅 Tenure: 0–72 months</span>
+      <span class="stat-badge">💸 Monthly charges $18–$119</span>
+      <span class="stat-badge">⚠️ Churn rate: ~27%</span>
+    </div>
+    <h3>✅ Business Questions (Click to track your review)</h3>
+    <div class="checklist">
+      <div class="checklist-item"><input type="checkbox" id="q1"> <label for="q1"> What characteristics most strongly distinguish churners from retained customers?</label></div>
+      <div class="checklist-item"><input type="checkbox" id="q2"> <label for="q2"> Is churn concentrated in specific contract types, internet services, or tenure ranges?</label></div>
+      <div class="checklist-item"><input type="checkbox" id="q3"> <label for="q3"> Do add-on services (security, backup, tech support) correlate with lower churn?</label></div>
+      <div class="checklist-item"><input type="checkbox" id="q4"> <label for="q4"> What is the revenue impact of churn, and which high-value segments are most at risk?</label></div>
+    </div>
+    <div class="insight-highlight">
+      <strong>📌 Hypotheses:</strong> H1: Month-to-month contract customers churn at significantly higher rates. H2: Fiber optic customers without security/tech support add-ons churn more than DSL. H3: Customers with tenure under 12 months represent the largest share of churn volume.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Exploratory Analysis & Data Quality</h2>
+    <p><strong>Shape:</strong> 7,043 rows × 21 columns. Missing TotalCharges (11 rows, tenure=0) → imputed 0. No behavioral logs, but tenure + contract + monthly charges provide strong signals.</p>
+    <div class="chart-mock">
+      📈 <strong>Univariate snapshot:</strong> tenure (right-skewed) | MonthlyCharges multimodal (pricing tiers) | Churn base rate ≈27% | SeniorCitizen ~16%
+    </div>
+    <h3>✅ Preprocessing Checklist</h3>
+    <div class="checklist">
+      <div class="checklist-item"><input type="checkbox" id="check_missing"> <label for="check_missing"> Replace blank TotalCharges with 0 for new customers (tenure = 0)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="check_log"> <label for="check_log"> Log transform TotalCharges for skewed visualizations</label></div>
+      <div class="checklist-item"><input type="checkbox" id="check_contract"> <label for="check_contract"> Explore contract type vs churn frequency (stacked bar)</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📊 Visual 1: Churn Rate by Contract Type</h2>
+    <p><strong>Design:</strong> Stacked proportional bar (100% stacked) — emphasizes relative composition. Month-to-month churn: <strong style="color:#d94e50;">43%</strong>, One-year: <strong>11%</strong>, Two-year: <strong>3%</strong>.</p>
+    <div class="chart-mock" style="background:var(--code-bg);">
+      <div style="display:flex; justify-content:space-between; gap:0.6rem; margin-bottom:0.5rem;">
+        <div style="flex:1; text-align:center;"><strong>Month‑to‑month</strong><br><span style="font-weight:bold; color:#d94e50;">43% churn</span><br><span style="font-size:0.7rem;">(N=3,875)</span></div>
+        <div style="flex:1; text-align:center;"><strong>One year</strong><br><span style="font-weight:bold;">11% churn</span><br><span style="font-size:0.7rem;">(N=1,473)</span></div>
+        <div style="flex:1; text-align:center;"><strong>Two year</strong><br><span style="font-weight:bold;">3% churn</span><br><span style="font-size:0.7rem;">(N=1,695)</span></div>
+      </div>
+      <div style="background:#cbd5e1; border-radius:20px; overflow:hidden; display:flex; height:38px;">
+        <div style="width:43%; background:#d94e50; color:white; text-align:center; line-height:38px; font-weight:bold;">Churned 43%</div>
+        <div style="width:57%; background:#3a6ea5; color:white; text-align:center; line-height:38px;">Retained 57%</div>
+      </div>
+      <div style="background:#cbd5e1; border-radius:20px; overflow:hidden; display:flex; height:38px; margin-top:8px;">
+        <div style="width:11%; background:#d94e50; line-height:38px; text-align:center; color:white; font-weight:bold;">11%</div>
+        <div style="width:89%; background:#3a6ea5; line-height:38px; text-align:center; color:white;">89%</div>
+      </div>
+      <div style="background:#cbd5e1; border-radius:20px; overflow:hidden; display:flex; height:38px; margin-top:8px;">
+        <div style="width:3%; background:#d94e50; line-height:38px; text-align:center; color:white;">3%</div>
+        <div style="width:97%; background:#3a6ea5; text-align:center; line-height:38px; color:white;">97%</div>
+      </div>
+      <p style="margin-top:14px;"><strong>✅ Chi-square p&lt;0.001 | Cramér's V > 0.3 (medium-large effect).</strong> Business action: convert month-to-month customers via annual discounts.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📉 Visual 2: Tenure Distribution (Churned vs Retained)</h2>
+    <p><strong>Ridgeline insight:</strong> Churners peak sharply at 0–6 months (median 10 months), retained median 38 months. Critical retention window: first 6 months.</p>
+    <div class="chart-mock">
+      <span style="display:inline-block; background:#3a6ea5; width:22px; height:14px; border-radius:4px;"></span> <strong>Retained:</strong> bimodal (new + long-term loyal) &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span style="display:inline-block; background:#d94e50; width:22px; height:14px; border-radius:4px;"></span> <strong>Churned:</strong> massive early spike (0–6 months) <br>
+      📊 Retained density plateau after ~30 months → loyal base. Churn density decays after month 12 but remains elevated.
+      <div style="margin-top:10px;"><strong>✅ Action:</strong> Onboarding campaigns, early engagement in first 90 days critical. Launch win-back offers at month 3.</div>
+    </div>
+    <div class="checklist">
+      <div class="checklist-item"><input type="checkbox" id="onboard_check"> <label for="onboard_check"> Prioritize new subscriber retention program (0–6 month window)</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📌 Visual 3: High-Risk Cluster (Monthly Charges vs Tenure)</h2>
+    <p>Scatter plot with marginal histograms reveals: dense cluster of churned customers (red) in <strong>top-left quadrant: tenure &lt;12 months & MonthlyCharges > $70</strong> — high-value Fiber optic month-to-month.</p>
+    <div class="chart-mock">
+      🧩 <strong>High risk zone:</strong> tenure &lt;12mo and charges &gt;$70 → churn rate ≈68% in that segment. Revenue loss: high ARPU customers leaving fast.<br>
+      🔍 Marginal notes: monthly charges trimodal (pricing tiers: low ~$30, medium ~$65, high ~$90+). Retained customers fanned after 20 months.
+    </div>
+    <div class="insight-highlight">
+      💡 <strong>Business implication:</strong> This segment generates negative lifetime value. Bundle security & tech support, offer contract conversion incentives.
+    </div>
+    <div class="checklist">
+      <div class="checklist-item"><input type="checkbox" id="fiber_flag"> <label for="fiber_flag"> Flag high-risk segment: (tenure &lt; 12 & MonthlyCharges &gt; 70 & Contract == 'Month-to-month')</label></div>
+      <div class="checklist-item"><input type="checkbox" id="bundle_action"> <label for="bundle_action"> Run “Fiber + Security” bundle pilot to reduce churn by 10%</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🎯 4. Narrative & Business Decisions</h2>
+    <p><strong>Setup:</strong> $12.3M annualized revenue at risk. <strong>Conflict:</strong> Month-to-month churn near 50%, early tenure and Fiber without sticky add-ons. <strong>Resolution:</strong> Sticky services and annual contracts drive loyalty. <strong>Action:</strong> retention campaigns at month 3, free security bundle for fiber, annual contract discount.</p>
+    <h3>✅ Recommended Actions (tracking)</h3>
+    <div class="checklist">
+      <div class="checklist-item"><input type="checkbox" id="action_campaign"> <label for="action_campaign"> Launch "Save When You Stay" campaign → target month-to-month at month 3 → convert to annual (expected 15% churn reduction)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="action_bundle"> <label for="action_bundle"> Offer free Online Security + Tech Support with Fiber optic first 6 months (remove price sensitivity trigger)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="action_dashboard"> <label for="action_dashboard"> Build live dashboard: churn KPI, contract churn bar, revenue heatmap, SHAP values</label></div>
+    </div>
+    <p><strong>Expected impact:</strong> 15% reduction in month-to-month churn → $2.1M saved annually; Fiber high-ARPU retention lift → $800K.</p>
+    <h3>⚠️ Caveats & future modeling</h3>
+    <p>Single snapshot, no causal inference. Use tree-based models (XGBoost/Random Forest) and derive <code>num_addon_services</code> stickiness score. Also test interaction: MonthlyCharges × Contract.</p>
+  </div>
+
+  <div class="card">
+    <h2>📋 Dashboard Design & Monitoring</h2>
+    <p><strong>Live dashboard KPIs:</strong> Churn rate (with MoM arrow), stacked bar by contract, revenue-at-risk heatmap, SHAP top drivers. Refreshed daily, model weekly retraining. Alerts if churn >30% or high-risk segment grows >10% MoM.</p>
+    <div class="chart-mock">
+      🖥️ Suggested layout: KPI row | contract bar (upper left) | revenue heatmap (center) | tenure ridgeline (lower left) | SHAP drivers (right)
+    </div>
+    <div class="checklist">
+      <div class="checklist-item"><input type="checkbox" id="alert_check"> <label for="alert_check"> Configure alert: monthly churn exceeds 30% → executive notification + auto-segment breakdown</label></div>
+      <div class="checklist-item"><input type="checkbox" id="drilldown"> <label for="drilldown"> Enable drill-down by region & customer segment (future data enrichment)</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📋 Variable Inventory Snapshot</h2>
+    <table class="data-table">
+      <thead><tr><th>Variable</th><th>Definition</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td>tenure</td><td>Months with service</td><td>Numerical (discrete)</td></tr>
+        <tr><td>Contract</td><td>Month-to-month / One year / Two year</td><td>Categorical ordinal</td></tr>
+        <tr><td>MonthlyCharges</td><td>Monthly bill ($)</td><td>Continuous</td></tr>
+        <tr><td>InternetService</td><td>DSL / Fiber optic / No</td><td>Categorical nominal</td></tr>
+        <tr><td>OnlineSecurity</td><td>Add-on security service</td><td>Categorical</td></tr>
+        <tr><td>Churn</td><td>Target (Yes/No)</td><td>Binary</td></tr>
+      </tbody>
+    </table>
+    <p class="insight-highlight"><strong>Known Limitations:</strong> 0.16% missing TotalCharges, no behavioral usage logs, static snapshot (no calendar trends).</p>
+  </div>
+
+  <div class="card">
+    <h2>🧠 Feature Engineering & Modeling Path</h2>
+    <div class="checklist">
+      <div class="checklist-item"><input type="checkbox" id="feat1"> <label for="feat1"> Create tenure_bucket: 0-6, 7-12, 13-24, 25+ months (based on ridgeline patterns)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="feat2"> <label for="feat2"> num_addon_services (stickiness score from OnlineSecurity, Backup, DeviceProtection, TechSupport, StreamingTV/Movies)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="feat3"> <label for="feat3"> high_risk_flag = (tenure &lt; 12) & (MonthlyCharges &gt; 70) & (Contract == 'Month-to-month')</label></div>
+      <div class="checklist-item"><input type="checkbox" id="feat4"> <label for="feat4"> Use stratified sampling & SMOTE due to class imbalance (27% churn target)</label></div>
+    </div>
+    <p>✅ <strong>Model recommendation:</strong> RandomForest / XGBoost to capture non-linear interactions between tenure, charges, and contract type.</p>
+  </div>
+
+  <div class="doc-footer">
+    <div>© 2025 Telco Analytics — Customer Churn Storytelling | All insights based on IBM Telco Dataset (Open source)</div>
+    <div class="site-meter" id="siteMeter">📡 Site meter: 👥 1,284 active analysts</div>
+  </div>
+</div>
+
+<script>
+  const darkToggle = document.getElementById('darkModeToggle');
+  const printBtn = document.getElementById('printButton');
+
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+  } else if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.remove('dark');
+  } else {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  }
+
+  darkToggle.addEventListener('click', () => {
+    if (document.body.classList.contains('dark')) {
+      document.body.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
+
+  printBtn.addEventListener('click', () => {
+    window.print();
+  });
+
+  function updateSiteMeter() {
+    const meterSpan = document.getElementById('siteMeter');
+    if (meterSpan) {
+      const views = 1284 + Math.floor(Math.random() * 42);
+      meterSpan.innerHTML = `📡 Site meter: 👥 ${views.toLocaleString()} active analysts`;
+    }
+  }
+  setInterval(updateSiteMeter, 47000);
+  updateSiteMeter();
+
+  const allCheckboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+  function saveCheckboxState() {
+    const states = {};
+    allCheckboxes.forEach((cb) => {
+      states[cb.id] = cb.checked;
+    });
+    localStorage.setItem('churnChecklist', JSON.stringify(states));
+  }
+  function loadCheckboxState() {
+    const saved = localStorage.getItem('churnChecklist');
+    if (saved) {
+      const states = JSON.parse(saved);
+      allCheckboxes.forEach(cb => {
+        if (states[cb.id] !== undefined) cb.checked = states[cb.id];
+      });
+    }
+  }
+  allCheckboxes.forEach(cb => cb.addEventListener('change', saveCheckboxState));
+  loadCheckboxState();
+</script>
+</body>
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>Health Science Report | Diabetes & Metabolic Health Cohort</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* GLOBAL VARIABLES & DEFAULTS */
+    :root {
+      --purple-primary: #6E3061;
+      --purple-dark: #4b1e42;
+      --purple-soft: #f4eef3;
+      --bg-light: #ffffff;
+      --bg-dark: #1a1a2e;
+      --text-light: #1e1e2f;
+      --text-dark: #f0f0f0;
+      --card-light: #ffffff;
+      --card-dark: #2d2d44;
+      --border-light: #e2e8f0;
+      --border-dark: #3e3e5e;
+      --accent-gold: #e9b35f;
+      --accent-mint: #7fcdb8;
+      --shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.2s ease, color 0.2s ease;
+      line-height: 1.5;
+      padding: 0;
+      margin: 0;
+    }
+
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* PRINT STYLES (optimized for PDF) */
+    @media print {
+      body {
+        background: white;
+        color: black;
+        font-size: 11pt;
+      }
+      .no-print, .toggle-bar, .page-size-controls, .print-btn-group, .darkmode-toggle, .checkbox-print-keep {
+        display: none !important;
+      }
+      .container {
+        max-width: 100%;
+        padding: 0.2in;
+        margin: 0;
+      }
+      .card, .visual-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+        box-shadow: none;
+        background: white;
+      }
+      h1, h2, h3 {
+        color: black;
+      }
+      header, footer {
+        background: #f8f9fa !important;
+        color: black !important;
+        border-bottom: 2px solid #6E3061;
+      }
+      footer {
+        border-top: 1px solid #ccc;
+      }
+      a {
+        text-decoration: none;
+        color: black;
+      }
+      .checklist-item {
+        border-bottom: 1px solid #ddd;
+      }
+    }
+
+    /* A3 & Letter page size simulation (print media already respects paper size) */
+    /* Layout */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+    }
+
+    /* header section */
+    header {
+      background: var(--purple-primary);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 0 0 1.5rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      transition: background 0.2s;
+    }
+    body.dark header {
+      background: #4a1f40;
+    }
+    .header-content {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .main-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.3rem;
+    }
+    .subtitle {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.9;
+      border-left: 3px solid var(--accent-gold);
+      padding-left: 1rem;
+    }
+
+    /* Control bar */
+    .control-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 2rem;
+      background: var(--card-light);
+      padding: 0.8rem 1.2rem;
+      border-radius: 60px;
+      border: 1px solid var(--border-light);
+      transition: background 0.2s;
+    }
+    body.dark .control-bar {
+      background: var(--card-dark);
+      border-color: var(--border-dark);
+    }
+    button {
+      background: var(--purple-primary);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: var(--purple-dark);
+      transform: scale(0.97);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--purple-primary);
+      color: var(--purple-primary);
+    }
+    body.dark .btn-outline {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+      background: transparent;
+    }
+    .btn-outline:hover {
+      background: var(--purple-primary);
+      color: white;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-light);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-light);
+      transition: background 0.2s, border 0.2s;
+    }
+    body.dark .card {
+      background: var(--card-dark);
+      border-color: var(--border-dark);
+    }
+    .visual-card {
+      background: var(--card-light);
+      border-left: 5px solid var(--purple-primary);
+    }
+    body.dark .visual-card {
+      background: var(--card-dark);
+    }
+    h2 {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      color: var(--purple-primary);
+    }
+    body.dark h3 {
+      color: #cf9ec5;
+    }
+    hr {
+      margin: 1rem 0;
+      border-color: var(--border-light);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    /* Checklists */
+    .checklist-group {
+      margin: 1rem 0;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.7rem;
+      padding: 0.3rem 0;
+    }
+    .checklist-item label {
+      cursor: pointer;
+      font-weight: 500;
+    }
+    input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      cursor: pointer;
+      accent-color: var(--purple-primary);
+    }
+    /* findings / stat highlights */
+    .stat-badge {
+      background: var(--purple-soft);
+      padding: 0.8rem;
+      border-radius: 1rem;
+      margin: 1rem 0;
+    }
+    body.dark .stat-badge {
+      background: #3a2a3f;
+    }
+    .insight-text {
+      font-weight: 500;
+    }
+    .footnote {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 1rem;
+    }
+    footer {
+      background: #f9f9fc;
+      margin-top: 3rem;
+      padding: 1.2rem 2rem;
+      border-radius: 1rem 1rem 0 0;
+      text-align: center;
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border-light);
+      transition: background 0.2s;
+    }
+    body.dark footer {
+      background: #1e1e2f;
+      border-top-color: #333;
+    }
+    .site-meter {
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 1rem;
+      }
+      .main-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-content">
+    <div class="main-title">📊 Incident Diabetes & Metabolic Risk</div>
+    <div class="subtitle">Metro Health & Aging Cohort (2010–2019) · 9-Year Prospective Analysis · Lifestyle, Inflammation & Structural Disparities</div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- control row: dark/light + print + paper size -->
+  <div class="control-bar no-print">
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <button id="darkmodeToggle" aria-label="Dark/Light mode">🌓 Dark/Light</button>
+      <button id="printPdfBtn" aria-label="Print as PDF">🖨️ Print / PDF</button>
+      <button id="sizeA3Btn" class="btn-outline">📄 A3 Page Size</button>
+      <button id="sizeLetterBtn" class="btn-outline">📃 Letter Page Size</button>
+    </div>
+    <span style="font-size:0.75rem; margin-left:auto;">✅ Interactive checklists</span>
+  </div>
+
+  <!-- MOTIVATION + CORE QUESTIONS -->
+  <div class="card">
+    <h2>📌 1. Motivation & Hypotheses</h2>
+    <p><strong>Dataset:</strong> 4,500 adults (40–70y, diabetes-free at baseline), 9-year follow-up. Incident T2D confirmed via glucose ≥126 mg/dL, HbA1c ≥6.5%, or physician dx.</p>
+    <div class="grid-2" style="margin-top: 0.8rem;">
+      <div>
+        <strong>🔍 Core Questions</strong>
+        <ul style="margin-left: 1.2rem; margin-top: 0.3rem;">
+          <li>9-year cumulative incidence by glycemic status & race/ethnicity?</li>
+          <li>Does hs-CRP mediate obesity→diabetes?</li>
+          <li>Does neighborhood SES modify lifestyle protection?</li>
+        </ul>
+      </div>
+      <div>
+        <strong>🧪 Hypotheses</strong>
+        <ul style="margin-left: 1.2rem;">
+          <li>H1: Healthy lifestyle → ≥25% lower hazard of T2D, BMI-independent.</li>
+          <li>H2: hs-CRP mediates ≥15% of waist–diabetes association.</li>
+          <li>H3: Lifestyle–diabetes association weaker in low-SES (interaction p&lt;0.05).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL 1: cumulative incidence -->
+  <div class="card visual-card">
+    <h2>📈 Visual 1: Cumulative Incidence by Glycemic Status × Race/Ethnicity</h2>
+    <div class="stat-badge">
+      <span class="insight-text">🔬 9-year incidence: <strong>42% (prediabetes)</strong> vs 8% (normoglycemia). Among prediabetes: Black 48% vs White 35%.</span><br>
+      <span style="font-size:0.9rem;">📉 Curves diverge early → screening at age 40 justified, disparities demand targeted prevention.</span>
+    </div>
+    <div class="checklist-group">
+      <div class="checklist-item"><input type="checkbox" id="vis1-check"> <label for="vis1-check">✅ I reviewed the cumulative incidence disparity and clinical implication</label></div>
+      <div class="checklist-item"><input type="checkbox" id="vis1b-check"> <label for="vis1b-check">📌 Action: Universal prediabetes screening at 40+ across all race/ethnicities</label></div>
+    </div>
+  </div>
+
+  <!-- VISUAL 2: Mediation by hs-CRP -->
+  <div class="card visual-card">
+    <h2>🩸 Visual 2: Mediation by hs-CRP (Obesity → Inflammation → Diabetes)</h2>
+    <div class="stat-badge">
+      <p><strong>📊 Total effect HR = 1.64</strong> · Indirect (via CRP) HR = 1.14 · <strong>Proportion mediated = 28% (95% CI: 18–38%)</strong></p>
+      <p>Inflammation explains ~one-quarter of obesity–diabetes pathway, supporting hs-CRP as risk stratification marker.</p>
+    </div>
+    <div class="checklist-group">
+      <div class="checklist-item"><input type="checkbox" id="med1"> <label for="med1">✔️ Understand CRP mediates 28% of waist–diabetes effect</label></div>
+      <div class="checklist-item"><input type="checkbox" id="med2"> <label for="med2">🧪 Consider anti-inflammatory strategies in high-CRP populations (research)</label></div>
+    </div>
+  </div>
+
+  <!-- VISUAL 3: Lifestyle × Neighborhood SES Interaction -->
+  <div class="card visual-card">
+    <h2>🏙️ Visual 3: Lifestyle × Neighborhood SES Interaction</h2>
+    <div class="stat-badge">
+      <p>🌿 <strong>High nSES:</strong> healthy lifestyle → 5% risk vs 18% (HR=0.52).  <strong>Low nSES:</strong> 12% vs 19% (HR=0.78). <strong>Interaction p = 0.008</strong> → structural context constrains individual benefits.</p>
+      <p>💡 Implication: Pair lifestyle programs with neighborhood investment (food access, safe recreation).</p>
+    </div>
+    <div class="checklist-item"><input type="checkbox" id="ses-check"> <label for="ses-check">🏗️ Advocate for combined individual + neighborhood-level prevention strategies</label></div>
+  </div>
+
+  <!-- EXPLORATION / METHODS card -->
+  <div class="card">
+    <h2>📐 Exploration Plan & Data Quality</h2>
+    <p><strong>Missing data:</strong> MICE (25 imputations) primary; sensitivity: complete-case, pattern-mixture models. Cumulative incidence (1-KM), DAG for mediation pathway. Cox models with interaction term for nSES × lifestyle.</p>
+    <ul>
+      <li>Univariate: Baseline Table 1 stratified, exposure distributions (log-transform CRP).</li>
+      <li>Bivariate/Multivariate: correlation heatmap, KM curves by BMI, lifestyle tertiles.</li>
+    </ul>
+    <div class="footnote">⚠️ Caveats: Observational data – causal claims limited. Healthy volunteer bias; 12% loss to follow-up (IPCW planned). Replication needed for neighborhood interaction.</div>
+  </div>
+
+  <!-- ACTION NARRATIVE & TRANSLATION -->
+  <div class="card">
+    <h2>⚡ Narrative & Actionable Insights</h2>
+    <div class="grid-2">
+      <div>
+        <h3>🎯 Clinical Actions</h3>
+        <ul>
+          <li>Universal prediabetes screening at age 40+.</li>
+          <li>Lifestyle programs for screen-positives + hs-CRP risk stratification.</li>
+          <li>Consider inflammation as intervention target.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>🏛️ Public Health & Research</h3>
+        <ul>
+          <li>Neighborhood investment: food access, safe recreation zones.</li>
+          <li>Replicate neighborhood interaction findings before resource allocation.</li>
+          <li>Test anti-inflammatory strategies in high-CRP cohorts.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="checklist-group" style="margin-top: 1rem;">
+      <div class="checklist-item"><input type="checkbox" id="action1"> <label for="action1">📋 Plan to implement prediabetes screening at 40+ in clinical workflow</label></div>
+      <div class="checklist-item"><input type="checkbox" id="action2"> <label for="action2">🏘️ Advocate for neighborhood-level investments alongside lifestyle coaching</label></div>
+      <div class="checklist-item"><input type="checkbox" id="action3"> <label for="action3">📊 Monitor hs-CRP as part of diabetes risk assessment</label></div>
+    </div>
+  </div>
+
+  <!-- SUPPLEMENTARY COHORT & LIMITATIONS -->
+  <div class="card">
+    <h3>🧾 Key Cohort Characteristics & Limitations</h3>
+    <p><strong>Key variables:</strong> Demographics, family history, BMI, waist circumference, physical activity, AHEI diet quality, smoking, fasting glucose, HbA1c, hs-CRP, neighborhood SES index, incident T2D, time-to-event.</p>
+    <p><strong>Limitations:</strong> Healthy volunteer bias, 12% loss to follow-up (IPCW planned), self-reported diet/activity non-differential misclassification, residual confounding. PAF estimates assume causality; interaction requires replication.</p>
+  </div>
+
+  <!-- ADDITIONAL RESEARCH CHECKLIST (standalone) -->
+  <div class="card">
+    <h2>✅ Research Implementation Checklist</h2>
+    <div class="checklist-group">
+      <div class="checklist-item"><input type="checkbox" id="chk1"> <label for="chk1">📋 Build cohort flow diagram & missingness heatmap (MICE imputation)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="chk2"> <label for="chk2">📈 Generate cumulative incidence curves (1-KM) by race/glycemic status</label></div>
+      <div class="checklist-item"><input type="checkbox" id="chk3"> <label for="chk3">📉 Mediation analysis: waist circumference → hs-CRP → T2D (proportion mediated)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="chk4"> <label for="chk4">🌍 Cox interaction model: lifestyle score × neighborhood SES, adjust for confounders</label></div>
+      <div class="checklist-item"><input type="checkbox" id="chk5"> <label for="chk5">📄 Prepare forest plot of total/direct/indirect effects and predicted risk curves</label></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div>© 2025 Health Science & Metabolic Epidemiology Unit — Data Storytelling Project: Prospective Cohort Metro Health</div>
+  <div class="site-meter" style="margin-top: 0.4rem;">📊 Site Meter: incident diabetes dashboard v2.4 | Evidence-based synthesis | 9-year cumulative risk analysis</div>
+  <div style="font-size:0.7rem; margin-top: 0.5rem;">📄 This report is for educational & research purposes. All data derived from simulated cohort analysis, public health synthesis.</div>
+</footer>
+
+<script>
+  (function() {
+    // dark/light mode toggle
+    const darkToggle = document.getElementById('darkmodeToggle');
+    const htmlElement = document.documentElement;
+    // check local storage or default light
+    if (localStorage.getItem('diabetesTheme') === 'dark') {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+    darkToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      localStorage.setItem('diabetesTheme', isDark ? 'dark' : 'light');
+    });
+
+    // PRINT TO PDF function with proper sizing (respect A3/Letter)
+    const printBtn = document.getElementById('printPdfBtn');
+    function setPrintPaperSize(size) {
+      let styleSheet = document.getElementById('dynamicPaperSize');
+      if (!styleSheet) {
+        styleSheet = document.createElement('style');
+        styleSheet.id = 'dynamicPaperSize';
+        document.head.appendChild(styleSheet);
+      }
+      if (size === 'A3') {
+        styleSheet.innerHTML = `@media print { @page { size: A3 landscape; margin: 1.2cm; } body { zoom: 0.95; } }`;
+      } else if (size === 'Letter') {
+        styleSheet.innerHTML = `@media print { @page { size: Letter portrait; margin: 1cm; } }`;
+      } else {
+        styleSheet.innerHTML = `@media print { @page { size: auto; margin: 1.5cm; } }`;
+      }
+    }
+    // default initial set to Letter (better for pdf)
+    setPrintPaperSize('Letter');
+    
+    printBtn.addEventListener('click', () => {
+      // store current paper size selection preference
+      window.print();
+    });
+    
+    const a3Btn = document.getElementById('sizeA3Btn');
+    const letterBtn = document.getElementById('sizeLetterBtn');
+    a3Btn.addEventListener('click', () => {
+      setPrintPaperSize('A3');
+      // visual feedback
+      alert('✅ Print size set to A3 landscape (for PDF export). Use print/PDF button now.');
+    });
+    letterBtn.addEventListener('click', () => {
+      setPrintPaperSize('Letter');
+      alert('✅ Print size set to Letter portrait. Ready for print/PDF.');
+    });
+    
+    // ensure when printing, checkboxes remain interactive? but for print we keep visual state.
+    // all checkboxes will show their tick marks in printed PDF (since they are standard inputs)
+    // also add full support for A3/Letter from media print dynamic.
+    
+    // Add optional: any interactive checkbox we keep functional.
+    // Persist checkboxes states with localStorage (optional to preserve between sessions)
+    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+    function loadCheckboxStates() {
+      try {
+        allCheckboxes.forEach(cb => {
+          const id = cb.id;
+          if (id) {
+            const saved = localStorage.getItem(`chk_${id}`);
+            if (saved === 'true') cb.checked = true;
+            else if (saved === 'false') cb.checked = false;
+          }
+        });
+      } catch(e) {}
+    }
+    function saveCheckboxStates() {
+      allCheckboxes.forEach(cb => {
+        if (cb.id) {
+          localStorage.setItem(`chk_${cb.id}`, cb.checked);
+        }
+      });
+    }
+    loadCheckboxStates();
+    allCheckboxes.forEach(cb => {
+      cb.addEventListener('change', saveCheckboxStates);
+    });
+    
+    // additional minor improvement: if any label missing for a11y? all checkboxes have corresponding label.
+    // Also ensure dynamic style for dark mode print consistency extra
+    const styleForPrintDark = document.createElement('style');
+    styleForPrintDark.innerHTML = `@media print { body.dark { background: white; color: black; } body.dark .card { background: white; color: black; border: 1px solid #ccc; } body.dark header { background: #6E3061 !important; color: white; } body.dark footer { background: #f1f1f1; } }`;
+    document.head.appendChild(styleForPrintDark);
+    
+    // final touch: when user toggles dark mode, print media adaptation is safe.
+    // support for A3 and letter with proper margins added via dynamic style, plus a fallback.
+    // Also add current page indicator for site meter?
+    // ensure all checkboxes have unique IDs already from html. good.
+    // enable native browser print scaling
+    
+    // side note: If any user wants to see current page size, we provide helper.
+    console.log("Diabetes report ready — interactive checklists, dark mode & PDF print with A3/Letter.");
+    
+    // improve print for dark mode: reset colors using print styles
+    const extraPrintAdjust = document.createElement('style');
+    extraPrintAdjust.innerHTML = `@media print { .control-bar, .no-print { display: none; } .checklist-item input:checked + label { font-weight: bold; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } header, .stat-badge { background-color: #f4eef3 !important; -webkit-print-color-adjust: exact; } body.dark header { background-color: #6E3061 !important; color: white; } }`;
+    document.head.appendChild(extraPrintAdjust);
+    
+    // provide additional support for 'clickable checkboxes' (already standard)
+    // All checkboxes are fully clickable and interactive.
+    // A3 and Letter page support both for screen (visual indication) and for print.
+    // Set default title and footer text, already done.
+    // also ensures when printed from any browser the checkboxes status is visible.
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>Loan Default Predictor | Risk Analytics Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* CSS Variables for themes & accessibility */
+    :root {
+      /* brand purple #6E3061 */
+      --brand: #6E3061;
+      --brand-dark: #4f2145;
+      --brand-light: #aa7b9b;
+      --brand-soft: rgba(110, 48, 97, 0.1);
+      --bg-body: #f5f7fc;
+      --surface: #ffffff;
+      --text-primary: #1a2c3e;
+      --text-secondary: #2c3e50;
+      --border: #e2e8f0;
+      --card-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      --code-bg: #f1f5f9;
+      --checkbox-accent: #6E3061;
+      --footer-bg: #f8fafc;
+    }
+
+    body.dark {
+      --brand: #aa7b9b;
+      --brand-dark: #c295b4;
+      --brand-light: #d9b8ce;
+      --bg-body: #121826;
+      --surface: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --border: #334155;
+      --card-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      --code-bg: #0f172a;
+      --checkbox-accent: #c084b5;
+      --footer-bg: #0f172a;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      line-height: 1.5;
+      transition: background 0.2s ease, color 0.2s;
+      padding: 2rem 1.5rem;
+    }
+
+    /* Container with A3/Letter friendly max-width */
+    .report-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 28px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      transition: background 0.2s;
+    }
+
+    /* HEADER with purple brand */
+    .report-header {
+      background: var(--brand);
+      padding: 2rem 2rem 1.8rem 2rem;
+      color: white;
+      border-bottom: 4px solid rgba(255,255,240,0.3);
+    }
+
+    .report-header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.4rem;
+    }
+
+    .report-header .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 400;
+      border-left: 3px solid #ffdcb5;
+      padding-left: 1rem;
+    }
+
+    /* Toolbar: dark/light + print hints */
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1.2rem;
+      border-radius: 60px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-dark);
+      transform: scale(0.97);
+    }
+
+    .btn:hover {
+      background: var(--brand-soft);
+    }
+
+    /* main content */
+    .content {
+      padding: 2rem 2rem 1.5rem 2rem;
+    }
+
+    /* insight cards */
+    .insight-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      flex: 1;
+      min-width: 180px;
+      background: var(--code-bg);
+      border-radius: 24px;
+      padding: 1.2rem;
+      border-left: 5px solid var(--brand);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .stat-card h4 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+    }
+
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--brand);
+    }
+
+    /* visual mockup containers (representative charts) */
+    .visual-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .visual-title {
+      background: var(--brand-soft);
+      padding: 1rem 1.5rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .visual-body {
+      padding: 1.8rem;
+    }
+
+    /* heatmap simulation (grid) */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin: 1rem 0;
+    }
+    .heat-cell {
+      background: #e2e8f0;
+      text-align: center;
+      padding: 0.8rem 0.2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    body.dark .heat-cell { background: #334155; }
+    .risk-high { background: #b91c1c; color: white; }
+    .risk-mid { background: #e67e22; color: white; }
+    .risk-low { background: #2c7a4d; color: white; }
+    .risk-midlow { background: #f4a261; }
+
+    /* table like loan purpose */
+    .interaction-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    .interaction-table th, .interaction-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 6px;
+      text-align: left;
+    }
+
+    /* CHECKBOXES row - interactive */
+    .checklist {
+      margin: 2rem 0 1.5rem;
+      background: var(--code-bg);
+      border-radius: 20px;
+      padding: 1.2rem 1.5rem;
+    }
+    .checklist h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 0.8rem 0;
+      cursor: pointer;
+    }
+    .check-item input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--checkbox-accent);
+      cursor: pointer;
+    }
+
+    /* footer */
+    .report-footer {
+      background: var(--footer-bg);
+      border-top: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* Print styles: A3 & Letter support */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+      body.dark {
+        --bg-body: white;
+        --surface: white;
+        --text-primary: black;
+        --text-secondary: #2c3e50;
+        --border: #ccc;
+        --code-bg: #f3f4f6;
+      }
+      .toolbar {
+        display: none;
+      }
+      .report-container {
+        box-shadow: none;
+        border-radius: 0;
+        max-width: 100%;
+      }
+      .btn, .btn-primary {
+        display: none;
+      }
+      .report-header {
+        background: #6E3061 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .heat-cell, .risk-high, .risk-mid, .risk-low {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      @page {
+        size: A3;
+        margin: 1.2cm;
+      }
+      /* fallback for letter */
+      @page letter {
+        size: letter;
+      }
+      body {
+        font-size: 11pt;
+      }
+      .visual-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .insight-grid {
+        break-inside: avoid;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 1rem;
+      }
+      .content {
+        padding: 1rem;
+      }
+      .heatmap-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* additional accessibility */
+    a, .btn, .check-item {
+      cursor: pointer;
+    }
+    .note {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 1rem;
+      border-left: 2px solid var(--brand);
+      padding-left: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+<div class="report-container" id="reportRoot">
+  <div class="report-header">
+    <h1>📊 Loan Default Intelligence</h1>
+    <div class="subtitle">Predicting risk in consumer lending | Near-prime segment analysis (2022–2025)</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" id="darkModeToggle" aria-label="Dark/Light mode">🌓 Dark / Light</button>
+    <button class="btn btn-primary" id="printPdfBtn" aria-label="Print as PDF">🖨️ Print / Save PDF (A3/Letter)</button>
+  </div>
+
+  <div class="content">
+    <!-- KPI row -->
+    <div class="insight-grid">
+      <div class="stat-card"><h4>📉 Portfolio Default Rate</h4><div class="value">14.2%</div><div>12-month rolling</div></div>
+      <div class="stat-card"><h4>⚠️ High Risk Cell (FICO<650, DTI>40%)</h4><div class="value">32%</div><div>default rate</div></div>
+      <div class="stat-card"><h4>📈 Vintage Q3'23 6M Default</h4><div class="value">4.2%</div><div>+150bps vs 2022</div></div>
+      <div class="stat-card"><h4>🎯 DTI vs FICO AUC Diff</h4><div class="value">+0.067</div><div>p=0.012 (DeLong)</div></div>
+    </div>
+
+    <!-- Visual 1 : Heatmap (FICO band vs DTI decile) -->
+    <div class="visual-card">
+      <div class="visual-title">🔥 Visual 1: Default rate by FICO Band & DTI Decile (Risk Matrix)</div>
+      <div class="visual-body">
+        <div style="overflow-x: auto;">
+          <div class="heatmap-grid">
+            <div><strong>DTI\FICO</strong></div><div><strong>600-649</strong></div><div><strong>650-699</strong></div><div><strong>700-749</strong></div><div><strong>750+</strong></div>
+            <div><strong>DTI >40%</strong></div><div class="heat-cell risk-high">32%<br>(N=278)</div><div class="heat-cell risk-high">21%<br>(N=412)</div><div class="heat-cell risk-mid">14%<br>(N=388)</div><div class="heat-cell risk-midlow">7%<br>(N=301)</div>
+            <div><strong>DTI 30-40%</strong></div><div class="heat-cell risk-high">24%<br>(N=405)</div><div class="heat-cell risk-mid">15%<br>(N=618)</div><div class="heat-cell risk-midlow">9%<br>(N=542)</div><div class="heat-cell risk-low">4%<br>(N=490)</div>
+            <div><strong>DTI 20-30%</strong></div><div class="heat-cell risk-mid">16%<br>(N=512)</div><div class="heat-cell risk-midlow">9%<br>(N=799)</div><div class="heat-cell risk-low">5%<br>(N=830)</div><div class="heat-cell risk-low">2.5%<br>(N=991)</div>
+            <div><strong>DTI <20%</strong></div><div class="heat-cell risk-midlow">11%<br>(N=390)</div><div class="heat-cell risk-low">5%<br>(N=702)</div><div class="heat-cell risk-low">2%<br>(N=840)</div><div class="heat-cell risk-low" style="background:#2c7a4d;">1.9%<br>(N=1024)</div>
+          </div>
+        </div>
+        <p class="note"><strong>📌 Finding:</strong> Gradient across DTI deciles steeper than FICO — DTI provides stronger risk discrimination in near-prime (FICO 600-700). Joint underwriting matrix recommended.</p>
+      </div>
+    </div>
+
+    <!-- Visual 2 : Loan purpose x amount interaction (line plot simulation) -->
+    <div class="visual-card">
+      <div class="visual-title">📈 Visual 2: Loan Purpose × Amount — Default Probability (Interaction effect)</div>
+      <div class="visual-body">
+        <table class="interaction-table">
+          <thead><tr><th>Loan Purpose</th><th>$5,000 default prob.</th><th>$25,000 default prob.</th><th>$40,000 default prob.</th><th>Interaction p-value</th></tr></thead>
+          <tbody>
+            <tr><td>💸 Debt Consolidation</td><td>8.2%</td><td>18.5%</td><td style="font-weight:bold;color:#b91c1c;">22.3%</td><td rowspan="3">p = 0.003 (significant)</td></tr>
+            <tr><td>🏡 Home Improvement</td><td>7.9%</td><td>9.1%</td><td>9.8%</td></tr>
+            <tr><td>🩺 Medical</td><td>10.1%</td><td>13.4%</td><td>15.2%</td></tr>
+          </tbody>
+        </table>
+        <p class="note"><strong>🔍 Implication:</strong> Debt consolidation loans >$25k carry 2-3× higher risk than home improvement. Purpose-specific caps: $25k for consolidation, $40k for home improvement.</p>
+      </div>
+    </div>
+
+    <!-- Visual 3 : Vintage Curves summary (cumulative default) -->
+    <div class="visual-card">
+      <div class="visual-title">📉 Visual 3: Vintage Default Curves — Cumulative Default Rate by Origination Quarter</div>
+      <div class="visual-body">
+        <div style="background: var(--code-bg); padding: 1rem; border-radius: 1rem;">
+          <div style="display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <div><strong>2022-Q1:</strong> 6m:2.7% | 12m:6.2% | 24m:12.1%</div>
+            <div><strong>2022-Q4:</strong> 6m:2.9% | 12m:6.8% | 24m:13.0%</div>
+            <div><strong>2023-Q3 (highlight):</strong> <span style="color:#e67e22;">6m:4.2%</span> | 12m:9.1%*</div>
+            <div><strong>2023-Q4:</strong> 6m:4.0% | 12m:8.9%*</div>
+          </div>
+          <div style="margin-top: 1rem; height: 6px; background: linear-gradient(90deg, #2c7a4d 20%, #f4a261 65%, #b91c1c 90%); border-radius: 6px;"></div>
+          <p class="note">📆 <strong>Alert:</strong> Vintages post mid-2023 show steeper early default curves coinciding with 300bps rate hikes. Vintage monitoring dashboard recommended.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hypothesis & Core findings with clickable checkboxes (interactive) -->
+    <div class="checklist">
+      <h3>✅ Core hypotheses & action tracker <span style="font-size:0.8rem;">(click to mark as reviewed)</span></h3>
+      <label class="check-item">
+        <input type="checkbox" class="action-checkbox"> <strong>H1 confirmed:</strong> DTI > FICO in near-prime (AUC diff +0.067, p<0.05) → implement dual-metric grid.
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="action-checkbox"> <strong>H2:</strong> Loan purpose × amount interaction significant (OR >1.5). Debt consolidation >25k has 22% default rate.
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="action-checkbox"> <strong>H3:</strong> Borrowers with ≥3 inquiries & DTI>40% → default rate 27.8% (>25% threshold).
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="action-checkbox"> 📊 Action: Underwriting grid with FICO×DTI, purpose-specific loan caps & risk-based pricing (±300bps).
+      </label>
+      <label class="check-item">
+        <input type="checkbox" class="action-checkbox"> 📈 Deploy vintage performance dashboard & early collections outreach for high-risk cell (FICO<650, DTI>40%, debt consolidation).
+      </label>
+    </div>
+
+    <!-- additional narrative: scenario & loss rate -->
+    <div class="visual-card">
+      <div class="visual-title">📉 Expected portfolio loss under 200bps interest rate shock</div>
+      <div class="visual-body">
+        <p><strong>Scenario:</strong> 200 bps increase in base rates → higher monthly payments for variable-rate & refinancing pressure. Estimated default rate uplift: +3.2pp, taking baseline from 14.2% → <strong style="background: var(--brand-soft); padding: 0.2rem 0.6rem; border-radius: 20px;">17.4% expected loss rate</strong> in near-prime segment.</p>
+        <p>Stress test also incorporates DTI sensitivity: borrowers with DTI >40% would see 5pp higher default migration. Recommendation: dynamic underwriting and macro overlay.</p>
+        <div class="note">⚠️ Caveats: Survivor bias from approved applicants only; macroeconomic variables not in model; static bureau data limited. Consider reject inference.</div>
+      </div>
+    </div>
+
+    <!-- summary story & action -->
+    <div class="visual-card">
+      <div class="visual-title">📋 Strategic actions & monitoring roadmap</div>
+      <div class="visual-body">
+        <ul style="margin-left: 1.2rem;">
+          <li><strong>Underwriting:</strong> Replace FICO-only cutoff with FICO × DTI approval grid + purpose-specific amount caps (debt consolidation ≤$25k, enhanced verification >$15k).</li>
+          <li><strong>Pricing:</strong> Risk-based pricing adjustment ±300bps based on DTI component beyond FICO.</li>
+          <li><strong>Monitoring:</strong> Vintage performance dashboard with auto-alert: new vintage 6-month default rate > trailing 12-month avg +100bps.</li>
+          <li><strong>Collections:</strong> Prioritize early outreach to high-risk cell (FICO<650, DTI>40%, consolidation purpose).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-footer">
+    <div>© 2025 Lending Risk Analytics — Proprietary & Confidential. Data source: Consumer Loan Performance (2022-2025).</div>
+    <div>📊 Site meter: v2.4 | near-prime dashboard | Last updated: Q1 2026</div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // Dark mode toggle
+    const toggleBtn = document.getElementById('darkModeToggle');
+    const root = document.documentElement;
+    const isDarkStored = localStorage.getItem('darkMode') === 'true';
+    if (isDarkStored) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+    toggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      localStorage.setItem('darkMode', isDark);
+    });
+
+    // Print to PDF function with correct sizing: A3 / Letter default handling
+    const printBtn = document.getElementById('printPdfBtn');
+    printBtn.addEventListener('click', () => {
+      // optional: temporarily set print media styles, but we already have @media print
+      window.print();
+    });
+
+    // Ensure checkboxes are interactive and persist state (no backend needed, they just work)
+    // extra bonus: store checkbox states in localStorage so that user’s progress remains across sessions?
+    const checkboxes = document.querySelectorAll('.action-checkbox');
+    // load saved states
+    try {
+      const savedStates = JSON.parse(localStorage.getItem('loanChecklistState') || '{}');
+      checkboxes.forEach((cb, idx) => {
+        const id = `chk_${idx}`;
+        if (savedStates[id] !== undefined) {
+          cb.checked = savedStates[id];
+        }
+        cb.addEventListener('change', () => {
+          const newStates = {};
+          checkboxes.forEach((c, i) => {
+            newStates[`chk_${i}`] = c.checked;
+          });
+          localStorage.setItem('loanChecklistState', JSON.stringify(newStates));
+        });
+      });
+    } catch(e) { /* ignore */ }
+
+    // Accessibility: add Aria roles
+    const container = document.querySelector('.report-container');
+    if(container) container.setAttribute('role', 'main');
+    
+    // ensure heatmap has proper color contrast
+    const style = document.createElement('style');
+    style.textContent = `
+      .risk-high { background-color: #b91c1c; color: white; }
+      .risk-mid { background-color: #e67e22; color: white; }
+      .risk-low { background-color: #2c7a4d; color: white; }
+      .risk-midlow { background-color: #f4a261; color: #1e293b; }
+      body.dark .risk-midlow { background-color: #b9692e; color: #f1f5f9; }
+      body.dark .heat-cell { color: #f1f5f9; }
+    `;
+    document.head.appendChild(style);
+
+    // additional print sizing: instruct browser that we prefer A3 but letter also fine
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.media = 'print';
+    link.href = 'data:text/css,' + encodeURIComponent(`
+      @page {
+        size: A3;
+      }
+      @media print {
+        body { margin: 0; padding: 0; }
+        .report-container { max-width: 100%; margin: 0; border-radius: 0; }
+        .toolbar { display: none; }
+        .btn, .btn-primary { display: none; }
+        a[href]:after { content: none; }
+      }
+    `);
+    document.head.appendChild(link);
+  })();
+</script>
+</body>
+</html>
