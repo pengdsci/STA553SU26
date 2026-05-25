@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ggplot2 Fundamentals - Quick Reference Cards</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1a1a1a;
+            --card-bg: #ffffff;
+            --card-border: #e0d4dc;
+            --header-bg: #6E3061;
+            --header-text: #ffffff;
+            --footer-bg: #f5f0f3;
+            --footer-text: #4a2040;
+            --bullet-color: #6E3061;
+            --shadow: 0 2px 8px rgba(110, 48, 97, 0.12);
+            --card-hover-shadow: 0 4px 16px rgba(110, 48, 97, 0.2);
+            --toggle-bg: #6E3061;
+            --toggle-text: #ffffff;
+            --code-bg: #f9f5f8;
+            --code-border: #e8d5e3;
+            --accent: #8B4578;
+            --divider: #d4bcd0;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a2e;
+            --text-color: #e0d4dc;
+            --card-bg: #252540;
+            --card-border: #3d2a3a;
+            --header-bg: #4a2040;
+            --header-text: #f0e6ed;
+            --footer-bg: #1a1025;
+            --footer-text: #c0a8b8;
+            --bullet-color: #c490b8;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --card-hover-shadow: 0 4px 16px rgba(180, 120, 170, 0.25);
+            --toggle-bg: #8B4578;
+            --toggle-text: #f0e6ed;
+            --code-bg: #2a2035;
+            --code-border: #4a3050;
+            --accent: #c490b8;
+            --divider: #4a3050;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============ HEADER ============ */
+        .header {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 24px 32px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+        .header h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.01em;
+        }
+       .header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.01em;
+        }
+        .header .subtitle {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        /* ============ TOOLBAR ============ */
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 32px;
+            flex-wrap: wrap;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--divider);
+            position: sticky;
+            top: 108px;
+            z-index: 99;
+            transition: background-color 0.3s ease;
+        }
+        .toggle-btn {
+            background-color: var(--toggle-bg);
+            color: var(--toggle-text);
+            border: 2px solid transparent;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .toggle-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(110, 48, 97, 0.3);
+        }
+        .toggle-btn:focus-visible {
+            outline: 3px solid #ffffff;
+            outline-offset: 2px;
+        }
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .page-size-selector select {
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 2px solid var(--card-border);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: border-color 0.2s ease;
+        }
+        .page-size-selector select:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+            border-color: var(--accent);
+        }
+        .print-btn {
+            background-color: var(--accent);
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .print-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 69, 120, 0.35);
+        }
+        .print-btn:focus-visible {
+            outline: 3px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        /* ============ MAIN CONTENT ============ */
+        .main-container {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 20px 40px;
+            width: 100%;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* ============ CARD ============ */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px 22px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 180px;
+        }
+        .card:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-2px);
+        }
+        .card-header-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .card-number {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+            line-height: 1.3;
+            padding-top: 2px;
+        }
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-left: 42px;
+        }
+        .card-bullet {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            color: var(--text-color);
+        }
+        .card-bullet .bullet-dot {
+            color: var(--bullet-color);
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .card-bullet code {
+            background-color: var(--code-bg);
+            border: 1px solid var(--code-border);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        /* ============ CHECKBOX BULLET ============ */
+        .check-bullet {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            color: var(--text-color);
+        }
+        .check-bullet input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            border: 2px solid var(--bullet-color);
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 2px;
+            background-color: transparent;
+            transition: all 0.2s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .check-bullet input[type="checkbox"]:checked {
+            background-color: var(--bullet-color);
+            border-color: var(--bullet-color);
+        }
+        .check-bullet input[type="checkbox"]:checked::after {
+            content: '✓';
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            line-height: 1;
+        }
+        .check-bullet input[type="checkbox"]:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .check-bullet input[type="checkbox"]:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(110, 48, 97, 0.1);
+        }
+        .check-label {
+            cursor: pointer;
+            user-select: none;
+            flex: 1;
+        }
+
+        /* ============ FOOTER ============ */
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            text-align: center;
+            padding: 16px 24px;
+            font-size: 0.82rem;
+            border-top: 1px solid var(--divider);
+            /*display: flex; */
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .site-meter {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.78rem;
+            opacity: 0.8;
+        }
+
+        /* ============ PRINT STYLES ============ */
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .header {
+                background-color: #6E3061 !important;
+                color: #ffffff !important;
+                position: static;
+                box-shadow: none;
+            }
+            .toolbar {
+                display: none !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #d4bcd0 !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+                background-color: #ffffff !important;
+                color: #000000 !important;
+            }
+            .card-number {
+                background-color: #6E3061 !important;
+                color: #ffffff !important;
+            }
+            .card-bullet code,
+            .check-bullet code {
+                background-color: #f9f5f8 !important;
+                border: 1px solid #e8d5e3 !important;
+            }
+            .check-bullet input[type="checkbox"] {
+                border: 2px solid #6E3061 !important;
+            }
+            .check-bullet input[type="checkbox"]:checked {
+                background-color: #6E3061 !important;
+            }
+            .footer {
+                background-color: #f5f0f3 !important;
+                color: #4a2040 !important;
+            }
+            .card:hover {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+
+            /* A3 */
+            @page size-a3 {
+                size: 297mm 420mm;
+                margin: 12mm;
+            }
+            /* Letter */
+            @page size-letter {
+                size: 215.9mm 279.4mm;
+                margin: 10mm;
+            }
+            .page-a3 { page: size-a3; }
+            .page-letter { page: size-letter; }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 900px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .toolbar {
+                top: 88px;
+                padding: 10px 16px;
+                gap: 10px;
+            }
+            .card {
+                padding: 16px;
+            }
+            .card-content {
+                padding-left: 38px;
+            }
+        }
+        @media (max-width: 500px) {
+            .header {
+                padding: 16px;
+            }
+            .header h1 {
+                font-size: 1.25rem;
+            }
+            .toolbar {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .footer {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body class="page-letter">
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="header" role="banner">
+        <h1>STA 553 DATA VISUALIZATION</h1>
+        <h2>ggplot2 Fundamentals</h2>
+        <p class="subtitle">Quick Reference Cards &mdash; 14 Essential Topics for R Data Visualization</p>
+    </header>
+
+    <!-- ==================== TOOLBAR ==================== -->
+    <div class="toolbar" role="toolbar" aria-label="Display controls">
+        <button class="toggle-btn" id="themeToggle" aria-label="Toggle dark/light mode" title="Switch between dark and light theme">
+            <span id="themeIcon">🌙</span>
+            <span id="themeLabel">Dark Mode</span>
+        </button>
+        <!--div class="page-size-selector">
+            <label for="pageSize">Page Size:</label>
+            <select id="pageSize" aria-label="Select page size for printing">
+                <option value="letter" selected>US Letter</option>
+                <option value="a3">A3</option>
+            </select>
+        </div-->
+        <button class="print-btn" id="printBtn" aria-label="Print this document">
+            🖨️ Print / Save PDF
+        </button>
+    </div>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="main-container" id="mainContent" role="main">
+        <div class="cards-grid">
+
+            <!-- Card 1: Grammar of Graphics & Basic Structure -->
+            <article class="card" aria-labelledby="card1-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">1</span>
+                    <h2 class="card-title" id="card1-title">Grammar of Graphics &amp; Basic Structure</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Layers built with data → aesthetics → geometries">
+                        <span class="check-label">Plots built layer by layer: <strong>data → aes → geom → facets → stats → coords → theme</strong></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Template is ggplot(data) + geom_function(aes(...))">
+                        <span class="check-label">Template: <code>ggplot(data) + geom_function(aes(x, y, color, etc.))</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: aes() maps variables to visual properties">
+                        <span class="check-label"><code>aes()</code> maps variables to visual properties; <code>+</code> adds layers (later = on top)</span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 2: Geoms: Choosing Visual Elements -->
+            <article class="card" aria-labelledby="card2-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">2</span>
+                    <h2 class="card-title" id="card2-title">Geoms: Choosing Visual Elements</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: 1 continuous variable - histogram, density, boxplot">
+                        <span class="check-label"><strong>1 continuous:</strong> <code>geom_histogram()</code>, <code>geom_density()</code>, <code>geom_boxplot()</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: 2 continuous variables - point, line, smooth">
+                        <span class="check-label"><strong>2 continuous:</strong> <code>geom_point()</code>, <code>geom_line()</code>, <code>geom_smooth()</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Discrete + continuous - col, bar, violin">
+                        <span class="check-label"><strong>Discrete + cont:</strong> <code>geom_col()</code>, <code>geom_bar()</code>, <code>geom_violin()</code>; use <code>stat="identity"</code></span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 3: Aesthetics -->
+            <article class="card" aria-labelledby="card3-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">3</span>
+                    <h2 class="card-title" id="card3-title">Aesthetics: Mapping Data to Visual Properties</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Position aesthetics x and y">
+                        <span class="check-label"><strong>Position:</strong> <code>x</code>, <code>y</code> (required for most geoms)</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Differentiation aesthetics color, fill, shape, size, alpha">
+                        <span class="check-label"><strong>Differentiation:</strong> <code>color</code>, <code>fill</code>, <code>shape</code>, <code>size</code>, <code>alpha</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Global vs local aes and group aesthetic">
+                        <span class="check-label"><strong>Global vs local:</strong> <code>aes()</code> in <code>ggplot()</code> applies to all; use <code>group</code> for line plots</span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 4: Layer Composition & Order -->
+            <article class="card" aria-labelledby="card4-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">4</span>
+                    <h2 class="card-title" id="card4-title">Layer Composition &amp; Order</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Layers stack bottom to top">
+                        <span class="check-label">Layers stack bottom to top: <strong>points → lines → text</strong> for proper overlay</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Each geom can have own data and aes">
+                        <span class="check-label">Each geom can have its own <code>data</code> and <code>aes()</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Combine raw data with summaries">
+                        <span class="check-label">Combine raw data + summaries: <code>geom_point() + geom_smooth(method="lm")</code></span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 5: Statistical Transformations -->
+            <article class="card" aria-labelledby="card5-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">5</span>
+                    <h2 class="card-title" id="card5-title">Statistical Transformations</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: All geoms have default stats">
+                        <span class="check-label">All geoms have default stats; use <code>after_stat()</code> for computed variables</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: stat_summary for error bars">
+                        <span class="check-label"><code>stat_summary()</code> with <code>fun.data=mean_cl_normal</code> creates error bars</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: after_stat(density) for normalized density plots">
+                        <span class="check-label"><code>geom_density(aes(y=after_stat(density)))</code> for normalized plots</span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 6: Faceting -->
+            <article class="card" aria-labelledby="card6-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">6</span>
+                    <h2 class="card-title" id="card6-title">Faceting: Multi-panel Plots</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: facet_wrap for one variable">
+                        <span class="check-label"><strong>One variable:</strong> <code>facet_wrap(~ category)</code> wraps panels; use <code>ncol</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: facet_grid for two variables">
+                        <span class="check-label"><strong>Two variables:</strong> <code>facet_grid(rows ~ cols)</code> creates full grid</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: scales free for independent axes">
+                        <span class="check-label"><strong>Scale control:</strong> <code>scales="free"</code> allows independent axes</span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 7: Scale Control -->
+            <article class="card" aria-labelledby="card7-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">7</span>
+                    <h2 class="card-title" id="card7-title">Scale Control</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Continuous scales with gradient, limits, breaks">
+                        <span class="check-label"><strong>Continuous:</strong> <code>scale_color_gradient()</code>, <code>scale_x_continuous(limits, breaks)</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Discrete scales with brewer palettes">
+                        <span class="check-label"><strong>Discrete:</strong> <code>scale_fill_brewer(palette="Set2")</code> — colorblind-friendly</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Date scales with breaks and labels">
+                        <span class="check-label"><strong>Dates:</strong> <code>scale_x_date(date_breaks="1 month", date_labels="%b %Y")</code></span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 8: Position Adjustments -->
+            <article class="card" aria-labelledby="card8-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">8</span>
+                    <h2 class="card-title" id="card8-title">Position Adjustments</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Bar positions - dodge, stack, fill">
+                        <span class="check-label"><strong>Bars:</strong> <code>position="dodge"</code> (side-by-side), <code>"stack"</code>, <code>"fill"</code> (100%)</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: position_jitter to reduce overplotting">
+                        <span class="check-label"><strong>Points:</strong> <code>position_jitter(width, height)</code> reduces overplotting</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: position identity for exact placement">
+                        <span class="check-label"><strong>Identity:</strong> <code>position="identity"</code> for exact placement (error bars)</span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 9: Coordinate Systems -->
+            <article class="card" aria-labelledby="card9-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">9</span>
+                    <h2 class="card-title" id="card9-title">Coordinate Systems</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: coord_flip rotates the plot">
+                        <span class="check-label"><code>coord_flip()</code> — rotates plot (horizontal bars)</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: coord_fixed maintains aspect ratio">
+                        <span class="check-label"><code>coord_fixed(ratio=1)</code> — maintains aspect ratio (maps, PCA)</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: coord_polar for pie charts">
+                        <span class="check-label"><code>coord_polar("y")</code> — transforms bars to pie charts</span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 10: Themes & Labels -->
+            <article class="card" aria-labelledby="card10-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">10</span>
+                    <h2 class="card-title" id="card10-title">Themes &amp; Labels</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Complete themes like minimal, bw, classic">
+                        <span class="check-label"><strong>Complete themes:</strong> <code>theme_minimal()</code>, <code>theme_bw()</code>, <code>theme_classic()</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Element customization with element_text">
+                        <span class="check-label"><strong>Elements:</strong> <code>theme(axis.title=element_text(size=14, face="bold"))</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: labs for titles and legend position control">
+                        <span class="check-label"><code>labs(title, subtitle, x, y, caption)</code>; <code>theme(legend.position="bottom")</code></span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 11: Annotations & References -->
+            <article class="card" aria-labelledby="card11-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">11</span>
+                    <h2 class="card-title" id="card11-title">Annotations &amp; References</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Reference lines - hline, vline, abline">
+                        <span class="check-label"><strong>Lines:</strong> <code>geom_hline(yintercept=mean)</code>, <code>geom_vline()</code>, <code>geom_abline()</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: annotate for text and shapes">
+                        <span class="check-label"><strong>Text/shapes:</strong> <code>annotate("text", x, y, label)</code> or <code>annotate("rect", ...)</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Direct labels with geom_text and geom_label">
+                        <span class="check-label"><strong>Direct labels:</strong> <code>geom_text(aes(label=var))</code>, <code>geom_label()</code></span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 12: Pipeline Integration -->
+            <article class="card" aria-labelledby="card12-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">12</span>
+                    <h2 class="card-title" id="card12-title">Pipeline Integration</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Combine dplyr and ggplot2 with pipe">
+                        <span class="check-label">Combine <code>dplyr</code> + <code>ggplot2</code>: <code>data %>% filter() %>% group_by() %>% summarise() %>% ggplot()</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: reorder for dynamic factor ordering">
+                        <span class="check-label">Use <code>reorder()</code> in <code>aes()</code>: <code>aes(x=reorder(category, value, median))</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Pre-process data before visualization">
+                        <span class="check-label">Pre-process data before visualization for cleaner code</span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 13: Handling Overplotting & Large Data -->
+            <article class="card" aria-labelledby="card13-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">13</span>
+                    <h2 class="card-title" id="card13-title">Handling Overplotting &amp; Large Data</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Transparency with alpha to reveal density">
+                        <span class="check-label"><strong>Transparency:</strong> <code>geom_point(alpha=0.1)</code> reveals density patterns</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Binning with geom_hex or geom_bin2d">
+                        <span class="check-label"><strong>Binning:</strong> <code>geom_hex()</code> or <code>geom_bin2d()</code> for 10,000+ rows</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Sampling and smaller point markers">
+                        <span class="check-label"><strong>Sampling:</strong> <code>sample_n()</code> / <code>sample_frac()</code>; <code>geom_point(size=0.5)</code></span>
+                    </label>
+                </div>
+            </article>
+
+            <!-- Card 14: Saving & Export -->
+            <article class="card" aria-labelledby="card14-title">
+                <div class="card-header-row">
+                    <span class="card-number" aria-hidden="true">14</span>
+                    <h2 class="card-title" id="card14-title">Saving &amp; Export</h2>
+                </div>
+                <div class="card-content">
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: ggsave with width, height, dpi">
+                        <span class="check-label"><code>ggsave("plot.png", width=8, height=6, dpi=300)</code> — dimensions + resolution</span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Save plot object then export">
+                        <span class="check-label">Save object first: <code>p &lt;- ggplot(...) + ...</code> then <code>ggsave("file.pdf", p)</code></span>
+                    </label>
+                    <label class="check-bullet">
+                        <input type="checkbox" aria-label="Check: Multiple formats - PNG, PDF, SVG">
+                        <span class="check-label">Export as PNG, PDF, SVG by changing file extension</span>
+                    </label>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer" role="contentinfo">
+       <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+             
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center> 
+    </footer>
+
+    <!-- ==================== SCRIPTS ==================== -->
+    <script>
+        
+         // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();   
+    
+        (function() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeLabel = document.getElementById('themeLabel');
+            const pageSizeSelect = document.getElementById('pageSize');
+            const printBtn = document.getElementById('printBtn');
+
+            // ============ THEME TOGGLE ============
+            const savedTheme = localStorage.getItem('ggplot-cards-theme');
+            if (savedTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = '☀️';
+                themeLabel.textContent = 'Light Mode';
+            }
+
+            themeToggle.addEventListener('click', function() {
+                if (body.getAttribute('data-theme') === 'dark') {
+                    body.removeAttribute('data-theme');
+                    localStorage.setItem('ggplot-cards-theme', 'light');
+                    themeIcon.textContent = '🌙';
+                    themeLabel.textContent = 'Dark Mode';
+                } else {
+                    body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('ggplot-cards-theme', 'dark');
+                    themeIcon.textContent = '☀️';
+                    themeLabel.textContent = 'Light Mode';
+                }
+            });
+
+            // ============ PAGE SIZE ============
+            function updatePageClass(size) {
+                body.classList.remove('page-a3', 'page-letter');
+                body.classList.add('page-' + size);
+                localStorage.setItem('ggplot-cards-pagesize', size);
+            }
+
+            const savedPageSize = localStorage.getItem('ggplot-cards-pagesize');
+            if (savedPageSize && (savedPageSize === 'a3' || savedPageSize === 'letter')) {
+                pageSizeSelect.value = savedPageSize;
+                updatePageClass(savedPageSize);
+            }
+
+            pageSizeSelect.addEventListener('change', function() {
+                updatePageClass(this.value);
+            });
+
+            // ============ PRINT BUTTON ============
+            printBtn.addEventListener('click', function() {
+                window.print();
+            });
+
+            // ============ CHECKBOX PERSISTENCE ============
+            const allCheckboxes = document.querySelectorAll('.check-bullet input[type="checkbox"]');
+            const storageKey = 'ggplot-cards-checkboxes';
+
+            function getCheckboxStates() {
+                try {
+                    return JSON.parse(localStorage.getItem(storageKey)) || {};
+                } catch (e) {
+                    return {};
+                }
+            }
+
+            function saveCheckboxState(index, checked) {
+                const states = getCheckboxStates();
+                states[index] = checked;
+                localStorage.setItem(storageKey, JSON.stringify(states));
+            }
+
+            // Load saved states
+            const savedStates = getCheckboxStates();
+            allCheckboxes.forEach(function(cb, index) {
+                if (savedStates[index] !== undefined) {
+                    cb.checked = savedStates[index];
+                }
+                cb.addEventListener('change', function() {
+                    saveCheckboxState(index, this.checked);
+                });
+            });
+
+            // ============ KEYBOARD SHORTCUT ============
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+P or Cmd+P triggers print
+                if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                    // Let default behavior happen (browser print dialog)
+                    // But ensure correct page size class is set
+                }
+                // 't' key for theme toggle (when not in input)
+                if (e.key === 't' && !e.ctrlKey && !e.metaKey && !e.altKey &&
+                    document.activeElement === body) {
+                    themeToggle.click();
+                }
+            });
+
+            console.log('✅ ggplot2 Fundamentals Cards ready!');
+            console.log('   🖱️  Click checkboxes — state saved automatically');
+            console.log('   🌙  Dark/Light toggle — preference saved');
+            console.log('   🖨️  Print button or Ctrl+P — choose A3 or Letter');
+            console.log('   ⌨️  Press "t" to toggle theme (when not typing)');
+        })();
+    </script>
+</body>
+</html>
