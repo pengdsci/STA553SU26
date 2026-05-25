@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Data Visualization Technologies & Platforms</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --card-bg: #f5f0f7;
+            --card-border: #e0d5e8;
+            --purple: #6E3061;
+            --purple-light: #8e4d7e;
+            --purple-dark: #4a1f3f;
+            --purple-bg: #6E3061;
+            --header-text: #ffffff;
+            --footer-bg: #f0eaf5;
+            --footer-text: #4a1f3f;
+            --check-bg: #ffffff;
+            --check-border: #6E3061;
+            --tag-bg: #ebe0f0;
+            --tag-text: #4a1f3f;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 6px 20px rgba(110,48,97,0.15);
+            --meter-bg: #e0d5e8;
+            --meter-fill: #6E3061;
+        }
+
+        .dark-mode {
+            --bg: #1a1a2e;
+            --text: #e8e6f0;
+            --card-bg: #2a2540;
+            --card-border: #3d3560;
+            --purple: #b388b5;
+            --purple-light: #c9a3c6;
+            --purple-dark: #8e6b95;
+            --purple-bg: #4a1f3f;
+            --header-text: #f0eaf5;
+            --footer-bg: #2a2540;
+            --footer-text: #c9a3c6;
+            --check-bg: #2a2540;
+            --check-border: #b388b5;
+            --tag-bg: #3d3560;
+            --tag-text: #c9a3c6;
+            --shadow: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-hover: 0 6px 20px rgba(179,136,181,0.2);
+            --meter-bg: #3d3560;
+            --meter-fill: #b388b5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--purple-bg);
+            color: var(--header-text);
+            padding: 28px 40px 22px;
+            text-align: center;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+        .header .subtitle {
+            font-size: 1.05rem;
+            font-weight: 400;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        /* Theme Toggle */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 28px;
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.35);
+            color: var(--header-text);
+            padding: 8px 16px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.25s;
+            backdrop-filter: blur(4px);
+        }
+        .toggle-btn:hover {
+            background: rgba(255,255,255,0.28);
+            border-color: rgba(255,255,255,0.55);
+        }
+        .toggle-btn:focus-visible {
+            outline: 3px solid #ffffff;
+            outline-offset: 3px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 24px 40px;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 24px;
+        }
+
+        /* Card */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 24px 22px 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .card-icon {
+            font-size: 2rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .card-title-group {
+            flex: 1;
+        }
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--purple-dark);
+            margin-bottom: 3px;
+            letter-spacing: -0.2px;
+        }
+        .card-subtitle {
+            font-size: 0.82rem;
+            color: var(--text);
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 500;
+        }
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 2px;
+        }
+        .tag {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+        .card-body {
+            font-size: 0.93rem;
+            line-height: 1.55;
+            color: var(--text);
+            flex: 1;
+        }
+        .card-body ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .card-body li {
+            padding: 3px 0 3px 18px;
+            position: relative;
+        }
+        .card-body li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--purple);
+            font-size: 0.75rem;
+            top: 5px;
+        }
+
+        /* Checkbox */
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .checkbox-row input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--check-border);
+            border-radius: 5px;
+            background: var(--check-bg);
+            cursor: pointer;
+            display: grid;
+            place-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .checkbox-row input[type="checkbox"]::before {
+            content: "";
+            width: 12px;
+            height: 12px;
+            clip-path: polygon(14% 44%, 0% 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            background-color: var(--check-bg);
+            transform: scale(0);
+            transition: 0.12s transform ease-in-out;
+        }
+        .checkbox-row input[type="checkbox"]:checked {
+            background-color: var(--purple);
+            border-color: var(--purple);
+        }
+        .checkbox-row input[type="checkbox"]:checked::before {
+            background-color: #ffffff;
+            transform: scale(1);
+        }
+        .checkbox-row input[type="checkbox"]:focus-visible {
+            outline: 3px solid var(--purple-light);
+            outline-offset: 2px;
+        }
+        .checkbox-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            opacity: 0.85;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 18px 28px;
+            /*display: flex; */
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.85rem;
+            transition: background-color 0.3s, color 0.3s;
+            border-top: 2px solid var(--card-border);
+        }
+        .footer .copyright {
+            opacity: 0.85;
+        }
+        .footer .site-meter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .meter-bar {
+            width: 100px;
+            height: 8px;
+            background-color: var(--meter-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .meter-bar .fill {
+            height: 100%;
+            background-color: var(--meter-fill);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
+        /* Page Size Badge */
+        .page-size-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            opacity: 0.75;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .toggle-btn {
+                display: none !important;
+            }
+            .header {
+                background-color: #6E3061 !important;
+                color: #ffffff !important;
+                padding: 20px 30px 16px !important;
+            }
+            .footer {
+                background-color: #f0eaf5 !important;
+                color: #4a1f3f !important;
+                border-top: 1px solid #ccc !important;
+                padding: 12px 20px !important;
+            }
+            .card {
+                box-shadow: 0 0 0 1px #ccc !important;
+                border: 1px solid #ccc !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+                background: #fafafa !important;
+            }
+            .card:hover {
+                transform: none !important;
+            }
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 16px !important;
+            }
+            @page {
+                size: A3;
+                margin: 12mm;
+            }
+            @page letter {
+                size: letter;
+                margin: 12mm;
+            }
+        }
+
+        /* Page size specific */
+        .page-a3 .cards-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .page-letter .cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @media (max-width: 800px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .toggle-btn {
+                top: 12px;
+                right: 14px;
+                padding: 6px 12px;
+                font-size: 0.78rem;
+            }
+        }
+    </style>
+</head>
+<body class="page-letter">
+    <!-- HEADER -->
+    <header class="header">
+        <h1>STA 553 Data Visualization</h1>
+        <h2>Modern Technologies &amp; Platforms</h2>
+        <p class="subtitle">A comprehensive overview of tools for visual storytelling, dashboards &amp; web-based presentation</p>
+        <button class="toggle-btn" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+            🌙 Dark Mode
+        </button>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <div class="cards-grid" id="cardsGrid">
+            <!-- Card 1: GitHub -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🐙</span>
+                    <div class="card-title-group">
+                        <div class="card-title">GitHub &amp; GitHub Pages</div>
+                        <div class="card-subtitle">Hosting &amp; Collaboration</div>
+                    </div>
+                </div>
+                <div class="card-tags">
+                    <span class="tag">Version Control</span>
+                    <span class="tag">Static Hosting</span>
+                    <span class="tag">Portfolio</span>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Version control for visualization code and data</li>
+                        <li>Free static web hosting via GitHub Pages</li>
+                        <li>Showcases interactive portfolios and project demos</li>
+                    </ul>
+                </div>
+                <label class="checkbox-row">
+                    <input type="checkbox" class="card-checkbox">
+                    <span class="checkbox-label">Mark as explored</span>
+                </label>
+            </div>
+
+            <!-- Card 2: RStudio & RPubs -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">💻</span>
+                    <div class="card-title-group">
+                        <div class="card-title">RStudio &amp; RPubs</div>
+                        <div class="card-subtitle">Development &amp; Publishing</div>
+                    </div>
+                </div>
+                <div class="card-tags">
+                    <span class="tag">IDE</span>
+                    <span class="tag">R Markdown</span>
+                    <span class="tag">One-Click Publish</span>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Primary IDE for R with integrated preview tools</li>
+                        <li>Visual editor for R Markdown and Shiny apps</li>
+                        <li>RPubs: free one-click publishing of HTML reports</li>
+                    </ul>
+                </div>
+                <label class="checkbox-row">
+                    <input type="checkbox" class="card-checkbox">
+                    <span class="checkbox-label">Mark as explored</span>
+                </label>
+            </div>
+
+            <!-- Card 3: Shiny & Flexdashboard -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📊</span>
+                    <div class="card-title-group">
+                        <div class="card-title">Shiny &amp; Flexdashboard</div>
+                        <div class="card-subtitle">Interactive Web Apps &amp; Dashboards</div>
+                    </div>
+                </div>
+                <div class="card-tags">
+                    <span class="tag">Reactive Apps</span>
+                    <span class="tag">Dashboards</span>
+                    <span class="tag">R-Based</span>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Build interactive web apps directly from R</li>
+                        <li>Flexdashboard: row/column dashboard layouts</li>
+                        <li>Embed Shiny components and HTML widgets easily</li>
+                    </ul>
+                </div>
+                <label class="checkbox-row">
+                    <input type="checkbox" class="card-checkbox">
+                    <span class="checkbox-label">Mark as explored</span>
+                </label>
+            </div>
+
+            <!-- Card 4: ggplot2 & plotly -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🎨</span>
+                    <div class="card-title-group">
+                        <div class="card-title">ggplot2 &amp; plotly</div>
+                        <div class="card-subtitle">Core Visualization Libraries</div>
+                    </div>
+                </div>
+                <div class="card-tags">
+                    <span class="tag">Grammar of Graphics</span>
+                    <span class="tag">Interactive</span>
+                    <span class="tag">Layered</span>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>ggplot2: declarative, layer-by-layer plot building</li>
+                        <li>plotly: converts ggplot2 charts to interactive web graphs</li>
+                        <li>Built-in hover, zoom, pan without JavaScript</li>
+                    </ul>
+                </div>
+                <label class="checkbox-row">
+                    <input type="checkbox" class="card-checkbox">
+                    <span class="checkbox-label">Mark as explored</span>
+                </label>
+            </div>
+
+            <!-- Card 5: Tableau -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📈</span>
+                    <div class="card-title-group">
+                        <div class="card-title">Tableau</div>
+                        <div class="card-subtitle">Business Intelligence &amp; Analytics</div>
+                    </div>
+                </div>
+                <div class="card-tags">
+                    <span class="tag">Drag &amp; Drop</span>
+                    <span class="tag">Enterprise</span>
+                    <span class="tag">No-Code</span>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Leading drag-and-drop analytics platform</li>
+                        <li>Connects to diverse data sources seamlessly</li>
+                        <li>Prioritizes visual best practices for dashboards</li>
+                    </ul>
+                </div>
+                <label class="checkbox-row">
+                    <input type="checkbox" class="card-checkbox">
+                    <span class="checkbox-label">Mark as explored</span>
+                </label>
+            </div>
+
+            <!-- Card 6: Web Slides & HTML/CSS -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🌐</span>
+                    <div class="card-title-group">
+                        <div class="card-title">Web Slides &amp; HTML/CSS</div>
+                        <div class="card-subtitle">Presentation &amp; Styling Libraries</div>
+                    </div>
+                </div>
+                <div class="card-tags">
+                    <span class="tag">xaringan</span>
+                    <span class="tag">Quarto</span>
+                    <span class="tag">CSS Customization</span>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>xaringan &amp; revealjs: HTML5 slides from R Markdown</li>
+                        <li>Quarto: next-gen multi-language publishing system</li>
+                        <li>HTML/CSS for fine-tuned styling beyond defaults</li>
+                    </ul>
+                </div>
+                <label class="checkbox-row">
+                    <input type="checkbox" class="card-checkbox">
+                    <span class="checkbox-label">Mark as explored</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Page Size Selector -->
+    </main>
+
+     <!-- FOOTER -->
+    <footer class="site-footer">
+        
+        <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+    
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center> 
+        
+    </footer>
+
+    <script>
+         // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();   
+    
+        // Dark/Light Mode Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        // Check saved preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeToggle.innerHTML = '☀️ Light Mode';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            themeToggle.innerHTML = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // Page Size Switching
+        const pageBtns = document.querySelectorAll('.page-btn');
+        const pageSizeLabel = document.getElementById('pageSizeLabel');
+        const cardsGrid = document.getElementById('cardsGrid');
+
+        pageBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const size = btn.getAttribute('data-size');
+                // Update body class
+                body.classList.remove('page-letter', 'page-a3');
+                body.classList.add('page-' + size);
+
+                // Update button styles
+                pageBtns.forEach(b => {
+                    b.style.background = 'transparent';
+                    b.style.color = 'var(--purple)';
+                    b.style.borderColor = 'var(--purple)';
+                });
+                btn.style.background = 'var(--purple)';
+                btn.style.color = '#fff';
+                btn.style.borderColor = 'var(--purple)';
+
+                // Update label
+                if (size === 'a3') {
+                    pageSizeLabel.textContent = 'Currently: A3 (3 columns)';
+                } else {
+                    pageSizeLabel.textContent = 'Currently: US Letter (2 columns)';
+                }
+            });
+        });
+
+        // Checkbox interaction
+        document.querySelectorAll('.card-checkbox').forEach(cb => {
+            cb.addEventListener('change', function() {
+                const card = this.closest('.card');
+                if (this.checked) {
+                    card.style.borderLeft = '4px solid var(--purple)';
+                    card.style.paddingLeft = '20px';
+                } else {
+                    card.style.borderLeft = '1px solid var(--card-border)';
+                    card.style.paddingLeft = '22px';
+                }
+            });
+        });
+
+        // Simulated visit counter animation
+        const meterFill = document.getElementById('meterFill');
+        const visitCount = document.getElementById('visitCount');
+        let visits = 7240;
+
+        // Subtle random update to simulate live meter
+        setInterval(() => {
+            visits += Math.floor(Math.random() * 3);
+            const pct = Math.min(95, (visits / 10000) * 100);
+            meterFill.style.width = pct + '%';
+            visitCount.textContent = visits.toLocaleString();
+        }, 8000);
+
+        // Initialize first page button as active
+        document.querySelector('.page-btn[data-size="letter"]').style.background = 'var(--purple)';
+        document.querySelector('.page-btn[data-size="letter"]').style.color = '#fff';
+    </script>
+</body>
+</html>

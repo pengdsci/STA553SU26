@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Reference Cards – Hierarchy, Relationships & Decision Framework</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --card-bg: #f8f5f7;
+            --card-border: #e0d6dc;
+            --accent: #6E3061;
+            --accent-light: #8b4d7e;
+            --accent-dark: #4d1f42;
+            --check-bg: #f0e8ee;
+            --header-bg: #6E3061;
+            --header-text: #ffffff;
+            --footer-bg: #f0e8ee;
+            --footer-text: #4d1f42;
+            --table-stripe: #f4eef3;
+            --tag-bg: #efe5ec;
+            --tag-text: #5c2a4f;
+            --shadow: 0 2px 8px rgba(110, 48, 97, 0.12);
+            --shadow-hover: 0 4px 16px rgba(110, 48, 97, 0.2);
+            --toggle-bg: #e8dce4;
+            --toggle-dot: #6E3061;
+            --result-bg: #f4eef3;
+            --highlight: #ffeaa7;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1a1118;
+            --text: #e8dce4;
+            --card-bg: #2a1d26;
+            --card-border: #4d3542;
+            --accent: #b8709f;
+            --accent-light: #d494b8;
+            --accent-dark: #8b4d7e;
+            --check-bg: #3a2834;
+            --header-bg: #4d1f42;
+            --header-text: #f0e8ee;
+            --footer-bg: #2a1d26;
+            --footer-text: #d494b8;
+            --table-stripe: #261a22;
+            --tag-bg: #3a2834;
+            --tag-text: #d494b8;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.5);
+            --toggle-bg: #4d3542;
+            --toggle-dot: #d494b8;
+            --result-bg: #2a1d26;
+            --highlight: #4d3a1a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── HEADER ────────────────────── */
+        .site-header {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        .site-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.3rem;
+        }
+        .site-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.3rem;
+        }
+        .site-header .subtitle {
+            font-size: 1.25rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        .header-controls {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* ── DARK/LIGHT TOGGLE ────────── */
+        .theme-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.9rem;
+            color: var(--header-text);
+            opacity: 0.9;
+        }
+        .theme-toggle-track {
+            width: 50px;
+            height: 26px;
+            background: var(--toggle-bg);
+            border-radius: 30px;
+            position: relative;
+            transition: background 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .theme-toggle-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--toggle-dot);
+            border-radius: 50%;
+            position: absolute;
+            top: 1px;
+            left: 3px;
+            transition: transform 0.3s, background 0.3s;
+        }
+        #theme-toggle:checked~.theme-toggle-label .theme-toggle-dot {
+            transform: translateX(22px);
+        }
+        #theme-toggle {
+            display: none;
+        }
+
+        /* ── BUTTONS ──────────────────── */
+        .btn-print {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #fff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .btn-print:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        /* ── MAIN CONTENT ─────────────── */
+        .main-content {
+            flex: 1;
+            max-width: 1100px;
+            width: 95%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* ── BLOCK / SECTION ──────────── */
+        .section-block {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
+        .section-block:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .section-block h2 {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid var(--accent-light);
+            letter-spacing: -0.01em;
+        }
+        .section-block h3 {
+            font-size: 1.15rem;
+            color: var(--accent-dark);
+            margin: 1.4rem 0 0.6rem;
+        }
+        .section-block h4 {
+            font-size: 1rem;
+            color: var(--accent);
+            margin: 1rem 0 0.4rem;
+            font-weight: 600;
+        }
+        .section-block p {
+            margin-bottom: 0.8rem;
+        }
+        .section-block ul,
+        .section-block ol {
+            margin-left: 1.4rem;
+            margin-bottom: 0.8rem;
+        }
+        .section-block li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* ── REFERENCE CARD ───────────── */
+        .ref-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-left: 5px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            margin: 1.2rem 0;
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .ref-card h4 {
+            margin-top: 0;
+            color: var(--accent-dark);
+            font-size: 1.05rem;
+        }
+        .ref-card .tag {
+            display: inline-block;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            font-size: 0.8rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            margin-right: 0.4rem;
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+        }
+
+        /* ── CHECKBOXES ───────────────── */
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+        }
+        .checklist li {
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            padding: 0.5rem 0.7rem;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .checklist li:hover {
+            background-color: var(--check-bg);
+        }
+        .checklist li.checked-item {
+            background-color: var(--check-bg);
+            font-weight: 500;
+        }
+        .checklist input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border: 2px solid var(--accent);
+            border-radius: 4px;
+            background: var(--bg);
+            cursor: pointer;
+            margin-top: 1px;
+            transition: all 0.2s;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .checklist input[type="checkbox"]:checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .checklist input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 7px;
+            height: 12px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        .checklist input[type="checkbox"]:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 2px;
+        }
+        .checklist label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* ── RESULT BOX ──────────────── */
+        .result-box {
+            margin-top: 1.2rem;
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            background: var(--result-bg);
+            border: 1px solid var(--accent-light);
+            min-height: 3.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        .result-box.active-result {
+            border-color: var(--accent);
+            background: var(--highlight);
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        [data-theme="dark"] .result-box.active-result {
+            color: #f0e8ee;
+            background: #3a2a1a;
+            border-color: #d494b8;
+        }
+        .result-box .result-icon {
+            font-size: 1.3rem;
+            margin-right: 0.4rem;
+        }
+        .result-box .confidence-bar {
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            margin-top: 0.6rem;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .result-box .confidence-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        /* ── TABLES ───────────────────── */
+        .ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.92rem;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        .ref-table th,
+        .ref-table td {
+            padding: 0.7rem 0.9rem;
+            text-align: left;
+            border: 1px solid var(--card-border);
+        }
+        .ref-table th {
+            background-color: var(--accent);
+            color: #ffffff;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .ref-table tbody tr:nth-child(even) {
+            background-color: var(--table-stripe);
+        }
+        .ref-table tbody tr:hover {
+            background-color: var(--check-bg);
+        }
+
+        /* ── STRONG / EMPHASIS ────────── */
+        strong {
+            color: var(--accent-dark);
+        }
+
+        /* ── SCENARIO CARDS ──────────── */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.2rem;
+            margin: 1rem 0;
+        }
+        .scenario-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 1.3rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+        .scenario-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .scenario-card h4 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+        .scenario-card .scenario-meta {
+            font-size: 0.85rem;
+            color: var(--accent-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.4rem;
+        }
+
+        /* ── QUICK REFERENCE GRID ─────── */
+        .quick-ref-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        /* ── FOOTER ───────────────────── */
+        .site-footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            text-align: center;
+            padding: 1.2rem 2rem;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+        .site-footer a {
+            color: var(--accent-dark);
+            text-decoration: underline;
+        }
+        .footer-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        /* ── PRINT STYLES ─────────────── */
+        @media print {
+            @page {
+                size: A3;
+                margin: 12mm;
+            }
+            body {
+                background: #fff !important;
+                color: #000 !important;
+                font-size: 11pt;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .site-header,
+            .site-footer {
+                background: #6E3061 !important;
+                color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .section-block,
+            .ref-card,
+            .scenario-card {
+                break-inside: avoid;
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                background: #fff !important;
+            }
+            .ref-card {
+                border-left: 5px solid #6E3061 !important;
+            }
+            .ref-table th {
+                background: #6E3061 !important;
+                color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .header-controls,
+            .btn-print,
+            #theme-toggle,
+            .theme-toggle-label,
+            .result-box .confidence-bar {
+                display: none !important;
+            }
+            .checklist input[type="checkbox"] {
+                border: 2px solid #000 !important;
+                background: #fff !important;
+            }
+            .checklist input[type="checkbox"]:checked {
+                background: #6E3061 !important;
+            }
+            .result-box {
+                border: 1px solid #6E3061 !important;
+                background: #fff !important;
+                color: #000 !important;
+            }
+        }
+
+        /* ── RESPONSIVE ──────────────── */
+        @media (max-width: 768px) {
+            .site-header {
+                padding: 1rem;
+            }
+            .site-header h1 {
+                font-size: 1.4rem;
+            }
+            .header-controls {
+                position: static;
+                justify-content: center;
+                margin-top: 0.8rem;
+            }
+            .section-block {
+                padding: 1.2rem;
+            }
+            .ref-table {
+                font-size: 0.78rem;
+            }
+            .ref-table th,
+            .ref-table td {
+                padding: 0.4rem 0.5rem;
+            }
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+            .quick-ref-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- HEADER -->
+    <!-- ═══════════════════════════════════════════ -->
+    <header class="site-header" role="banner">
+        <div class="header-controls">
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark/light mode">
+            <label for="theme-toggle" class="theme-toggle-label">
+                <span id="theme-label-text">☀️ Light</span>
+                <span class="theme-toggle-track">
+                    <span class="theme-toggle-dot"></span>
+                </span>
+            </label>
+        </div>
+        <h1>STA 553 DATA VISUALIZATION</h1>       
+        <h2>Data Visualization Reference Cards</h2>
+        <p class="subtitle">Hierarchy of Visuals · Relationships &amp; Distinctions · Decision Framework</p>
+    </header>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- MAIN CONTENT -->
+    <!-- ═══════════════════════════════════════════ -->
+    <main class="main-content" role="main">
+
+        <!-- BLOCK 1: The Hierarchy of Visuals -->
+        <section class="section-block" aria-labelledby="sec1-title">
+            <h2 id="sec1-title">📊 Part 1: The Hierarchy of Visuals – Relationships &amp; Distinctions</h2>
+            <p>Think of these concepts as a <strong>matryoshka doll</strong> (<it> the traditional Russian wooden nesting dolls that open to reveal smaller dolls inside</it>) of analytical and communicative depth, moving from the most basic unit to the most complex, human-centered narrative.<br>
+            <center><img src = "taowa.png" alt="Russian Nested Dolls" width="200" height="200"></center>
+            </p>
+
+            <!-- Level 1 -->
+            <div class="ref-card">
+                <h4><span class="tag">Level 1</span> The Atom – The Individual Plot</h4>
+                <p><strong>What it is:</strong> A single, irreducible graphical representation of data—one bar chart, one line graph, one scatter plot. It answers a single, specific question or shows one relationship.</p>
+                <p><strong>Distinction:</strong> It is the raw material. No surrounding context, no interactivity, no narrative arc. It's a <em>statement</em>, not a story.</p>
+                <p><em>Example: "What were sales by quarter?"</em></p>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="ref-card">
+                <h4><span class="tag">Level 2</span> The System – Data Visualization &amp; Information Visualization</h4>
+                <p><strong>Data Visualization (Data Viz):</strong> Visual representation of <strong>quantitative data</strong> (numbers, measurements). Purpose: <em>amplify cognition</em>—discovery and sense-making.</p>
+                <p><strong>Information Visualization (Info Viz):</strong> Visual representation of <strong>abstract, non-numerical, or conceptual data</strong> (hierarchies, networks, flows, text). Purpose: make a complex mental model tangible.</p>
+                <p><strong>Relationship:</strong> All Data Viz is a subset of visualization. Info Viz is the other major subset. The line blurs when you size network nodes by a quantitative attribute.</p>
+                <p><em>Example: Scatter plot of spending vs. frequency (Data Viz). Subway map, org chart (Info Viz).</em></p>
+            </div>
+
+            <!-- Level 3 -->
+            <div class="ref-card">
+                <h4><span class="tag">Level 3</span> The Process – Process Information &amp; Visual Analytics</h4>
+                <p><strong>Process Information:</strong> Not a visualization method but the <em>subject matter</em>—data about a sequence of events, steps, or states over time. Visualized with Gantt charts, Sankey diagrams, or process flow diagrams.</p>
+                <p><strong>Visual Analytics:</strong> A <strong>human-in-the-loop process</strong>. The science of analytical reasoning supported by interactive visual interfaces. It's a <em>dialogue</em>, not a chart.</p>
+                <p><strong>The Defining Loop:</strong> Analyze First → Show the Important → Zoom, Filter, Analyze Further. Visual Analytics is the <strong>process</strong> that consumes Data Viz and Info Viz as its interface.</p>
+            </div>
+
+            <!-- Level 4 -->
+            <div class="ref-card">
+                <h4><span class="tag">Level 4</span> The Narrative – Data Storytelling &amp; Visual Data Storytelling</h4>
+                <p><strong>Data Storytelling:</strong> A broader framework where the <em>story</em> is paramount and data is the primary evidence. Can be written, verbal, or a report. Purpose: drive a decision or change a mind.</p>
+                <p><strong>Visual Data Storytelling:</strong> A specific form where the <strong>visual narrative is the primary vehicle</strong>. Text, annotations, and animations are deeply integrated with carefully sequenced visualizations. Purpose: guide the audience efficiently and persuasively.</p>
+            </div>
+
+            <!-- Critical Distinction -->
+            <div class="ref-card" style="border-left-color: #c0392b;">
+                <h4>⚡ Critical Distinction: Analysis vs. Communication</h4>
+                <div class="table-wrapper">
+                    <table class="ref-table">
+                        <thead>
+                            <tr><th>Feature</th><th>Visual Analytics</th><th>Visual Data Storytelling</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Goal</strong></td><td>Explore, discover, understand <em>for yourself</em></td><td>Explain, persuade, enlighten <em>for an audience</em></td></tr>
+                            <tr><td><strong>Audience</strong></td><td>You, the analyst, or a small technical team</td><td>Decision-makers, stakeholders, the public</td></tr>
+                            <tr><td><strong>Key Feature</strong></td><td>High interactivity (filter, zoom, model)</td><td>Guided narrative, annotated highlights, low/no interactivity</td></tr>
+                            <tr><td><strong>Message</strong></td><td>No pre-baked message. You are searching.</td><td>A clear, pre-defined message and call to action</td></tr>
+                            <tr><td><strong>Process</strong></td><td>A dialogue with the data</td><td>A monologue to the audience, crafted with empathy</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- BLOCK 2: When and What to Use -->
+        <section class="section-block" aria-labelledby="sec2-title">
+            <h2 id="sec2-title">🎯 Part 2: When and What to Use (And Why)</h2>
+            <p>This decision framework turns theory into a practical guide. Each scenario below maps a real-world situation to the correct approach.</p>
+
+            <div class="scenario-grid">
+                <!-- Scenario 1 -->
+                <div class="scenario-card">
+                    <div class="scenario-meta">🔍 Scenario 1</div>
+                    <h4>You Are Diagnosing a New Problem</h4>
+                    <p><strong>Situation:</strong> Sales down 15% last quarter. You don't know why. Millions of transactions.</p>
+                    <p><strong>Use:</strong> <span class="tag">Visual Analytics</span></p>
+                    <p><strong>Why:</strong> No single plot answers this. You need a dialogue—zoom, filter, brush, link views—to find the needle in the haystack. Start with a time-series line chart, then interactively drill into geography, product, and customer segments.</p>
+                </div>
+
+                <!-- Scenario 2 -->
+                <div class="scenario-card">
+                    <div class="scenario-meta">💼 Scenario 2</div>
+                    <h4>You've Found the Insight &amp; Need Executive Buy-In</h4>
+                    <p><strong>Situation:</strong> The 'Pro' product line in the Northeast is collapsing due to a price-cutting competitor. You need resources.</p>
+                    <p><strong>Use:</strong> <span class="tag">Visual Data Storytelling</span></p>
+                    <p><strong>Why:</strong> A dashboard abdicates your job. Craft a story: Setup (overall sales down) → Conflict (one segment causing the loss) → Resolution (targeted price adjustment projected to recover $2.5M). Annotated charts guide attention.</p>
+                </div>
+
+                <!-- Scenario 3 -->
+                <div class="scenario-card">
+                    <div class="scenario-meta">🏭 Scenario 3</div>
+                    <h4>You Need to Document &amp; Monitor a Business Process</h4>
+                    <p><strong>Situation:</strong> Supply chain team needs a weekly overview of active shipments from factory to warehouse.</p>
+                    <p><strong>Use:</strong> <span class="tag">Process Information</span> (via Info Viz like a Gantt chart or Sankey diagram)</p>
+                    <p><strong>Why:</strong> The mental model is a sequence of steps. A Gantt chart shows time; a Sankey diagram highlights bottlenecks. This creates a shared operational picture without deep analysis or narrative.</p>
+                </div>
+
+                <!-- Scenario 4 -->
+                <div class="scenario-card">
+                    <div class="scenario-meta">📰 Scenario 4</div>
+                    <h4>You're Writing a News Article for a General Audience</h4>
+                    <p><strong>Situation:</strong> Explain why it's harder for millennials to buy homes compared to their parents' generation.</p>
+                    <p><strong>Use:</strong> <span class="tag">Data Storytelling</span> with well-explained Data Visualizations</p>
+                    <p><strong>Why:</strong> The narrative arc carries the emotional weight. Static, annotated charts serve as irrefutable proof. A complex interactive dashboard would overwhelm. The story is the container; visualizations are the evidence.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BLOCK 3: Summary Cheat Sheet -->
+        <section class="section-block" aria-labelledby="sec3-title">
+            <h2 id="sec3-title">📋 Summary Cheat Sheet</h2>
+            <div class="table-wrapper">
+                <table class="ref-table">
+                    <thead>
+                        <tr>
+                            <th>Your Goal is to…</th>
+                            <th>The Best Approach is…</th>
+                            <th>Core Unit</th>
+                            <th>Key Question</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>See a single fact or relationship</td>
+                            <td><strong>Individual Plot</strong></td>
+                            <td>A Bar Chart</td>
+                            <td>"What were Q3 sales?"</td>
+                        </tr>
+                        <tr>
+                            <td>Understand a system's structure</td>
+                            <td><strong>Information Visualization</strong></td>
+                            <td>A Flowchart, Subway Map</td>
+                            <td>"How does this organization work?"</td>
+                        </tr>
+                        <tr>
+                            <td>Explore unknown patterns yourself</td>
+                            <td><strong>Visual Analytics</strong></td>
+                            <td>Interactive, linked-view dashboard</td>
+                            <td>"Why is customer churn suddenly up?"</td>
+                        </tr>
+                        <tr>
+                            <td>Document or monitor a sequence of events</td>
+                            <td><strong>Process Information</strong> Viz</td>
+                            <td>Gantt chart, Sankey diagram</td>
+                            <td>"Where is the bottleneck?"</td>
+                        </tr>
+                        <tr>
+                            <td>Communicate a clear insight to drive a decision</td>
+                            <td><strong>(Visual) Data Storytelling</strong></td>
+                            <td>Guided, annotated narrative sequence</td>
+                            <td>"We must invest $X in Y region."</td>
+                        </tr>
+                        <tr>
+                            <td>Convince a broad audience of a complex trend</td>
+                            <td><strong>Data Storytelling</strong> (with strong visual evidence)</td>
+                            <td>News article with insightful charts</td>
+                            <td>"This is how the economy has changed."</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- BLOCK 4: Interactive Checklist – Decision Helper -->
+        <section class="section-block" aria-labelledby="sec4-title">
+            <h2 id="sec4-title">✅ Interactive Decision Checklist</h2>
+            <p>Use this checklist to determine which approach fits your current need. <strong>Check all that apply</strong> — your selections will update the recommendation in real time.</p>
+
+            <ul class="checklist" id="decision-checklist">
+                <li data-value="explore">
+                    <input type="checkbox" id="chk1" value="explore">
+                    <label for="chk1">I am exploring data to <strong>discover unknown patterns</strong> for myself.</label>
+                </li>
+                <li data-value="communicate">
+                    <input type="checkbox" id="chk2" value="communicate">
+                    <label for="chk2">I need to <strong>communicate a clear insight</strong> to drive a specific decision.</label>
+                </li>
+                <li data-value="audience-broad">
+                    <input type="checkbox" id="chk3" value="audience-broad">
+                    <label for="chk3">My audience is <strong>broad and non-technical</strong>.</label>
+                </li>
+                <li data-value="audience-technical">
+                    <input type="checkbox" id="chk4" value="audience-technical">
+                    <label for="chk4">My audience is <strong>technical</strong> (analysts, data scientists).</label>
+                </li>
+                <li data-value="interactive-needed">
+                    <input type="checkbox" id="chk5" value="interactive-needed">
+                    <label for="chk5">I need <strong>high interactivity</strong> (zoom, filter, drill-down).</label>
+                </li>
+                <li data-value="narrative-needed">
+                    <input type="checkbox" id="chk6" value="narrative-needed">
+                    <label for="chk6">I need a <strong>clear narrative arc</strong> with a call to action.</label>
+                </li>
+                <li data-value="process-flow">
+                    <input type="checkbox" id="chk7" value="process-flow">
+                    <label for="chk7">I am visualizing a <strong>sequence of steps, events, or a flow</strong>.</label>
+                </li>
+                <li data-value="abstract-structure">
+                    <input type="checkbox" id="chk8" value="abstract-structure">
+                    <label for="chk8">I am visualizing an <strong>abstract structure</strong> (hierarchy, network, concept map).</label>
+                </li>
+            </ul>
+
+            <!-- RESULT DISPLAY -->
+            <div class="result-box" id="checklist-result">
+                <span class="result-icon">💡</span> <em>Check items above — a real-time recommendation will appear here.</em>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidence-fill"></div>
+                </div>
+            </div>
+
+            <!-- RESET BUTTON -->
+            <button id="reset-checklist" style="margin-top:0.8rem;background:var(--accent);color:#fff;border:none;padding:0.5rem 1.2rem;border-radius:6px;cursor:pointer;font-size:0.9rem;transition:background 0.2s;">
+                🔄 Reset All Checkboxes
+            </button>
+        </section>
+
+        <!-- BLOCK 5: Quick Reference – Definitions at a Glance -->
+        <section class="section-block" aria-labelledby="sec5-title">
+            <h2 id="sec5-title">📖 Quick Reference: Definitions at a Glance</h2>
+            <div class="quick-ref-grid">
+                <div class="ref-card"><h4>Individual Plot</h4><p>Single graphical representation. One question, one chart.</p></div>
+                <div class="ref-card"><h4>Data Visualization</h4><p>Visual representation of <strong>quantitative</strong> data. Amplifies cognition.</p></div>
+                <div class="ref-card"><h4>Information Visualization</h4><p>Visual representation of <strong>abstract/conceptual</strong> data. Spatializes the non-spatial.</p></div>
+                <div class="ref-card"><h4>Process Information</h4><p>Data about sequences/events. Visualized with Gantt, Sankey, flowcharts.</p></div>
+                <div class="ref-card"><h4>Visual Analytics</h4><p>Human-in-the-loop analytical reasoning with interactive visual interfaces.</p></div>
+                <div class="ref-card"><h4>Data Storytelling</h4><p>Framework where narrative is paramount; data is evidence. Drives decisions.</p></div>
+                <div class="ref-card"><h4>Visual Data Storytelling</h4><p>Visual narrative is the <strong>primary vehicle</strong>. Annotated, guided, persuasive.</p></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- FOOTER -->
+    <!-- ═══════════════════════════════════════════ -->
+    <footer class="site-footer" role="contentinfo">
+       <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+             
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center> 
+        
+    </footer>
+
+    <script>
+         // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();  
+        
+        
+        (function() {
+            // ── DOM REFERENCES ─────────────
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeLabelText = document.getElementById('theme-label-text');
+            const htmlElement = document.documentElement;
+            const checkboxes = document.querySelectorAll('#decision-checklist input[type="checkbox"]');
+            const checklistItems = document.querySelectorAll('#decision-checklist li');
+            const resultDiv = document.getElementById('checklist-result');
+            const confidenceFill = document.getElementById('confidence-fill');
+            const resetBtn = document.getElementById('reset-checklist');
+
+            // ── DARK / LIGHT TOGGLE ──────────
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    htmlElement.setAttribute('data-theme', 'dark');
+                    themeToggle.checked = true;
+                    themeLabelText.textContent = '🌙 Dark';
+                } else {
+                    htmlElement.removeAttribute('data-theme');
+                    themeToggle.checked = false;
+                    themeLabelText.textContent = '☀️ Light';
+                }
+            }
+
+            const savedTheme = localStorage.getItem('data-viz-theme');
+            applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
+
+            themeToggle.addEventListener('change', function() {
+                const newTheme = this.checked ? 'dark' : 'light';
+                applyTheme(newTheme);
+                localStorage.setItem('data-viz-theme', newTheme);
+            });
+
+            // ── PRINT BUTTONS ────────────────
+            function printDocument() {
+                const originalTitle = document.title;
+                document.title = 'Data Visualization Reference Cards';
+                window.print();
+                document.title = originalTitle;
+            }
+
+            document.getElementById('print-letter-btn').addEventListener('click', printDocument);
+            document.getElementById('print-a3-btn').addEventListener('click', printDocument);
+
+            // ── INTERACTIVE CHECKLIST ────────
+            function getCheckedValues() {
+                const checked = {};
+                checkboxes.forEach(cb => {
+                    checked[cb.value] = cb.checked;
+                });
+                return checked;
+            }
+
+            function countChecked(checked) {
+                return Object.values(checked).filter(v => v).length;
+            }
+
+            function updateChecklistItemStyles() {
+                checklistItems.forEach(item => {
+                    const cb = item.querySelector('input[type="checkbox"]');
+                    if (cb.checked) {
+                        item.classList.add('checked-item');
+                    } else {
+                        item.classList.remove('checked-item');
+                    }
+                });
+            }
+
+            function updateRecommendation() {
+                const checked = getCheckedValues();
+                const totalChecked = countChecked(checked);
+                const anyChecked = totalChecked > 0;
+
+                // Update list item styles
+                updateChecklistItemStyles();
+
+                // Update confidence bar
+                const maxChecks = checkboxes.length;
+                const confidencePercent = Math.round((totalChecked / maxChecks) * 100);
+                confidenceFill.style.width = confidencePercent + '%';
+
+                if (!anyChecked) {
+                    resultDiv.innerHTML =
+                        '<span class="result-icon">💡</span> <em>Check items above — a real-time recommendation will appear here.</em>';
+                    resultDiv.classList.remove('active-result');
+                    confidenceFill.style.width = '0%';
+                    return;
+                }
+
+                let recommendation = '';
+                let icon = '✅';
+                let confidence = 'medium';
+
+                const exploreChecked = checked['explore'];
+                const communicateChecked = checked['communicate'];
+                const broadAudience = checked['audience-broad'];
+                const technicalAudience = checked['audience-technical'];
+                const interactiveNeeded = checked['interactive-needed'];
+                const narrativeNeeded = checked['narrative-needed'];
+                const processFlow = checked['process-flow'];
+                const abstractStructure = checked['abstract-structure'];
+
+                // DECISION TREE LOGIC
+                if (exploreChecked && communicateChecked) {
+                    recommendation =
+                        '<strong>Two-phase approach:</strong> Use <em>Visual Analytics</em> first to discover the insight, then switch to <em>Visual Data Storytelling</em> to communicate it to stakeholders.';
+                    icon = '⚡';
+                    confidence = 'high';
+                } else if (exploreChecked && interactiveNeeded && !communicateChecked) {
+                    recommendation =
+                        '<strong>Visual Analytics</strong> — You need an interactive, linked-view dashboard to explore and discover patterns in your data. The human-in-the-loop process is ideal here.';
+                    icon = '🔬';
+                    confidence = 'high';
+                } else if (communicateChecked && narrativeNeeded && broadAudience) {
+                    recommendation =
+                        '<strong>Visual Data Storytelling</strong> — Craft a guided, annotated narrative sequence. Your broad audience needs a clear story arc with visual highlights, not raw interactivity.';
+                    icon = '📖';
+                    confidence = 'high';
+                } else if (communicateChecked && broadAudience && !interactiveNeeded) {
+                    recommendation =
+                        '<strong>Data Storytelling</strong> (with strong visual evidence) — Use a narrative framework with well-explained static charts. The story carries the message; charts are the proof.';
+                    icon = '📰';
+                    confidence = 'high';
+                } else if (processFlow && !abstractStructure) {
+                    recommendation =
+                        '<strong>Process Information Visualization</strong> — Use a Gantt chart, Sankey diagram, or flowchart to show sequences, timelines, and bottlenecks.';
+                    icon = '🏭';
+                    confidence = 'high';
+                } else if (abstractStructure && !processFlow) {
+                    recommendation =
+                        '<strong>Information Visualization</strong> — Use a network diagram, tree map, or conceptual map to represent abstract structures and relationships.';
+                    icon = '🗺️';
+                    confidence = 'high';
+                } else if (exploreChecked && technicalAudience) {
+                    recommendation =
+                        '<strong>Visual Analytics</strong> — Your technical audience will benefit from interactive exploration tools. They have the skills to drill down themselves.';
+                    icon = '🔬';
+                    confidence = 'medium';
+                } else if (communicateChecked && technicalAudience && !narrativeNeeded) {
+                    recommendation =
+                        '<strong>Data Visualization</strong> with explanatory annotations — Technical audiences can handle more complex static views without a heavy narrative wrapper.';
+                    icon = '📊';
+                    confidence = 'medium';
+                } else if (exploreChecked && !interactiveNeeded && !communicateChecked) {
+                    recommendation =
+                        '<strong>Individual Plot</strong> — Start with a single, focused chart to answer one question at a time. Build from there.';
+                    icon = '📈';
+                    confidence = 'low';
+                } else if (communicateChecked && !broadAudience && !technicalAudience && !narrativeNeeded) {
+                    recommendation =
+                        '<strong>Data Visualization</strong> — Create clear, well-labeled charts. Without a specific audience type selected, focus on clarity and accuracy.';
+                    icon = '📊';
+                    confidence = 'low';
+                } else if (processFlow && abstractStructure) {
+                    recommendation =
+                        '<strong>Mixed approach:</strong> You have both process and abstract structure needs. Consider <em>Information Visualization</em> for the structure and <em>Process Information</em> techniques for the flow.';
+                    icon = '🤔';
+                    confidence = 'medium';
+                } else if (!exploreChecked && !communicateChecked && !processFlow && !abstractStructure) {
+                    recommendation =
+                        '<strong>Start simple:</strong> Begin with an <em>Individual Plot</em> to clarify your question, then check more boxes as your needs become clearer.';
+                    icon = '🎯';
+                    confidence = 'low';
+                } else {
+                    recommendation =
+                        '<strong>Mixed approach</strong> — Your needs span multiple categories. Consider combining Visual Analytics for exploration with Data Storytelling for communication, depending on your primary goal.';
+                    icon = '🤔';
+                    confidence = 'medium';
+                }
+
+                // Build result HTML
+                let confidenceText = '';
+                if (confidence === 'high') confidenceText = ' 🟢 High confidence';
+                else if (confidence === 'medium') confidenceText = ' 🟡 Medium confidence';
+                else confidenceText = ' 🔵 Lower confidence — check more boxes for a stronger recommendation';
+
+                resultDiv.innerHTML =
+                    '<span class="result-icon">' + icon + '</span> ' + recommendation +
+                    '<span style="font-size:0.8rem;display:block;margin-top:0.4rem;opacity:0.8;">' + confidenceText +
+                    ' (based on ' + totalChecked + ' of ' + maxChecks + ' criteria)</span>';
+                resultDiv.classList.add('active-result');
+            }
+
+            // Attach event listeners to each checkbox
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateRecommendation);
+            });
+
+            // Make entire list item clickable (clicking the label area toggles checkbox)
+            checklistItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Don't double-toggle if the checkbox itself was clicked
+                    if (e.target.tagName === 'INPUT') return;
+                    const cb = this.querySelector('input[type="checkbox"]');
+                    cb.checked = !cb.checked;
+                    // Trigger the change event manually
+                    cb.dispatchEvent(new Event('change'));
+                });
+            });
+
+            // Reset button
+            resetBtn.addEventListener('click', function() {
+                checkboxes.forEach(cb => {
+                    cb.checked = false;
+                });
+                updateRecommendation();
+            });
+
+            // Initialize on page load
+            updateRecommendation();
+
+            // ── SITE METER ──────────────────
+            const meterSpan = document.getElementById('site-meter');
+            let visits = parseInt(localStorage.getItem('data-viz-page-visits') || '0');
+            visits++;
+            localStorage.setItem('data-viz-page-visits', visits);
+            meterSpan.textContent = '📄 Page compiled for educational & professional reference. | 👁 Visits: ' + visits;
+
+            console.log('✅ Data Visualization Reference Cards loaded successfully.');
+            console.log('   - Dark/light toggle: active');
+            console.log('   - Print buttons (Letter & A3): active');
+            console.log('   - Interactive checklist: FULLY FUNCTIONAL');
+            console.log('   - Click any checkbox or list item to see real-time recommendations');
+            console.log('   - ' + visits + ' total visits to this page');
+        })();
+    </script>
+</body>
+</html>
