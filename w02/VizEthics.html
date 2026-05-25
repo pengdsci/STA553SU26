@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, print-size: A3, print-orientation: landscape">
+  <title>Ethics in Data Visualization • 8 Perspectives</title>
+  <!-- Font Awesome 6 for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-light: #f5f3f7;
+      --bg-dark: #1e1a1f;
+      --card-light: #ffffff;
+      --card-dark: #2b232d;
+      --text-light: #1e1a1f;
+      --text-dark: #f0e9f2;
+      --border-light: #ddd8e4;
+      --border-dark: #4a3a4c;
+      --accent: #6E3061;
+      --accent-glow: #8e4b7e;
+      --shadow-light: 0 8px 20px rgba(0,0,0,0.06);
+      --shadow-dark: 0 8px 20px rgba(0,0,0,0.4);
+      --footer-bg-light: #ede7f0;
+      --footer-bg-dark: #2f2630;
+      --checkbox-bg: #f0ecf5;
+      --checkbox-bg-dark: #3b2e3a;
+      --toggle-bg: #ddd0e0;
+      --toggle-bg-dark: #412f40;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.3s ease, color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1.5rem 1rem;
+      margin: 0;
+    }
+
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* Main container – simulates page flow */
+    .document-wrapper {
+      max-width: 1400px;
+      width: 100%;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* HEADER */
+    .page-header {
+      background: #6E3061; /* purple background */
+      color: #ffffff;
+      padding: 1.8rem 2.5rem;
+      border-radius: 28px;
+      box-shadow: 0 12px 30px rgba(110, 48, 97, 0.35);
+      /*display: flex;
+      flex-wrap: wrap;*/
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s;
+    }
+
+    .header-titles {
+      /*display: flex;*/
+      flex-direction: column;
+      gap: 0.3rem;
+      text-align: center;
+    }
+
+    .main-title {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      /*display: flex;*/
+      align-items: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      color: white;
+    }
+
+    .main-title i {
+      font-size: 2rem;
+      color: #f7d6f0;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      font-weight: 400;
+      opacity: 0.9;
+      margin-left: 0.2rem;
+      border-left: 3px solid #f7d6f0;
+      padding-left: 1rem;
+      color: #f3e2f2;
+    }
+
+    .toggle-btn {
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.35);
+      color: white;
+      padding: 0.7rem 1.4rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      background-color: rgba(255,255,255,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .toggle-btn:hover {
+      background: rgba(255,255,255,0.28);
+      border-color: rgba(255,255,255,0.6);
+    }
+
+    body.dark .page-header {
+      background: #4a2542; /* darker purple for dark mode but still meets accessibility */
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+
+    /* CARDS GRID */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+      gap: 1.6rem;
+      margin: 0.5rem 0 1.2rem;
+    }
+
+    .card {
+      background: var(--card-light);
+      border-radius: 24px;
+      padding: 1.5rem 1.5rem 1.8rem;
+      box-shadow: var(--shadow-light);
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+      border: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.dark .card {
+      background: var(--card-dark);
+      border: 1px solid var(--border-dark);
+      box-shadow: var(--shadow-dark);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 28px rgba(0,0,0,0.12);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 1.2rem;
+      border-bottom: 2px solid #6E3061;
+      padding-bottom: 0.7rem;
+    }
+
+    body.dark .card-header {
+      border-bottom-color: #b87ca5;
+    }
+
+    .card-icon {
+      background: #6E3061;
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #3d2a3a;
+    }
+
+    body.dark .card-title {
+      color: #f0d9ed;
+    }
+
+    .bullet-list {
+      list-style: none;
+      margin: 0.5rem 0 1.2rem;
+      flex: 1;
+    }
+
+    .bullet-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      margin-bottom: 0.9rem;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .bullet-item i.fa-circle {
+      font-size: 0.45rem;
+      color: #6E3061;
+      margin-top: 0.55rem;
+      opacity: 0.9;
+    }
+
+    body.dark .bullet-item i.fa-circle {
+      color: #d9a0cb;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: auto;
+      padding-top: 0.8rem;
+      border-top: 1px dashed #ccc;
+    }
+
+    body.dark .checkbox-wrapper {
+      border-top-color: #5a4a5a;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      background: var(--checkbox-bg);
+      border: 2px solid #6E3061;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    body.dark .checkbox-wrapper input[type="checkbox"] {
+      background: var(--checkbox-bg-dark);
+      border-color: #c292b0;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked {
+      background: #6E3061;
+      border-color: #6E3061;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked::after {
+      content: "✓";
+      color: white;
+      font-weight: bold;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .checkbox-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #4a3a4a;
+    }
+
+    body.dark .checkbox-label {
+      color: #ddccda;
+    }
+
+    /* FOOTER */
+    .page-footer {
+      background: var(--footer-bg-light);
+      border-radius: 20px;
+      padding: 1.2rem 2rem;
+      /*display: flex;
+      flex-wrap: wrap;*/
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #4a3a4a;
+      margin-top: 0.5rem;
+      border: 1px solid var(--border-light);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark .page-footer {
+      background: var(--footer-bg-dark);
+      border-color: var(--border-dark);
+      color: #cfbfcf;
+    }
+
+    .copyright {
+      /*display: flex; */
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .site-meter {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .meter-dot {
+      width: 10px;
+      height: 10px;
+      background: #6E3061;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    /* PRINT STYLES for A3 and Letter */
+    @media print {
+      body {
+        background: white !important;
+        padding: 0.3in;
+        color: black;
+      }
+      body.dark {
+        background: white !important;
+        color: black;
+      }
+      .page-header {
+        background: #6E3061 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .card {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        color: black;
+      }
+      body.dark .card {
+        background: white !important;
+        color: black;
+      }
+      .card-title, .bullet-item, .checkbox-label {
+        color: black !important;
+      }
+      .toggle-btn {
+        display: none;
+      }
+      .checkbox-wrapper input[type="checkbox"] {
+        background: white !important;
+        border: 2px solid #6E3061;
+      }
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      /* support A3 and letter sizing */
+      @page {
+        size: A3;
+        margin: 0.4in;
+      }
+      /* If Letter is preferred, override with a class or just rely on browser print dialog; 
+         we ensure it fits both by flexible grid. Most printers will scale to letter if needed. */
+    }
+
+    /* For screens, allow A3 simulation if needed */
+    @media screen and (min-width: 1600px) {
+      .document-wrapper {
+        max-width: 1500px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-wrapper">
+    <!-- HEADER -->
+    <header class="page-header">
+
+      <div class="header-titles">
+      <h1>STA 553 DATA VISUALIZATION</h1>
+        <div class="main-title">
+          <i class="fas fa-chart-pie"></i> Ethics in Data Visualization
+        </div>
+        <!--div class="subtitle">
+          <i class="fas fa-eye" style="margin-right: 6px;"></i> 8 Critical Perspectives • Modern Practice
+        </div-->
+      </div>
+       
+
+      <button id="darkModeToggle" class="toggle-btn">
+        <i class="fas fa-moon"></i> <span>Dark Mode</span>
+      </button>
+ 
+    </header>
+
+    <!-- 8 CARDS -->
+    <div class="cards-grid" id="cardsContainer">
+      <!-- Card 1: Designer’s Perspective -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-pencil-ruler"></i></div>
+          <span class="card-title">1. Designer’s Perspective</span>
+        </div>
+        <ul class="bullet-list">
+          <li class="bullet-item"><i class="fas fa-circle"></i> Truthful Encoding: axis starts at zero, area scales by value.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Accessibility baseline: colorblind-safe, ARIA (Accessible Rich Internet Applications) labels, contrast.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Clarity over chartjunk: avoid 3D distortion, misleading animation.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Annotation mandate: surface uncertainty & missing data.</li>
+        </ul>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="card1Check" class="card-checkbox">
+          <label for="card1Check" class="checkbox-label">Reviewed design ethics</label>
+        </div>
+      </div>
+
+      <!-- Card 2: User’s Perspective -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-user-check"></i></div>
+          <span class="card-title">2. User’s Perspective</span>
+        </div>
+        <ul class="bullet-list">
+          <li class="bullet-item"><i class="fas fa-circle"></i> Pre-attentive exploitation: red for trivial data manipulates.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Baseline framing: truncated axis triggers panic or calm.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Cognitive overload forces blind trust in designer.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Realism uncanny valley: 3D maps suppress skepticism.</li>
+        </ul>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="card2Check" class="card-checkbox">
+          <label for="card2Check" class="checkbox-label">User impact considered</label>
+        </div>
+      </div>
+
+      <!-- Card 3: Data Journalism -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-newspaper"></i></div>
+          <span class="card-title">3. Data Journalism</span>
+        </div>
+        <ul class="bullet-list">
+          <li class="bullet-item"><i class="fas fa-circle"></i> Single insight tyranny: omit trend = lie by omission.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Emotionalization: icons override quantitative reality.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Source equivalence: unverified data demands caveat.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Iterative correction: transparent version history.</li>
+        </ul>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="card3Check" class="card-checkbox">
+          <label for="card3Check" class="checkbox-label">Journalistic integrity check</label>
+        </div>
+      </div>
+
+      <!-- Card 4: Algorithmic/ML Perspective -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-robot"></i></div>
+          <span class="card-title">4. Algorithmic / ML</span>
+        </div>
+        <ul class="bullet-list">
+          <li class="bullet-item"><i class="fas fa-circle"></i> Auto‑bin slicing creates false clusters.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Benchmark corruption: traffic lights mislead.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Proxy variable visualization sanitizes bias.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Temporal blindness ignores disaster context.</li>
+        </ul>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="card4Check" class="card-checkbox">
+          <label for="card4Check" class="checkbox-label">Algorithm audit done</label>
+        </div>
+      </div>
+
+      <!-- Card 5: Persuasion & Marketing -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-bullhorn"></i></div>
+          <span class="card-title">5. Persuasion & Marketing</span>
+        </div>
+        <ul class="bullet-list">
+          <li class="bullet-item"><i class="fas fa-circle"></i> Truncated do-gooder: false emergency for donations.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Confusion as conversion: hidden lifetime cost.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Vanity metrics distract from churn rate.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Comparative anchoring without absolute context.</li>
+        </ul>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="card5Check" class="card-checkbox">
+          <label for="card5Check" class="checkbox-label">Ethical persuasion verified</label>
+        </div>
+      </div>
+
+      <!-- Card 6: DEI Perspective -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-people-arrows"></i></div>
+          <span class="card-title">6. DEI Perspective</span>
+        </div>
+        <ul class="bullet-list">
+          <li class="bullet-item"><i class="fas fa-circle"></i> God trick: default viewpoint hides power structures.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Binarization erases non‑binary identities.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Color scales reinforce harmful associations.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Deficit‑based framing strips agency.</li>
+        </ul>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="card6Check" class="card-checkbox">
+          <label for="card6Check" class="checkbox-label">Inclusive representation check</label>
+        </div>
+      </div>
+
+      <!-- Card 7: Open-Source & Tooling -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-code-branch"></i></div>
+          <span class="card-title">7. Open-Source & Tooling</span>
+        </div>
+        <ul class="bullet-list">
+          <li class="bullet-item"><i class="fas fa-circle"></i> Defaults encode bias (Mercator, red‑green scales).</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Vendor lock‑in holds narratives hostage.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Granular hover exposes personal microdata.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Exploitation of open source for surveillance.</li>
+        </ul>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="card7Check" class="card-checkbox">
+          <label for="card7Check" class="checkbox-label">Tooling ethics assessed</label>
+        </div>
+      </div>
+
+      <!-- Card 8: Environmental & Futures -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-leaf"></i></div>
+          <span class="card-title">8. Environmental & Futures</span>
+        </div>
+        <ul class="bullet-list">
+          <li class="bullet-item"><i class="fas fa-circle"></i> Carbon cost of real‑time dashboards.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Normalizing apocalypse: climate doomism.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> Self‑fulfilling prophecy visualizations.</li>
+          <li class="bullet-item"><i class="fas fa-circle"></i> E‑waste from GPU‑heavy 3D rendering.</li>
+        </ul>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="card8Check" class="card-checkbox">
+          <label for="card8Check" class="checkbox-label">Sustainability reviewed</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="page-footer">
+
+                
+        <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+
+        <p>Inspired by Edward Tufte (The Visual Display of Quantitative Information), Stephen Few (Show Me the Numbers), and WCAG 2.1 accessibility guidelines.</p>
+        
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center> 
+        
+    </footer>
+      
+  </div>
+
+  <script>
+    (function() {
+      // Dark / Light toggle
+      const body = document.body;
+      const toggleBtn = document.getElementById('darkModeToggle');
+      const icon = toggleBtn.querySelector('i');
+      const spanText = toggleBtn.querySelector('span');
+
+      function setDarkMode(isDark) {
+        if (isDark) {
+          body.classList.add('dark');
+          icon.className = 'fas fa-sun';
+          spanText.textContent = 'Light Mode';
+          localStorage.setItem('vizEthicsTheme', 'dark');
+        } else {
+          body.classList.remove('dark');
+          icon.className = 'fas fa-moon';
+          spanText.textContent = 'Dark Mode';
+          localStorage.setItem('vizEthicsTheme', 'light');
+        }
+      }
+
+      // load saved preference
+      const savedTheme = localStorage.getItem('vizEthicsTheme');
+      if (savedTheme === 'dark') {
+        setDarkMode(true);
+      } else if (savedTheme === 'light') {
+        setDarkMode(false);
+      } else {
+        // default light
+        setDarkMode(false);
+      }
+
+      toggleBtn.addEventListener('click', () => {
+        const isDark = body.classList.contains('dark');
+        setDarkMode(!isDark);
+      });
+
+      // Checkbox persistence (optional, using localStorage for demonstration)
+      const checkboxes = document.querySelectorAll('.card-checkbox');
+      
+      function loadCheckboxStates() {
+        checkboxes.forEach((cb, index) => {
+          const key = `vizCheckbox-${index}`;
+          const saved = localStorage.getItem(key);
+          if (saved === 'true') {
+            cb.checked = true;
+          } else {
+            cb.checked = false;
+          }
+        });
+      }
+
+      function saveCheckboxState(index, checked) {
+        localStorage.setItem(`vizCheckbox-${index}`, checked);
+      }
+
+      checkboxes.forEach((checkbox, idx) => {
+        checkbox.addEventListener('change', (e) => {
+          saveCheckboxState(idx, e.target.checked);
+        });
+      });
+
+      // initial load
+      loadCheckboxStates();
+
+      // Accessibility: ensure toggle button has proper aria
+      toggleBtn.setAttribute('aria-label', 'Toggle dark or light mode');
+      
+      console.log('Ethics visualization ready. Print as PDF (A3/Letter) via browser.');
+    })();
+  </script>
+</body>
+</html>

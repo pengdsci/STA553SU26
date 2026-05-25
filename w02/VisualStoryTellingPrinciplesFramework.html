@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=yes">
+    <title>DataViz: Visual Storytelling · Bullet Points Framework</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* CSS Variables for Light/Dark Mode & Accessibility */
+        :root {
+            --bg-body: #f8f5fc;
+            --surface: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #1e1a2f;
+            --text-secondary: #2d2a3e;
+            --border-light: #e2dceb;
+            --accent-purple: #6E3061;
+            --accent-soft: #f1e6ef;
+            --accent-glow: #9b4b8a;
+            --checkbox-bg: #ffffff;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.1);
+            --header-footer-bg: #6E3061;
+            --header-text: #ffffff;
+            --footer-text: #f5eef3;
+            --story-bullet-bg: #faf3fe;
+            --bullet-icon: #6E3061;
+        }
+
+        body.dark {
+            --bg-body: #121212;
+            --surface: #1e1e2a;
+            --card-bg: #252530;
+            --text-primary: #efecf5;
+            --text-secondary: #cdc9e0;
+            --border-light: #3a3a4a;
+            --accent-soft: #2c2a38;
+            --checkbox-bg: #2d2d3a;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.6);
+            --header-footer-bg: #491f40;
+            --story-bullet-bg: #2a2332;
+            --bullet-icon: #c99bbc;
+            --danger-bg: #3b2a2a;
+            --danger-text: #f8a5a5;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            transition: background 0.2s, color 0.2s;
+            padding: 1.5rem;
+        }
+
+        /* Print Styles */
+        @media print {
+            body, body.dark {
+                background: white;
+                color: black;
+            }
+            .card, .report-header, footer, .story-bullet-block {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                background: white !important;
+                color: black !important;
+                border: 1px solid #ccc;
+                box-shadow: none;
+            }
+            .no-print, .toolbar button, .toggle-mode-btn, .print-pdf-btn {
+                display: none !important;
+            }
+            @page {
+                size: A3;
+            }
+            .bullet-point-story {
+                background: #f9f9f9 !important;
+            }
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .report-header {
+            background: var(--header-footer-bg);
+            color: var(--header-text);
+            padding: 2rem 2rem;
+            border-radius: 32px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+        .report-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .report-header .subtitle {
+            font-size: 1rem;
+            opacity: 0.92;
+            margin-top: 0.5rem;
+            border-left: 3px solid #ffefd6;
+            padding-left: 1rem;
+        }
+        .badge-story {
+            display: inline-block;
+            background: rgba(255,255,210,0.2);
+            border-radius: 50px;
+            padding: 0.2rem 1rem;
+            font-size: 0.7rem;
+            margin-top: 0.8rem;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        button {
+            background: var(--accent-purple);
+            border: none;
+            padding: 0.6rem 1.3rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            background: #4f2445;
+            transform: translateY(-2px);
+        }
+        .print-pdf-btn {
+            background: #2c5f2d;
+        }
+
+        /* MAIN VISUAL STORYTELLING SECTION — BULLET POINTS FOCUS */
+        .storytelling-bullet-section {
+            margin-bottom: 2.5rem;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 3px solid var(--accent-purple);
+            display: inline-block;
+            padding-bottom: 4px;
+        }
+        .bullet-story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.8rem;
+            margin-top: 1rem;
+        }
+        .bullet-point-story {
+            background: var(--card-bg);
+            border-radius: 28px;
+            border: 1px solid var(--border-light);
+            padding: 1.5rem;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .bullet-point-story:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent-purple);
+        }
+        .bullet-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-purple);
+            padding-left: 1rem;
+        }
+        .bullet-header span {
+            font-size: 2rem;
+        }
+        .bullet-header h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--danger-text);
+            /*color: var(--accent-purple); */
+        }
+        .bullet-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .bullet-list li {
+            margin-bottom: 1rem;
+            padding-left: 1.8rem;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            color: var(--text-secondary);
+        }
+        .bullet-list li::before {
+            content: "✦";
+            color: var(--accent-purple);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            font-size: 1.1rem;
+        }
+        .insight-tag {
+            display: inline-block;
+            background: var(--accent-soft);
+            border-radius: 20px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            margin-top: 0.8rem;
+            font-weight: 500;
+        }
+        .quote-mini {
+            font-style: italic;
+            border-top: 1px dashed var(--border-light);
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        
+        
+        /*=========== 6 Cards Grid =================*/
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0 2rem 0;
+        }
+
+        /* Card styling */
+        .insight-card {
+            background: var(--card-bg);
+            border-radius: 1.75rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(0px);
+        }
+
+        .insight-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-header {
+            background: var(--accent-soft);
+            padding: 1.2rem 1.5rem;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .card-header h3 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--accent-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        body.dark .card-header h3 {
+            color: var(--accent-light);
+        }
+
+        .card-body {
+            padding: 1.4rem 1.5rem 1.8rem;
+            flex: 1;
+        }
+
+        .card-body p, .card-body li {
+            font-size: 0.92rem;
+            line-height: 1.45;
+            color: var(--text-secondary);
+        }
+
+        .card-body ul, .card-body .compact-list {
+            margin: 0.8rem 0 0.8rem 1.2rem;
+        }
+
+        .badge-mini {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            font-size: 0.65rem;
+            border-radius: 30px;
+            padding: 2px 10px;
+            margin-right: 8px;
+        }
+
+        /* compact table inside card */
+        .mini-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin: 0.8rem 0;
+            background: var(--surface);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .mini-table td, .mini-table th {
+            border: 1px solid var(--border);
+            padding: 8px 6px;
+            vertical-align: top;
+        }
+        .mini-table th {
+            background: var(--table-header-bg);
+            font-weight: 700;
+        }
+        
+          /*===========   =================*/      
+        
+        /* Original Components Grid with checkboxes */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .card h2 {
+            font-size: 1.5rem;
+            border-left: 5px solid var(--accent-purple);
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+        .checklist {
+            list-style: none;
+        }
+        .checklist-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 6px 8px;
+            background: var(--accent-soft);
+            border-radius: 16px;
+            align-items: center;
+        }
+        .checklist-item input {
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: var(--accent-purple);
+            cursor: pointer;
+        }
+        .tag-pill {
+            background: var(--accent-purple);
+            color: white;
+            font-size: 0.7rem;
+            border-radius: 40px;
+            padding: 0.2rem 0.9rem;
+            display: inline-block;
+            margin-bottom: 0.6rem;
+        }
+        .table-summary {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .table-summary th, .table-summary td {
+            border: 1px solid var(--border-light);
+            padding: 8px;
+            text-align: left;
+        }
+        .pitfall-block {
+            background: rgba(110, 48, 97, 0.08);
+            border-left: 4px solid var(--accent-purple);
+            padding: 0.8rem 1rem;
+            border-radius: 20px;
+            margin-top: 1rem;
+        }
+        footer {
+            background: var(--header-footer-bg);
+            border-radius: 28px;
+            padding: 1.5rem 2rem;
+            /*display: flex;  */
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2.5rem;
+            color: var(--footer-text);
+            text-align: center;
+        }
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+        }
+        .checklist-item label {
+            cursor: pointer;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="report-header">
+        <h1>STA 553 DATA VISUALIZATION</h1>
+        <h2>📖 Visual Storytelling Components and Framework</h2>
+        <div class="subtitle">From raw metrics to compelling narrative — actionable rules, story arcs, and cognitive principles.</div>
+        <div class="badge-story">🎯 "Data + Story = Decision Impact"</div>
+    </div>
+
+    <div class="toolbar no-print">
+        <button id="darkModeToggle">🌓 Dark / Light Mode</button>
+        <button id="printPdfBtn" class="print-pdf-btn">🖨️ Print / Save as PDF (A3/Letter ready)</button>
+    </div>
+
+    
+<!-- Bonus: Golden bullet story principle -->
+    <div class="card" style="background: var(--accent-soft); text-align: center;">
+        <p>📢 <strong>Golden bullet for visual storytelling:</strong> “Start with a question → reveal pattern → explain surprise → suggest next step.” Every chart should be a headline.</p>
+    </div>
+    
+    
+    <h2 class="section-title">📌 Components of Data Visualization</h2>
+    <!-- Original Components Grid (with working checkboxes + dark/light + persistence) -->
+    <div class="grid-2col">
+         <div class="card">
+            <h2>🎯 1. Problem Definition</h2>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_measures"><label> What is the decision and/or action?</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_dimensions"><label> What is the metric?</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_granularity"><label>What are dimension and scope?</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_calc"><label> What is the comparison or benchmark?</label></li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>📁 2. Data Components</h2>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_measures"><label> Measures & Metrics (sales revenue, conversion)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_dimensions"><label> Dimensions (region, product, date)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_granularity"><label> Granularity (daily vs monthly aggregation)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_calc"><label> Calculated Fields (profit margin = revenue - cost)</label></li>
+            </ul>
+        </div>
+        <div class="card">
+            <h2>🎨 3. Visual Encodings</h2>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_barChart"><label> Bar/Column – comparison & ranking</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_lineChart"><label> Line/Area – trends over time</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_colorMap"><label> Color (hue + saturation) – categories & magnitude</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_scatter"><label> Scatter / Histogram – distribution & correlation</label></li>
+            </ul>
+        </div>
+        <div class="card">
+            <h2>🗂️ 4. Layout & Context</h2>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_titleAxes"><label> Title, Axis labels, Legends</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_filters"><label> Filters / Slicers (interactive context)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_referenceLines"><label> Reference lines (goal, average, baseline)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_annotations"><label> Annotations & Data labels (key insights)</label></li>
+            </ul>
+        </div>
+        <div class="card">
+            <h2>⚡ 5. Interactivity & Utility</h2>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_tooltips"><label> Tooltips – hover details, % change</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_drill"><label> Drill-down / Drill-up (summary to detail)</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_crossfilter"><label> Cross-filtering – highlight related charts</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_export"><label> Export: PNG, PDF, CSV</label></li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>👀 6. Storytelling Recipe</h2>
+            <ul class="checklist">
+                <li class="checklist-item"><input type="checkbox" id="chk_tooltips"><label> Hook - business question upfront</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_drill"><label>Evidence - pick minimal and effective visual</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_crossfilter"><label> Context - add target & benchmarks</label></li>
+                <li class="checklist-item"><input type="checkbox" id="chk_export"><label>Insight - explain the 'why' behind patterns</label></li>
+            </ul>
+        </div>        
+        
+    </div>
+    
+    
+    <!-- ========== VISUAL STORYTELLING IN BULLET POINTS (CORE NEW SECTION) ========== -->
+    <h2 class="section-title">📌 Data Storytelling Principles and Framework</h2>
+    <div class="storytelling-bullet-section">
+            
+        <div class="bullet-story-grid">
+            <!-- Card 1: The 4-Step Story Arc -->
+            <div class="bullet-point-story">
+                <div class="bullet-header">
+                    <span>📖</span>
+                    <h3>1. Narrative Arc for Charts</h3>
+                </div>
+                <ul class="bullet-list">
+                    <li><strong>Setup (Context)</strong> — Define what’s being measured: "Sales by region, Q3 2025"</li>
+                    <li><strong>Conflict (Unexpected)</strong> — Highlight anomaly or trend: "Midwest dropped 12% WoW"</li>
+                    <li><strong>Resolution (Insight)</strong> — Explain driver: "Supply delay impacted midwest"</li>
+                    <li><strong>Action (Next step)</strong> — "Increase inventory buffer for fall season"</li>
+                </ul>
+                <div class="insight-tag">✨ Every chart needs a micro-story</div>
+                <div class="quote-mini">“Don’t just show the peak — explain the why behind it.”</div>
+            </div>
+
+            <!-- Card 2: Visual Encoding & Pre-Attentive Attributes -->
+            <div class="bullet-point-story">
+                <div class="bullet-header">
+                    <span>🎨</span>
+                    <h3>2. Visual Cues That Tell</h3>
+                </div>
+                <ul class="bullet-list">
+                    <li><strong>Color intensity</strong> → highlights magnitude (dark = high sales)</li>
+                    <li><strong>Position on axis</strong> → rank & comparison (bar charts)</li>
+                    <li><strong>Annotations + callouts</strong> → draw eye to key data points</li>
+                    <li><strong>Reference lines</strong> → target vs actual instantly readable</li>
+                    <li><strong>Size scaling</strong> → bubble maps communicate third dimension</li>
+                </ul>
+                <div class="insight-tag">🎯 Pre-attentive attributes guide the narrative flow</div>
+            </div>
+
+            <!-- Card 3: Chart Types as Story Genres -->
+            <div class="bullet-point-story">
+                <div class="bullet-header">
+                    <span>📊</span>
+                    <h3>3. Chart = Story Genre</h3>
+                </div>
+                <ul class="bullet-list">
+                    <li><strong>Line chart</strong> → "The journey over time" (trend story)</li>
+                    <li><strong>Bar chart</strong> → "Ranking & comparison" (hero vs villain)</li>
+                    <li><strong>Scatter plot</strong> → "Correlation or outlier discovery"</li>
+                    <li><strong>Waterfall</strong> → "Breakdown of contributions" (financial story)</li>
+                    <li><strong>Bullet graph</strong> → "Performance against goal" (success/failure)</li>
+                </ul>
+                <div class="insight-tag">🔍 Match chart type to your story question</div>
+            </div>
+
+            <!-- Card 4: Context & Annotation Techniques -->
+            <div class="bullet-point-story">
+                <div class="bullet-header">
+                    <span>✍️</span>
+                    <h3>4. Annotation as Narrator</h3>
+                </div>
+                <ul class="bullet-list">
+                    <li><strong>Highlighting peaks/troughs</strong> — "Best month ever: +34% YoY"</li>
+                    <li><strong>Explaining outliers</strong> — "Black Friday campaign spike"</li>
+                    <li><strong>Adding trend lines</strong> — "3-month moving average shows recovery"</li>
+                    <li><strong>Data labels</strong> — only on key values to reduce clutter</li>
+                    <li><strong>Arrow callouts</strong> → direct attention to turning points</li>
+                </ul>
+                <div class="insight-tag">💬 A number without context is noise. Annotate!</div>
+            </div>
+
+            <!-- Card 5: Interactivity for Story Discovery -->
+            <div class="bullet-point-story">
+                <div class="bullet-header">
+                    <span>🖱️</span>
+                    <h3>5. Interactive Story Layers</h3>
+                </div>
+                <ul class="bullet-list">
+                    <li><strong>Drill-down</strong> → "From region → city → store" (unfold details)</li>
+                    <li><strong>Tooltips</strong> → reveal supporting data without breaking flow</li>
+                    <li><strong>Cross-filtering</strong> → "select a segment, see the impact elsewhere"</li>
+                    <li><strong>Step-by-step guiding</strong> → dashboard intro + narrative captions</li>
+                    <li><strong>Parameter controls</strong> → "What-if analysis" builds tension</li>
+                </ul>
+                <div class="insight-tag">🚀 Empowers user-driven story exploration</div>
+            </div>
+
+            <!-- Card 6: Pitfalls that break the story -->
+            <div class="bullet-point-story">
+                <div class="bullet-header">
+                    <span>⚠️</span>
+                    <h3>6. Story Killers to avoid</h3>
+                </div>
+                <ul class="bullet-list">
+                    <li><strong>Missing baseline zero</strong> → exaggerates differences (bar chart lie)</li>
+                    <li><strong>Pie charts with >4 slices</strong> → forces mental angle comparison</li>
+                    <li><strong>Ambiguous color coding</strong> → red/green issues, poor contrast</li>
+                    <li><strong>No title or question</strong> → viewer doesn't know what to look for</li>
+                    <li><strong>Overcrowded dashboard</strong> → conflicting narratives at once</li>
+                </ul>
+                <div class="insight-tag">🧹 Clean, focused visuals tell the most powerful story</div>
+            </div>
+        </div>
+    </div>
+
+      <h2 class="section-title">📌 Comparisons of Viz Concepts</h2>
+    
+     <!-- 6 CARD GRID based on the original structure: each captures a major theme -->
+    <div class="cards-grid">
+        <!-- CARD 1: Core Components & Framework -->
+        <div class="insight-card">
+            <div class="card-header"><h3>📊  1. Core Components</h3></div>
+            <div class="card-body">
+                <p><strong>Four pillars of visual analysis:</strong></p>
+                <ul>
+                    <p><li><strong>Statistical Graphics</strong> – estimation, distribution, uncertainty</li></p>
+                    <p><li><strong>Data Visualization</strong> – pattern detection, exploration</li></p>
+                    <p><li><strong>Visual Representation</strong> – mapping to visual attributes</li></p>
+                    <p><li><strong>Visual Storytelling</strong> – narrative, argument, persuasion</li></p>
+                </ul>
+                <div style="background: var(--accent-soft); padding: 0.5rem; border-radius: 14px; margin-top: 8px;">
+                    <small>🎯 <strong>Typical users:</strong> analysts, scientists, designers, executives, public.</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: Similarities vs Differences (compact table) -->
+        <div class="insight-card">
+            <div class="card-header"><h3>🔄 2. Similarities & Differences</h3></div>
+            <div class="card-body">
+                <p><strong>🔹 Shared foundations:</strong> Visual perception, mapping data dimensions, risk of misleading, need for labeling.</p>
+                <table class="mini-table">
+                    <tr><th align="left">Dimension</th><th align="left">Primary Goal</th></tr>
+                    <tr><td>Statistical Graphics</td><td>Accuracy & inference</td></tr>
+                    <tr><td>Data Visualization</td><td>Exploration & communication</td></tr>
+                    <tr><td>Visual Representation</td><td>Encoding theory</td></tr>
+                    <tr><td>Visual Storytelling</td><td>Narrative & action</td></tr>
+                </table>
+                <p><small>📊 <strong>Graphical density:</strong> High (stats) → Medium (DV) → Low/Medium (storytelling)</small></p>
+            </div>
+        </div>
+
+        <!-- CARD 3: Insight vs Decoration (Ornament) - core tension -->
+        <div class="insight-card">
+            <div class="card-header"><h3>⚡ 3. Insight vs Decoration</h3></div>
+            <div class="card-body">
+                <p><strong>💡 Insight:</strong> Non-obvious, data-driven conclusion (trend, outlier, cluster). <strong>Value: HIGH</strong></p>
+                <br>
+                <p><strong>🎨 Decoration:</strong> Non-data ink, 3D bevels, shadows, gradients — distracts & misleads.</p>
+                <!--div class="checklist-compact">
+                    <div class="check-item"><input type="checkbox" id="card3_test"> <label for="card3_test">🔍 <em>"Remove without losing comprehension?"</em> → Functional test.</label></div>
+                </div>
+                <hr-->
+                <br>
+                <p><strong>✔️ Guideline:</strong> Ornament is harmful when competes for attention. Functional ornament (subtle banding) rare but possible.</p><br>
+                
+                <p><b>Example</b> 3D pie → decoration. Confidence interval line → functional.</p>
+            </div>
+        </div>
+
+        <!-- CARD 4: Less Is More – Application & Exceptions -->
+        <div class="insight-card">
+            <div class="card-header"><h3>📉 4. Less Is More</h3></div>
+            <div class="card-body">
+                <p><strong>Tufte's data-ink ratio:</strong> Maximize ink for data. Remove redundant gridlines, 3D, heavy borders.</p>
+                <p><strong>✅ Works well:</strong> Scientific papers, expert dashboards, small multiples.</p>
+                <p><strong>⚠️ Exceptions (more is needed):</strong></p>
+                <ul>
+                    <li>Visual storytelling → annotations, arrows</li>
+                    <li>Novice audiences → explicit legends & labels</li>
+                    <li>Monitoring dashboards → red-yellow-green status</li>
+                    <li>Accessibility → high contrast, redundant encoding</li>
+                </ul>
+                <div class="checklist-compact" style="margin-top: 0.6rem;">
+                    <div class="check-item"><input type="checkbox" id="lessMoreCheck"> <label for="lessMoreCheck">✨ Apply “less ink for structure, more ink for insight”</label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 5: Decision Ladder (clickable checklist) - 6 steps integrated -->
+        <div class="insight-card">
+            <div class="card-header"><h3>🧩 5. Decision Ladder</h3></div>
+            <div class="card-body">
+                <p><strong>Design flow – check as you go:</strong></p><br>
+                <div class="checklist-compact">
+                    <div class="check-item">1️⃣ Visual representation – correct mapping (position > length > angle)?</div>
+                    <div class="check-item">2️⃣ Statistical graphic – match data type (distribution/relationship)?</div>
+                    <div class="check-item">3️⃣ Data visualization – avoid distortion (axis zero, lie factor)?</div>
+                    <div class="check-item">4️⃣ Visual storytelling – add annotation/flow for narrative?</div>
+                    <!--div class="check-item">5️⃣ Insight vs decoration – remove non-functional ink?</div>
+                    <div class="check-item">6️⃣ Less is more – simplify without losing message?</div-->
+                </div>
+                <p style="font-size:0.75rem; margin-top: 0.5rem;">📌 <em>Statistical graphics = engine, Visual representation = grammar, Data viz = practice, Storytelling = persuasion.</em></p>
+            </div>
+        </div>
+
+        <!-- CARD 6: Tensions / Summary + Final Best Practices -->
+        <div class="insight-card">
+            <div class="card-header"><h3>🎯 6. Tensions & Framework</h3></div>
+            <div class="card-body">
+                <p><strong>Similarity vs Difference:</strong> All rely on perception but diverge on goals (inference, exploration, narrative).</p><br>
+                <p><strong>Insight vs Ornament:</strong> Data-ink priority with narrative-driven exceptions.</p><br>
+                <p><strong>Less vs More:</strong> Minimalism for experts; extra anchors for novices & accessibility.</p><br>
+                <hr>
+                <p><strong>🚀 Final summary phrase:</strong> <em>Decoration is the enemy; functional minimalism is the goal — but stories require guided extra ink that still encodes meaning.</em></p>
+                <!--div class="check-item"><input type="checkbox" id="finalInsight"> <label for="finalInsight">📖 I've reviewed the complete framework</label></div-->
+            </div>
+        </div>
+    </div>
+   
+    
+    
+
+    <footer>            
+        <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+
+        <p>Inspired by Edward Tufte (The Visual Display of Quantitative Information), Stephen Few (Show Me the Numbers), and WCAG 2.1 accessibility guidelines.</p>
+        
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center>        
+    </footer>
+</div>
+
+<script>
+     // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();   
+    
+    (function() {
+        // Dark Mode Toggle + persistence
+        const toggleBtn = document.getElementById('darkModeToggle');
+        const storedTheme = localStorage.getItem('vizThemeStory');
+        if (storedTheme === 'dark') document.body.classList.add('dark');
+        else if (storedTheme === 'light') document.body.classList.remove('dark');
+        else if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.classList.add('dark');
+        
+        toggleBtn.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark');
+            if (isDark) {
+                document.body.classList.remove('dark');
+                localStorage.setItem('vizThemeStory', 'light');
+            } else {
+                document.body.classList.add('dark');
+                localStorage.setItem('vizThemeStory', 'dark');
+            }
+        });
+        
+        // Checkbox state persistence (all checkboxes inside .checklist-item)
+        const allCheckboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+        function saveChecks() {
+            const states = {};
+            allCheckboxes.forEach(cb => { states[cb.id] = cb.checked; });
+            localStorage.setItem('storyChecklistStates', JSON.stringify(states));
+        }
+        function loadChecks() {
+            const saved = localStorage.getItem('storyChecklistStates');
+            if (saved) {
+                try {
+                    const states = JSON.parse(saved);
+                    allCheckboxes.forEach(cb => {
+                        if (states.hasOwnProperty(cb.id)) cb.checked = states[cb.id];
+                    });
+                } catch(e) {}
+            }
+        }
+        allCheckboxes.forEach(cb => cb.addEventListener('change', saveChecks));
+        loadChecks();
+        
+        // Print to PDF with A3/Letter support
+        const printBtn = document.getElementById('printPdfBtn');
+        printBtn.addEventListener('click', () => {
+            window.print();
+        });
+    })();
+</script>
+</body>
+</html>

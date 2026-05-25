@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, print-scale=1">
+  <title>Visual Design Principles · Data Visualization Reference</title>
+  <style>
+    /* ----- GLOBAL RESET & VARIABLES ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Purple background #6E3061 as primary page background */
+      --page-bg: #6E3061;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f7f4;
+      --bg-card: #ffffff;
+      --text-primary: #1e1e1e;
+      --text-secondary: #3a3a3a;
+      --text-muted: #5c5c5c;
+      --border-light: #e0dcd5;
+      --shadow-card: 0 8px 20px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+      --accent-purple: #6E3061;
+      --accent-soft: #f2e9f0;
+      --check-bg: #f0e6ed;
+      --check-border: #b89aaf;
+      --header-footer-bg: #f5f2f0;
+      --toggle-bg: #e8e3dd;
+      --toggle-thumb: #ffffff;
+      --block-title-accent: #6E3061;
+      --bullet-color: #6E3061;
+      /* accessibility: high contrast text on purple areas */
+      --on-purple-text: #ffffff;
+      --on-purple-subtle: #6E3061;
+      /*--on-purple-subtle: #f0e6ed; */
+    }
+
+    body.dark {
+      --page-bg: #3d1f36;
+      --bg-primary: #1c1b1f;
+      --bg-secondary: #25232a;
+      --bg-card: #2d2b32;
+      --text-primary: #f0ece4;
+      --text-secondary: #d6d2c8;
+      --text-muted: #b7b0a5;
+      --border-light: #4a4458;
+      --shadow-card: 0 8px 20px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
+      --accent-purple: #d0a5c9;
+      --accent-soft: #3a2e38;
+      --check-bg: #3b3140;
+      --check-border: #8f7d8b;
+      --header-footer-bg: #2a272f;
+      --toggle-bg: #4a4458;
+      --toggle-thumb: #f0ece4;
+      --block-title-accent: #d9b3d0;
+      --bullet-color: #d0a5c9;
+      --on-purple-text: #f0ece4;
+      --on-purple-subtle: #d9b3d0;
+     /*--on-purple-subtle: #d6d2c8;*/
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      line-height: 1.5;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1.5rem;
+      margin: 0;
+    }
+
+    /* ----- PRINT SETTINGS (A3 & LETTER) ----- */
+    @media print {
+      body {
+        background-color: white !important;
+        padding: 0.3in;
+        color: #1e1e1e;
+      }
+      .no-print {
+        display: none !important;
+      }
+      header, footer {
+        background: #f5f2f0 !important;
+        color: #1e1e1e !important;
+      }
+      .card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        break-inside: avoid;
+        background: white !important;
+      }
+      .block {
+        break-inside: avoid;
+      }
+      @page {
+        size: A3;
+        margin: 12mm;
+      }
+      html.letter-print @page {
+        size: letter;
+      }
+      .main-container {
+        box-shadow: none !important;
+        border: 1px solid #ddd;
+      }
+    }
+
+    /* ----- LAYOUT & CONTAINER (white card on purple bg) ----- */
+    .main-container {
+      max-width: 1500px;
+      width: 100%;
+      background-color: var(--bg-primary);
+      border-radius: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15);
+      padding: 2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    /* ----- HEADER & FOOTER (inside white container) ----- */
+    .site-header {
+      background: var(--header-footer-bg);
+      border-radius: 2rem;
+      padding: 1.8rem 2rem;
+      /*display: flex; */
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border-light);
+      text-align: center;
+    }
+
+    .title-group h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #6E3061 0%, #9a4d87 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+      
+      .title-group h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #6E3061 0%, #9a4d87 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+      
+    body.dark .title-group h1 {
+      background: linear-gradient(135deg, #e6b8dc 0%, #d0a5c9 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+      /*display: flex; */
+      align-items: right;
+      text-align: right;
+      gap: 0.5rem;
+      /*flex-wrap: wrap; */
+    }
+
+    .site-footer {
+      background: var(--header-footer-bg);
+      border-radius: 2rem;
+      padding: 1.2rem 2rem;
+      /*display: flex;
+      flex-wrap: wrap;  */
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border-light);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .copyright {
+      /*display: flex;  */
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .site-meter {
+      font-family: monospace;
+      background: var(--bg-card);
+      padding: 0.3rem 1rem;
+      border-radius: 2rem;
+      border: 1px solid var(--border-light);
+    }
+
+    /* Purple badge/tag inside header - high contrast white on purple */
+    .purple-badge {
+      background: #6E3061;
+      color: #ffffff;
+      font-weight: 600;
+      padding: 0.2rem 1rem;
+      border-radius: 2rem;
+      letter-spacing: 0.3px;
+    }
+    body.dark .purple-badge {
+      background: #d0a5c9;
+      color: #1e1b1f;
+      font-weight: 600;
+    }
+
+    /* ----- TOGGLE BUTTON (dark/light) ----- */
+    .toggle-wrap {
+      /*display: flex;*/
+      align-items: right;
+      gap: 1rem;
+      background: var(--toggle-bg);
+      padding: 0.1rem 0.51rem;
+      border-radius: 3rem;
+    }
+
+    .toggle-label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: none;
+      width: 52px;
+      height: 28px;
+      background-color: #6E3061;
+      border-radius: 30px;
+      position:relative;
+      /*position: relative; */
+      cursor: pointer;
+      transition: background 0.3s;
+      /*box-shadow: inset 0 0 4px rgba(0,0,0,0.2);  */
+    }
+
+    .theme-toggle::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.25s ease;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    body.dark .theme-toggle {
+      background-color: #b58db1;
+    }
+
+    body.dark .theme-toggle::after {
+      transform: translateX(24px);
+    }
+
+    /* ----- BLOCKS & CARDS ----- */
+    .blocks-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2.2rem;
+    }
+
+    .block {
+      background: transparent;
+      border-left: 6px solid var(--block-title-accent);
+      padding-left: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .block-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .block-title span {
+      background: #6E3061;
+      color: #ffffff;
+      font-size: 1rem;
+      padding: 0.2rem 1rem;
+      border-radius: 2rem;
+      letter-spacing: 0.3px;
+      font-weight: 500;
+    }
+
+    body.dark .block-title span {
+      background: #d0a5c9;
+      color: #1e1b1f;
+      font-weight: 600;
+    }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 1.5rem;
+      padding: 1.4rem 1.5rem;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-light);
+      transition: all 0.25s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 28px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 1.25rem;
+      border-bottom: 1px dashed var(--border-light);
+      padding-bottom: 0.4rem;
+    }
+
+    .card-header i {
+      font-style: normal;
+      font-size: 1.4rem;
+    }
+
+    .card-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .principle-desc {
+      background: var(--accent-soft);
+      border-radius: 1rem;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-left: 3px solid #6E3061;
+      margin: 0.2rem 0;
+    }
+
+    body.dark .principle-desc {
+      border-left-color: #d0a5c9;
+    }
+
+    /* bullet list inside cards */
+    .detail-list {
+      list-style: none;
+      padding-left: 0.3rem;
+      margin: 0.2rem 0 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .detail-list li {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .detail-list li::before {
+      content: "•";
+      color: var(--bullet-color);
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* ----- CHECKBOXES (clickable, accessible) ----- */
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.9rem;
+      margin-top: 0.3rem;
+      border-top: 1px solid var(--border-light);
+      padding-top: 0.7rem;
+    }
+
+    .custom-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      user-select: none;
+      color: var(--text-secondary);
+    }
+
+    .custom-checkbox input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--check-bg);
+      border: 2px solid var(--check-border);
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 0;
+    }
+
+    .custom-checkbox input[type="checkbox"]:checked {
+      background: #6E3061;
+      border-color: #6E3061;
+    }
+
+    .custom-checkbox input[type="checkbox"]:checked::after {
+      content: "✓";
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .print-format-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-left: 0.5rem;
+    }
+
+    select {
+      padding: 0.3rem 0.8rem;
+      border-radius: 2rem;
+      border: 1px solid var(--border-light);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    hr {
+      border: 0.5px solid var(--border-light);
+      margin: 0.3rem 0;
+    }
+
+    /* Accessibility: focus indicators */
+    button:focus-visible, select:focus-visible, input:focus-visible, .custom-checkbox input:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 3px rgba(110, 48, 97, 0.5);
+    }
+
+    @media (max-width: 650px) {
+      body {
+        padding: 1rem 0.8rem;
+      }
+      .main-container {
+        padding: 1.2rem;
+      }
+      .site-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <!-- HEADER -->
+    <header class="site-header">
+
+      <div class="title-group">
+         <h1>STA 553 DATA VISUALIZATION</h1>  
+        <h2>Various Types of Visual Design Principles</h2>
+          
+        <div style="text-align:right;">         
+            <span class="toggle-label" id="modeText">🌙 Dark</span>
+            <button class="theme-toggle" id="themeToggle" aria-label="Switch dark/light mode"></button>
+        </div> 
+      </div>
+
+    </header>
+
+    <!-- 5 MAJOR BLOCKS -->
+    <div class="blocks-grid">
+      
+      <!-- BLOCK 1: Cognitive & Perceptual -->
+      <div class="block">
+        <div class="block-title">🧠 1. Cognitive & Perceptual <span>How we see</span></div>
+        <div class="cards-container">
+          <div class="card">
+            <div class="card-header"><i>🔮</i> Gestalt Proximity</div>
+            <div class="card-text">Objects placed close together are perceived as a group.</div>
+            <ul class="detail-list">
+              <li>Group related bars in a chart; separate distinct categories with whitespace.</li>
+              <li>Use spatial clustering to reduce cognitive effort in dashboards.</li>
+              <li>Proximity overrides color – position is stronger than hue for grouping.</li>
+            </ul>
+            <div class="principle-desc">📌 Application: cluster KPIs by business unit, not randomly.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Proximity applied</label>
+              <label class="custom-checkbox"><input type="checkbox"> Review spacing</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>⚡</i> Pre-attentive Color</div>
+            <div class="card-text">Hue & intensity spotted in &lt;250ms. Highlight outliers instantly.</div>
+            <ul class="detail-list">
+              <li>Use a single bright hue (red/orange) on a gray background to direct attention.</li>
+              <li>Limit pre-attentive markers to 1–2 per view to avoid dilution.</li>
+              <li>Shape and orientation are also pre-attentive; combine with color for accessibility.</li>
+            </ul>
+            <div class="principle-desc">🔴 Single red dot among gray ones draws immediate focus.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Used for alert</label>
+              <label class="custom-checkbox"><input type="checkbox"> Accessible contrast</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>🧩</i> Miller’s Law (Chunking)</div>
+            <div class="card-text">Working memory holds ~7±2 items. Limit palette to 5-7 colors.</div>
+            <ul class="detail-list">
+              <li>Beyond 7 categories, group into "Other" or use hierarchical nesting.</li>
+              <li>Apply chunking to dashboard filters: present top 5, rest under "More".</li>
+              <li>Legends with >7 items cause constant eye travel; consider small multiples.</li>
+            </ul>
+            <div class="principle-desc">🎨 Palette strategy: 5 categorical hues + neutral gray for context.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> ≤7 hues</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCK 2: Artistic & Aesthetic -->
+      <div class="block">
+        <div class="block-title">🎨 2. Artistic & Aesthetic <span>How we feel</span></div>
+        <div class="cards-container">
+          <div class="card">
+            <div class="card-header"><i>🖋️</i> Data-Ink Ratio (Tufte)</div>
+            <div class="card-text">Maximize data ink, erase non-data ink and redundant elements.</div>
+            <ul class="detail-list">
+              <li>Remove heavy gridlines, 3D effects, and ornamental shadows.</li>
+              <li>Use subtle axis lines; let the data shape the visual weight.</li>
+              <li>High data-ink ratio improves clarity and speeds up interpretation.</li>
+            </ul>
+            <div class="principle-desc">📊 Erase borders, mute grids – every pixel should convey information.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Low chartjunk</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>🌸</i> Aesthetic-Usability Effect</div>
+            <div class="card-text">Beautiful designs are perceived as easier to use and more trustworthy.</div>
+            <ul class="detail-list">
+              <li>Consistent typography, harmonious whitespace, and polished color schemes increase engagement.</li>
+              <li>Even when functionality is identical, aesthetic dashboards receive higher user satisfaction scores.</li>
+              <li>Balance visual appeal with analytical integrity – avoid style over substance.</li>
+            </ul>
+            <div class="principle-desc">✨ Typography hierarchy + intentional color palette = credibility.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Visual harmony</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>🎭</i> Emotional & Cultural Palette</div>
+            <div class="card-text">Color evokes emotion and carries cultural meaning.</div>
+            <ul class="detail-list">
+              <li>Warm palettes (reds, oranges) suggest urgency or passion; cool palettes convey calm and trust.</li>
+              <li>Respect cultural conventions: red = loss in Western finance, but prosperity in some Eastern contexts.</li>
+              <li>Use a muted background canvas to make the data colors feel more vibrant.</li>
+            </ul>
+            <div class="principle-desc">🔵 Finance: blue for trust; Environment: green/brown earth tones.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Palette intentional</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCK 3: Structural & Compositional -->
+      <div class="block">
+        <div class="block-title">🏗️ 3. Structural & Composition <span>How we organize</span></div>
+        <div class="cards-container">
+          <div class="card">
+            <div class="card-header"><i>🗺️</i> Shneiderman’s Mantra</div>
+            <div class="card-text">Overview first, zoom and filter, then details-on-demand.</div>
+            <ul class="detail-list">
+              <li>Start with high-level KPIs; let users drill down interactively.</li>
+              <li>Provide clear navigation cues for filtering (click, brush, dropdown).</li>
+              <li>Tooltip details appear on hover, preserving the clean overview.</li>
+            </ul>
+            <div class="principle-desc">📈 Dashboard flow: summary tiles → trend charts → raw data table.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Overview present</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>🪟</i> Small Multiples (Trellis)</div>
+            <div class="card-text">Repeat the same chart structure for different categories.</div>
+            <ul class="detail-list">
+              <li>All panels share identical axes and scales for instant comparison.</li>
+              <li>Reduces cognitive load compared to overlapping lines on a single chart.</li>
+              <li>Ideal for comparing trends across regions, products, or time periods.</li>
+            </ul>
+            <div class="principle-desc">📉 Grid of mini line charts, one per product category.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Consistent axes</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>📐</i> Baseline & Proportional Ink</div>
+            <div class="card-text">Bar charts must start at zero; area must match data value.</div>
+            <ul class="detail-list">
+              <li>Truncated y-axes exaggerate differences and mislead viewers.</li>
+              <li>Bubble charts: encode by area (not radius) to avoid quadratic distortion.</li>
+              <li>Line charts are exempt from the zero baseline because position/judge slope is the encoding.</li>
+            </ul>
+            <div class="principle-desc">⚠️ A 2x radius increase = 4x area – always check proportional ink.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Zero baseline</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCK 4: Practical & Communication -->
+      <div class="block">
+        <div class="block-title">📢 4. Practical & Communication <span>How we apply</span></div>
+        <div class="cards-container">
+          <div class="card">
+            <div class="card-header"><i>🎯</i> Purpose-Driven Design</div>
+            <div class="card-text">Align chart type, detail level, and interaction with goal & audience.</div>
+            <ul class="detail-list">
+              <li>Exploratory analysis: high-density plots, interactive filters, raw numbers.</li>
+              <li>Explanatory presentation: simplified, annotated, with a clear takeaway title.</li>
+              <li>CEO report: 3 KPIs max. Analyst dashboard: drillable, multi-faceted.</li>
+            </ul>
+            <div class="principle-desc">👔 Know your audience: executive summary vs. deep-dive exploration.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Audience defined</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>♿</i> Accessibility & Inclusivity</div>
+            <div class="card-text">Design for color-vision deficiency, screen readers, and low contrast.</div>
+            <ul class="detail-list">
+              <li>Avoid red-green alone; use blue-orange or add texture/patterns.</li>
+              <li>Ensure text meets WCAG AA contrast ratio (4.5:1 for normal text).</li>
+              <li>Provide descriptive alt-text and enable keyboard navigation.</li>
+            </ul>
+            <div class="principle-desc">🦯 Test with CVD simulator; never rely solely on color to convey meaning.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Colorblind safe</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>📰</i> Glance-and-Go Narrative</div>
+            <div class="card-text">Communicate the key message within 5 seconds using active titles.</div>
+            <ul class="detail-list">
+              <li>Replace generic titles ("Sales by Month") with insight-driven ones ("Sales dipped 12% in March").</li>
+              <li>Integrate annotations directly onto data points to guide the viewer.</li>
+              <li>Use bold, large text for the main finding; smaller, neutral text for axes.</li>
+            </ul>
+            <div class="principle-desc">💬 “Marketing spend is flat, but cost-per-lead is rising sharply.”</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Title tells story</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCK 5: Interactive & System -->
+      <div class="block">
+        <div class="block-title">🖱️ 5. Interactive & System <span>How we explore</span></div>
+        <div class="cards-container">
+          <div class="card">
+            <div class="card-header"><i>👆</i> Direct Manipulation</div>
+            <div class="card-text">Click, brush, or drag data points to filter and explore directly.</div>
+            <ul class="detail-list">
+              <li>Brushing a scatter plot immediately updates linked visualizations.</li>
+              <li>Avoid separate control panels when possible; let the data be the interface.</li>
+              <li>Immediate visual feedback (less than 100ms) maintains the user's flow state.</li>
+            </ul>
+            <div class="principle-desc">🔄 Click a bar → filter map; drag a range → zoom timeline.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Interactive element</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>📱</i> Responsive Visual Complexity</div>
+            <div class="card-text">Adapt chart detail and layout to screen size, not just scaling.</div>
+            <ul class="detail-list">
+              <li>Desktop: full scatter plot with hover tooltips; Mobile: sparkline + key number.</li>
+              <li>Rearrange dashboard tiles into a single column on narrow viewports.</li>
+              <li>Touch targets should be at least 44x44px for mobile interactivity.</li>
+            </ul>
+            <div class="principle-desc">📲 Mobile shows aggregated KPI; tap to expand trend.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Mobile version</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><i>🔽</i> Progressive Disclosure</div>
+            <div class="card-text">Reveal complexity on demand; keep the initial view simple.</div>
+            <ul class="detail-list">
+              <li>Start with high-level summary; offer "drill-down" paths for deeper data.</li>
+              <li>Use accordions, expandable sections, or hierarchical navigation.</li>
+              <li>Reduces cognitive overload for casual users while serving power analysts.</li>
+            </ul>
+            <div class="principle-desc">🧅 Global revenue → click continent → country detail → city table.</div>
+            <div class="checkbox-group">
+              <label class="custom-checkbox"><input type="checkbox"> Layered complexity</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        
+        <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+
+        <p>Inspired by Edward Tufte (The Visual Display of Quantitative Information), Stephen Few (Show Me the Numbers), and WCAG 2.1 accessibility guidelines.</p>
+        
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center> 
+        
+    </footer>
+  </div>
+
+  <script>
+      
+         // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();   
+    
+      
+    (function() {
+      const body = document.body;
+      const toggleBtn = document.getElementById('themeToggle');
+      const modeText = document.getElementById('modeText');
+      const pageSelect = document.getElementById('pageSizeSelect');
+      const htmlElement = document.documentElement;
+
+      function updateThemeUI() {
+        if (body.classList.contains('dark')) {
+          modeText.textContent = '☀️ Light';
+        } else {
+          modeText.textContent = '🌙 Dark';
+        }
+      }
+
+      toggleBtn.addEventListener('click', () => {
+        body.classList.toggle('dark');
+        updateThemeUI();
+        try {
+          localStorage.setItem('vis-principles-theme', body.classList.contains('dark') ? 'dark' : 'light');
+        } catch(e) {}
+      });
+
+      try {
+        const saved = localStorage.getItem('vis-principles-theme');
+        if (saved === 'dark') {
+          body.classList.add('dark');
+        } else if (saved === 'light') {
+          body.classList.remove('dark');
+        }
+      } catch(e) {}
+      updateThemeUI();
+
+      function setPrintFormat(format) {
+        if (format === 'letter') {
+          htmlElement.classList.add('letter-print');
+        } else {
+          htmlElement.classList.remove('letter-print');
+        }
+        try {
+          localStorage.setItem('vis-print-format', format);
+        } catch(e) {}
+      }
+
+      if (pageSelect) {
+        pageSelect.addEventListener('change', (e) => {
+          setPrintFormat(e.target.value);
+        });
+        try {
+          const savedFormat = localStorage.getItem('vis-print-format');
+          if (savedFormat === 'letter' || savedFormat === 'a3') {
+            pageSelect.value = savedFormat;
+            setPrintFormat(savedFormat);
+          } else {
+            setPrintFormat('a3');
+          }
+        } catch(e) {
+          setPrintFormat('a3');
+        }
+      }
+
+      console.log('✅ Purple background #6E3061 applied — accessible contrast, dark/light, PDF print ready.');
+    })();
+  </script>
+</body>
+</html>
