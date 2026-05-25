@@ -1,0 +1,1963 @@
+---
+title: "ggplot2 Themes: Fundamentals, Structure & Custom Creation"
+subtitle: "A Comprehensive Guide with Working Examples"
+author: "Cheng Peng"
+date: "West Chester University"
+output:
+  html_document:
+    theme: yeti
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    number_sections: yes
+    toc_collapsed: yes
+    code_folding: hide
+    code_download: yes
+    smooth_scroll: yes
+    highlight: tango
+    css: styles.css
+---
+
+```{r setup, include=FALSE}
+if (!require("tidyverse")) {
+   install.packages("tidyverse")
+   library(tidyverse)
+}
+if (!require("knitr")) {
+   install.packages("knitr")
+   library(knitr)
+}
+if (!require("plotly")) {
+   install.packages("plotly")
+   library(plotly)
+}
+if (!require("ggplot2")) {
+   install.packages("ggplot2")
+   library(ggplot2)
+}
+if (!require("patchwork")) {
+   install.packages("patchwork")
+   library(patchwork)
+}
+if (!require("dplyr")) {
+   install.packages("dplyr")
+   library(dplyr)
+}
+##
+## knitr::opts_knit$set(root.dir = "C:\\STA490\\w05")
+##
+knitr::opts_chunk$set(echo = TRUE,       
+                      warning = FALSE,   
+                      result = TRUE,   
+                      message = FALSE,
+                      fig.width = 8,
+                      fig.height = 5,
+                      fig.align = "center",
+                      comment = NA)
+```
+
+
+```{css echo = FALSE}
+/* ============ CSS Styling for Lecture Notes ============ */
+
+body {
+  font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.7;
+  color: #2d1b29;
+  background-color: #fdfafd;
+}
+
+h1 {
+  color: #6E3061;
+  border-bottom: 3px solid #6E3061;
+  padding-bottom: 8px;
+  margin-top: 40px;
+  font-weight: bold;
+  font-size: 2.2rem;
+}
+
+h2 {
+  color: #6E3061;
+  border-left: 5px solid #6E3061;
+  padding-left: 12px;
+  margin-top: 30px;
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+h3 {
+  color: #8b4a7d;
+  margin-top: 24px;
+  font-weight: bold;
+  font-size: 1.8m;
+}
+
+h4 {
+  color: #a05f92;
+  margin-top: 18px;
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+code {
+  background-color: #f4edf3;
+  color: #4a2040;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.9em;
+  border: 1px solid #d4c0d1;
+}
+
+pre {
+  background-color: #f9f5f9;
+  border: 1px solid #d4c0d1;
+  border-left: 4px solid #6E3061;
+  border-radius: 6px;
+  padding: 14px;
+}
+
+pre code {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+blockquote {
+  background-color: #f4edf3;
+  border-left: 4px solid #6E3061;
+  padding: 12px 18px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  color: #4a2040;
+}
+
+.note-box {
+  background-color: #f0e6ee;
+  border: 1px solid #c49bb8;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 18px 0;
+}
+
+.note-box strong {
+  color: #6E3061;
+}
+
+.tip-box {
+  background-color: #e8f5e9;
+  border: 1px solid #81c784;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 18px 0;
+}
+
+.tip-box strong {
+  color: #2e7d32;
+}
+
+.warning-box {
+  background-color: #fff3e0;
+  border: 1px solid #ffb74d;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 18px 0;
+}
+
+.warning-box strong {
+  color: #e65100;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+table th {
+  background-color: #6E3061;
+  color: white;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #d4c0d1;
+}
+
+table tr:nth-child(even) td {
+  background-color: #faf5f9;
+}
+
+table tr:hover td {
+  background-color: #f0e6ee;
+}
+
+.toc {
+  background-color: #faf5f9;
+  border: 1px solid #d4c0d1;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.figure {
+  border: 1px solid #e0d1db;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(110, 48, 97, 0.08);
+}
+```
+
+#  Theme Fundamentals
+
+ggplot2's theming system is a comprehensive framework that controls every non-data visual aspect of your plots. Themes handle backgrounds, grids, text formatting, legends, and faceting strips—essentially everything that makes your plot look polished and publication-ready.
+
+<div class="note-box"> <strong>Key Concept:</strong> Themes in ggplot2 follow a strict hierarchical inheritance structure. When you modify a theme element, you're overriding the default values from the complete theme you started with. </div>
+
+  
+## Complete vs. Incomplete Themes
+
+A complete theme specifies every visual property of a plot. These are designed to be standalone.
+
+**Examples**:
+
+* `theme_grey()` (default)
+* `theme_bw()`
+* `theme_minimal()`
+* `theme_classic()`
+* `theme_void()`
+
+**Behavior**: When you add `+ theme(...)` to a complete theme, ggplot merges your changes with the existing complete specification.
+
+An incomplete theme (created with `theme()`) specifies only some properties, leaving others to be inherited from the current complete theme.
+
+
+**Example**:
+
+```{r}
+my_incomplete <- theme(axis.text.x = element_text(angle = 45))
+```
+
+The following example contains workable code:
+
+
+```{r}
+# Default theme (complete)
+p_default <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  labs(title = "Default theme_grey()")
+
+# Built-in complete theme
+p_bw <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_bw() +
+  labs(title = "theme_bw()")
+
+# Incomplete theme modification
+p_modified <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(title = "Modified theme_minimal()")
+
+# Display comparison
+(p_default + p_bw) / p_modified
+```
+
+The following two operators `%+replace%`  and `+` are used in building complete and incomplete themes in `ggplot()`.
+
+
+
+## `%+replace%`  vs `+`
+
+`%+replace%` – Use when you are building a completely custom theme from scratch (e.g., starting with theme() or theme_minimal() and wanting to replace entire element structures rather than merging).
+
+`+` – Use for incremental changes to an existing theme (e.g., starting with theme_bw() then modifying only axis text size).
+
+**Example**: Using %+replace% (complete custom theme)
+
+```{r}
+#library(ggplot2)
+
+my_custom_theme <- theme_minimal() %+replace%
+  theme(
+    axis.title = element_text(color = "red", size = 20),
+    axis.text = element_text(color = "blue", size = 12),
+    # explicitly not inheriting from previous theme defaults
+    panel.background = element_rect(fill = "lightgray")
+  )
+```
+
+Here, `%+replace%` replaces the entire `axis.title`, `axis.text`, and `panel.background` specifications instead of merging with the existing `theme_minimal()` defaults.
+
+**Example**: Using `+` (incremental modification)
+
+```{r}
+modified_theme <- theme_bw() +
+  theme(
+    axis.title.x = element_text(color = "red"),  # keeps other axis.title.y default
+    plot.title = element_text(hjust = 0.5)
+  )
+```
+
+Here, only the specified changes are added; all other theme elements from `theme_bw()` remain unchanged.
+
+
+**Best Practices**
+
+
+|   Scenario	      |   Recommended Operator   |
+|:------------------|:-------------------------|
+| Start with complete theme, tweak a few things | 	`+` |
+| Build completely custom theme from scratch	| `theme_void() %+replace% theme(...)`|
+| Modify incomplete theme	| Almost always + (never `%+replace%` unless you know you want to purge defaults)|
+| Remove a specific element set	|  `%+replace%` with `element_blank()`|
+
+
+
+<div class="tip-box"> <strong>Pro Tip:</strong> Use <code>%+replace%</code> when creating a complete custom theme from scratch. Use <code>+</code> for incremental modifications to an existing theme. </div>
+
+
+# The Hierarchy of GGPlot Elements 
+
+The ggplot and theme have a complex structure. Two hierarchical structures are useful in design and debugging. The component hierarchy diagram answers "what parts exist?" for customization, while the pipeline diagram answers "what happens when?" for understanding rendering order.
+
+
+## Processing pipeline
+
+The rendering pipeline diagram (or grammar of graphics evaluation order). It outlines the dynamic processing flow, sequencing from geoms to aesthetics, scales, coordinate systems, facets, statistical transforms, and finally themes.
+
+
+**1. Geoms (Highest Priority)**: Layer-specific visual elements that override everything below
+
+```{}
+geom_point(color = "red", size = 3)           # Specific to this layer
+geom_line(linetype = "dashed")                # Overrides any global settings
+```
+
+
+**2. Aesthetics Mapping (aes())**: Mapped variables override constants; scales transform these
+
+```{}
+aes(x = mpg, y = wt, color = cyl)             # Mapped to data
+aes(x = mpg, y = wt, color = "blue")          # Treated as constant, NOT mapping
+```
+
+**3. Scales**: Transform and guide the visual representation of mapped aesthetics
+
+```{}
+scale_color_gradient(low = "blue", high = "red")  # Overrides default color scale
+scale_x_log10()                                   # Transforms axis
+```
+
+
+**4. Coordinate Systems (coord_xx())**: Override axis and coordinate properties set by scales
+
+```{}
+coord_flip()                      # Swaps x and y axes
+coord_cartesian(xlim = c(0, 10))  # Zooms (doesn't drop data)
+```
+
+
+**5. Facets (facet_xx())**:  Split data into subplots; each facet inherits from global settings but can have its own scale
+
+```{}
+facet_wrap(~cyl, scales = "free")   # Different axis scales per facet
+```
+
+**6. Statistical Transformations (stat_xx())**: Override default statistical calculations
+
+```{}
+stat_smooth(method = "lm")           # Uses linear model instead of loess
+stat_bin(bins = 30)                  # Overrides default binning
+```
+
+**7. Themes (Lowest Priority)**: Control non-data ink: backgrounds, grids, text, legends (not data representation)
+
+```{}
+theme_bw() +                          # Complete theme
+  theme(axis.text = element_text(size = 10))  # Specific element
+```
+
+
+##  ggplot2 Component hierarchy
+
+The component hierarchy tree (or plot anatomy diagram). It illustrates the static, nested structure of a plot, showing how elements like the panel, axes, legend, strip, and titles branch into specific sub-components such as backgrounds, borders, grids, ticks, and text.
+
+
+```{}
+ 
+ plot
+ |
+ ├── panel
+ │   ├── background
+ │   ├── border
+ │   ├── grid
+ │   │   ├── major
+ │   │   └── minor
+ │   └── spacing
+ ├── axis
+ │   ├── title (x, y, top, right)
+ │   ├── text (x, y, top, right)
+ │   ├── ticks (x, y, top, right)
+ │   └── line (x, y, top, right)
+ ├── legend
+ │   ├── background
+ │   ├── title
+ │   ├── text
+ │   └── key
+ ├── strip
+ │   ├── background
+ │   └── text
+ └── plot
+     ├── title
+     ├── subtitle
+     ├── caption
+     └── tag
+```  
+  
+  
+
+# The Four Element Functions
+
+The four element functions in ggplot2 are `element_blank()`, `element_rect()`, `element_line()`, and `element_text()` . These functions are the building blocks of the ggplot2 theme system, used to control the appearance of all non-data components of a plot .
+
+* `element_blank()` – Draws nothing and allocates no space; effectively removes a theme element .
+
+* `element_rect()` – Used for rectangular areas such as plot backgrounds, panel borders, and legend backgrounds .
+
+* `element_line()` – Used for lines including axis lines, grid lines, and tick marks .
+
+* `element_text()` – Used for text elements like plot titles, axis labels, legend text, and strip text .
+
+Each function accepts specific parameters. For instance, `element_text()` supports `family`, `face`, `colour`, `size`, `hjust`, `vjust`, `angle`, and `lineheight` , while `element_rect()` accepts `fill`, `colour`, `linewidth`, and `linetype`. 
+
+Additional element types exist, such as `element_polygon()` and `element_point()`, but are not widely used .
+
+
+
+
+```{r}
+# Create a base plot for demonstration
+base_plot <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 3, alpha = 0.7)
+
+# 1. element_text() - for all text elements
+p_text <- base_plot +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(
+      family = "serif",
+      face = "bold.italic",
+      colour = "#6E3061",
+      size = 18,
+      hjust = 0.5
+    ),
+    axis.title = element_text(
+      face = "bold",
+      colour = "grey30",
+      size = 12
+    ),
+    axis.text = element_text(
+      colour = "grey40",
+      size = 10
+    )
+  ) +
+  labs(title = "Custom element_text() Example")
+
+# 2. element_line() - for lines and borders
+p_line <- base_plot +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(
+      colour = "#6E3061",
+      linewidth = 0.5,
+      linetype = "dashed"
+    ),
+    panel.grid.minor = element_line(
+      colour = "#c49bb8",
+      linewidth = 0.2,
+      linetype = "dotted"
+    ),
+    axis.line = element_line(
+      colour = "black",
+      linewidth = 0.8
+    )
+  ) +
+  labs(title = "Custom element_line() Example")
+
+# 3. element_rect() - for rectangles and backgrounds
+p_rect <- base_plot +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(
+      fill = "#f4edf3",
+      colour = "#6E3061",
+      linewidth = 1
+    ),
+    plot.background = element_rect(
+      fill = "#fdfafd",
+      colour = NA
+    ),
+    legend.background = element_rect(
+      fill = "white",
+      colour = "#d4c0d1"
+    )
+  ) +
+  labs(title = "Custom element_rect() Example")
+
+# 4. element_blank() - to remove elements
+p_blank <- base_plot +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.ticks = element_blank(),
+    legend.position = "none"
+  ) +
+  labs(title = "element_blank() Example")
+
+# Display all four
+(p_text + p_line) / (p_rect + p_blank)
+```
+
+
+
+## `element_text()` Parameter Reference
+
+
+```{r}
+# Demonstrate key element_text parameters
+demo_data <- data.frame(
+  category = LETTERS[1:5],
+  value = c(23, 45, 32, 56, 41)
+)
+
+ggplot(demo_data, aes(category, value)) +
+  geom_col(fill = "#6E3061", alpha = 0.8) +
+  theme_minimal() +
+  theme(
+    # Title with multiple parameters
+    plot.title = element_text(
+      family = "sans",
+      face = "bold",
+      colour = "#6E3061",
+      size = 16,
+      hjust = 0.5,
+      margin = margin(b = 15)
+    ),
+    # Subtitle
+    plot.subtitle = element_text(
+      size = 12,
+      colour = "grey40",
+      hjust = 0.5
+    ),
+    # Axis titles
+    axis.title.x = element_text(
+      face = "italic",
+      colour = "grey30",
+      margin = margin(t = 10)
+    ),
+    axis.title.y = element_text(
+      angle = 90,
+      face = "italic",
+      colour = "grey30"
+    ),
+    # Rotated axis text
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      colour = "grey40"
+    ),
+    # Caption
+    plot.caption = element_text(
+      size = 8,
+      colour = "grey60",
+      hjust = 1,
+      margin = margin(t = 10)
+    )
+  ) +
+  labs(
+    title = "Complete element_text() Demonstration",
+    subtitle = "Showcasing all major text parameters",
+    x = "Category",
+    y = "Value",
+    caption = "Source: Demo Data"
+  )
+```
+
+
+Some of the graphical parameters used in the above plots are summarizedin the following table:
+
+
+<table> <tr><th>Parameter</th><th>Description</th><th>Example Values</th></tr> <tr><td><code>family</code></td><td>Font family name</td><td><code>"sans"</code>, <code>"serif"</code>, <code>"mono"</code></td></tr> <tr><td><code>face</code></td><td>Font face/style</td><td><code>"plain"</code>, <code>"italic"</code>, <code>"bold"</code>, <code>"bold.italic"</code></td></tr> <tr><td><code>colour</code></td><td>Text color</td><td><code>"#6E3061"</code>, <code>"grey40"</code>, <code>"steelblue"</code></td></tr> <tr><td><code>size</code></td><td>Font size in pts</td><td><code>12</code>, <code>rel(0.9)</code>, <code>rel(1.2)</code></td></tr> <tr><td><code>hjust</code></td><td>Horizontal justification</td><td><code>0</code> (left), <code>0.5</code> (center), <code>1</code> (right)</td></tr> <tr><td><code>vjust</code></td><td>Vertical justification</td><td><code>0</code> (bottom), <code>0.5</code> (middle), <code>1</code> (top)</td></tr> <tr><td><code>angle</code></td><td>Rotation angle</td><td><code>0</code>, <code>45</code>, <code>90</code></td></tr> <tr><td><code>lineheight</code></td><td>Line height multiplier</td><td><code>1</code>, <code>1.5</code></td></tr> <tr><td><code>margin</code></td><td>Margin around text</td><td><code>margin(t=10, r=5, b=10, l=5)</code></td></tr> </table>
+  
+## `element_rect()` Parameter Reference
+
+`element_rect()` controls the appearance of rectangular elements: backgrounds (plot, panel, legend, strip), borders, and keys.
+
+```{r}
+# Create a dedicated rectangle demonstration
+rect_demo <- ggplot(mtcars, aes(wt, mpg, colour = factor(cyl))) +
+  geom_point(size = 3)
+
+# 1. fill: Interior color of rectangles
+p_fill <- rect_demo +
+  theme_minimal() +
+  theme(
+    # Panel background fill
+    panel.background = element_rect(
+      fill = "#f4edf3",        # Light purple tint
+      colour = NA               # No border
+    ),
+    # Plot background fill
+    plot.background = element_rect(
+      fill = "#fdfafd",        # Very light purple
+      colour = NA
+    ),
+    # Legend key fill
+    legend.key = element_rect(
+      fill = "#faf5f9",        # Match panel
+      colour = NA
+    )
+  ) +
+  labs(title = "fill: Custom background colors")
+
+# 2. colour & linewidth: Borders on rectangles
+p_border <- rect_demo +
+  theme_minimal() +
+  theme(
+    # Panel border with color and width
+    panel.border = element_rect(
+      fill = NA,                # Transparent interior
+      colour = "#6E3061",      # Purple border
+      linewidth = 1.5          # Thick border
+    ),
+    # Legend background with border
+    legend.background = element_rect(
+      fill = "white",
+      colour = "#4a2040",      # Dark purple border
+      linewidth = 0.5
+    ),
+    # Strip background with fill AND border
+    strip.background = element_rect(
+      fill = "#6E3061",        # Purple fill
+      colour = "#4a2040",      # Darker border
+      linewidth = 0.5
+    )
+  ) +
+  facet_wrap(~ gear) +
+  labs(title = "colour + linewidth: Borders on panel, legend, strip")
+
+# 3. linetype: Border pattern for rectangles
+p_linetype <- rect_demo +
+  theme_minimal() +
+  theme(
+    panel.border = element_rect(
+      fill = NA,
+      colour = "#6E3061",
+      linewidth = 1.2,
+      linetype = "dashed"      # Dashed border
+    ),
+    legend.background = element_rect(
+      fill = "white",
+      colour = "#c49bb8",
+      linewidth = 0.8,
+      linetype = "dotted"      # Dotted border
+    )
+  ) +
+  labs(title = "linetype: 'dashed' panel, 'dotted' legend")
+
+# 4. Multiple layered rectangles
+p_layered <- rect_demo +
+  theme_minimal() +
+  theme(
+    # Outer plot background
+    plot.background = element_rect(
+      fill = "#e8dce5",        # Medium purple
+      colour = "#6E3061",
+      linewidth = 1
+    ),
+    # Inner panel background
+    panel.background = element_rect(
+      fill = "white",
+      colour = "#c49bb8",
+      linewidth = 0.5,
+      linetype = "dashed"
+    ),
+    # Legend sits on top
+    legend.background = element_rect(
+      fill = alpha("white", 0.9),  # Semi-transparent white
+      colour = "#6E3061",
+      linewidth = 0.5
+    )
+  ) +
+  labs(title = "Layered: plot.bg > panel.bg > legend.bg")
+
+# Display rectangle demonstrations
+(p_fill + p_border) / (p_linetype + p_layered)
+```
+
+
+Some of the key graphical parameters used in the above example of `element_redt()` are summarized in the following table.
+
+
+
+|  Parameter |	Type	| Default	| Description	Example  |
+|:----------|:-----------|:-------------------|:---------------------------------------|
+| `fill`	| character	| `NULL`	| Interior fill color	| `"white"`, `"#f4edf3"`, `"grey95"`, `NA` (transparent)| 
+| `colour` / `color`	| character	| `NULL`	| Border color	| `"#6E3061"`, `"grey80"`, `"black"`, `NA` (no border)| 
+| `linewidth`	| numeric	| `NULL`	| Border width in mm	| `0.3`, `0.5`, `1.0`, `2.0`| 
+| `linetype`	| character/numeric	| `NULL`	| Border line pattern	| `"solid"`, `"dashed"`, `"dotted"`, `"dotdash"`, `"blank"`| 
+| `inherit.blank`	| logical	| `FALSE`	| Inherit blank from parent?| 	`TRUE`, `FALSE`| 
+
+
+<div class="note-box"> <strong>Key Pattern:</strong> Use <code>fill = NA</code> when you want a transparent interior with only a visible border. Use <code>colour = NA</code> when you want a filled rectangle with no border. </div>
+
+
+
+## `element_line()` Parameter Reference
+
+`element_line()` controls the appearance of all line elements: grid lines, axis lines, tick marks, panel borders, and more.
+
+**Syntax**
+
+```{}
+element_line(
+  colour = NULL,       # Line color (color also accepted)
+  linewidth = NULL,    # Line width in mm (replaces deprecated 'size')
+  linetype = NULL,     # Line type: "solid", "dashed", "dotted", "dotdash", 
+                       # "longdash", "twodash", "blank"
+  lineend = NULL,      # Line end style: "round", "butt", "square"
+  arrow = NULL,        # Add arrow to line end (use arrow() function)
+  inherit.blank = FALSE # Should blank lines inherit from parents?
+)
+```
+
+
+**Example**
+
+```{r}
+# Create a dedicated line demonstration
+line_demo <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 3, alpha = 0.7, colour = "#6E3061") +
+  theme_minimal(base_size = 14)
+
+# 1. linetype: Different line patterns
+p_linetype <- line_demo +
+  theme(
+    panel.grid.major = element_line(
+      colour = "#6E3061",
+      linewidth = 0.6,
+      linetype = "dashed"    # Try: solid, dashed, dotted, dotdash, longdash, twodash
+    ),
+    panel.grid.minor = element_line(
+      colour = "#c49bb8",
+      linewidth = 0.3,
+      linetype = "dotted"
+    )
+  ) +
+  labs(title = "linetype: 'dashed' major,\n 'dotted' minor")
+
+# 2. linewidth: Controlling line thickness
+p_linewidth <- line_demo +
+  theme(
+    panel.grid.major = element_line(
+      colour = "#6E3061",
+      linewidth = 1.2,       # Thicker lines
+      linetype = "solid"
+    ),
+    axis.line = element_line(
+      colour = "black",
+      linewidth = 0.8        # Medium axis lines
+    ),
+    axis.ticks = element_line(
+      colour = "grey50",
+      linewidth = 0.3        # Thin ticks
+    )
+  ) +
+  labs(title = "linewidth: 1.2 (grid), \n 0.8 (axis), 0.3 (ticks)")
+
+# 3. lineend: How line ends are rendered
+p_lineend <- line_demo +
+  theme(
+    panel.grid.major = element_line(
+      colour = "#6E3061",
+      linewidth = 1.5,
+      linetype = "dashed",
+      lineend = "round"      # Try: "round", "butt", "square"
+    )
+  ) +
+  labs(title = "lineend: 'round' \n(visible on thick dashed lines)")
+
+# 4. arrow: Adding arrows to lines
+p_arrow <- line_demo +
+  theme(
+    axis.line.x = element_line(
+      colour = "#6E3061",
+      linewidth = 0.8,
+      arrow = arrow(
+        angle = 20,          # Arrowhead angle
+        length = unit(0.3, "cm"),  # Arrowhead size
+        ends = "last",       # "first", "last", "both"
+        type = "closed"      # "open" or "closed"
+      )
+    )
+  ) +
+  labs(title = "arrow: Arrow on \n x-axis line end")
+
+# Display line demonstrations
+(p_linetype + p_linewidth) / (p_lineend + p_arrow)
+```
+
+
+Some graphical parameters used in the above example of `element_line()` is summarized in the following table.
+
+
+
+|  Parameter	| Type	| Default	| Description	Example |
+|:--------------|:---------|:-------------------|:-----------------------------|
+| `colour` / `color`	| character	| `NULL`	| Line color| 	`"#6E3061"`, `"grey50"`, `"steelblue"`| 
+| `linewidth`	| numeric	| `NULL`	| Line width in mm| 	`0.3`, `0.5`, `1.2`, `2.0`| 
+| `linetype`	| character/numeric	| `NULL`	| Line pattern| 	`"solid"`, `"dashed"`, `"dotted"`, `"dotdash"`, `"longdash"`, `"twodash"`, `"blank"`, `1–6`| 
+| `lineend`	| character	| `NULL`	| Line cap style| 	`"round"`, `"butt"`, `"square"`| 
+| `arrow`	| arrow object	| `NULL`	| Arrow specification| 	`arrow(angle=20, length=unit(0.3,"cm"), ends="last", type="closed")`| 
+| `inherit.blank`	| 	`FALSE`	| Inherit blank from parent?| 	`TRUE`, `FALSE`| 
+
+
+
+<div class="tip-box"> <strong>Note on linewidth vs size:</strong> In ggplot2 ≥ 3.4.0, <code>linewidth</code> replaced the deprecated <code>size</code> parameter for line elements. Always use <code>linewidth</code> for lines, <code>size</code> for points/text. </div>
+
+
+
+## `element_blank()` Parameter Reference
+
+`element_blank()` is the simplest yet most powerful element function. It removes a theme element entirely, as if it were never drawn.
+
+**Syntax**
+
+```{}
+element_blank()
+```
+
+**Working Example**
+
+```{r}
+base_for_blank <- ggplot(mtcars, aes(wt, mpg, colour = factor(cyl))) +
+  geom_point(size = 3)
+
+# 1. Remove all grid lines
+p_no_grid <- base_for_blank +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(title = "No Grid Lines")
+
+# 2. Remove axis elements (minimalist look)
+p_no_axis <- base_for_blank +
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank()
+  ) +
+  labs(title = "No Axis Elements", subtitle = "Pure data display")
+
+# 3. Remove legend and background elements
+p_clean <- base_for_blank +
+  theme_minimal() +
+  theme(
+    legend.position = "none",         # Remove entire legend
+    legend.background = element_blank(),
+    panel.background = element_blank(),
+    plot.background = element_blank(),
+    panel.border = element_blank()
+  ) +
+  labs(title = "Clean Slate: No Legend or Backgrounds")
+
+# 4. Remove strip elements (for faceted plots)
+p_no_strips <- base_for_blank +
+  facet_wrap(~ gear) +
+  theme_minimal() +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_blank()
+  ) +
+  labs(title = "No Strip Headers", subtitle = "Facet identity hidden")
+
+# Display blank demonstrations
+(p_no_grid + p_no_axis) / (p_clean + p_no_strips)
+```
+
+
+`element_blank()` Common Usage Table
+
+
+| Theme Element to Blank	| Effect	| Common Use Case |
+|:-----------------------|:-----------------|:--------------------------|
+| panel.grid.major	| Removes major grid lines| 	Clean, minimalist plots| 
+| panel.grid.minor	| Removes minor grid lines| 	Reduce visual clutter| 
+| panel.grid	| Removes ALL grid lines| 	Complete grid removal| 
+| axis.ticks	| Removes tick marks| 	Modern, streamlined look| 
+| axis.text	| Removes tick labels| 	When labels aren't needed| 
+| axis.title	| Removes axis titles| 	When axes are self-explanatory| 
+| axis.line	| Removes axis lines| 	Combine with void theme| 
+| legend.title	| Removes legend title| 	When legend is self-explanatory| 
+| legend.key	| Removes legend key background| 	Transparent legend symbols| 
+| strip.background	| Removes facet strip background| 	Minimalist faceting| 
+| strip.text	| Removes facet labels| 	Hide facet identity| 
+| panel.background	| Removes panel fill| 	Transparent plotting area| 
+| plot.background	| Removes plot fill| 	Transparent overall background| 
+| panel.border	| Removes panel border| 	No framing rectangle| 
+
+
+<div class="warning-box"> <strong>Important:</strong> <code>element_blank()</code> completely removes an element. For legends, use <code>legend.position = "none"</code> instead of blanking all legend sub-elements individually. </div>
+
+
+
+
+
+
+## Overall Summary: Key Graphical Parameters
+
+Below is a comprehensive cross-reference table of all key graphical parameters used across the four element functions. Use this as your quick reference when building custom themes.
+
+<div class="summary-table-wrapper"><table class="summary-table"> <thead> <tr> <th>Parameter</th> <th>Type</th> <th>Used In</th> <th>Description &amp; Common Values</th> </tr> </thead> <tbody><tr> <td class="param-col"><code>family</code></td> <td class="type-col">character</td> <td class="func-col"><code>element_text()</code></td> <td class="desc-col">Font family name. Common: <code>"sans"</code>, <code>"serif"</code>, <code>"mono"</code>, <code>"Arial"</code>, <code>"Times"</code></td> </tr><tr> <td class="param-col"><code>face</code></td> <td class="type-col">character</td> <td class="func-col"><code>element_text()</code></td> <td class="desc-col">Font style: <code>"plain"</code>, <code>"italic"</code>, <code>"bold"</code>, <code>"bold.italic"</code></td> </tr><tr> <td class="param-col"><code>colour</code> / <code>color</code></td> <td class="type-col">character</td> <td class="func-col"><code>element_text()</code><br><code>element_line()</code><br><code>element_rect()</code></td> <td class="desc-col">Color specification. Accepts: hex codes (<code>"#6E3061"</code>), named colors (<code>"steelblue"</code>), <code>NA</code> (transparent/no color)</td> </tr><tr> <td class="param-col"><code>size</code></td> <td class="type-col">numeric</td> <td class="func-col"><code>element_text()</code></td> <td class="desc-col">Font size in points. Use <code>rel()</code> for scaling: <code>12</code>, <code>rel(0.9)</code>, <code>rel(1.2)</code></td> </tr><tr> <td class="param-col"><code>linewidth</code></td> <td class="type-col">numeric</td> <td class="func-col"><code>element_line()</code><br><code>element_rect()</code></td> <td class="desc-col">Line/border width in mm. Common: <code>0.3</code>, <code>0.5</code>, <code>0.8</code>, <code>1.0</code>, <code>1.5</code>, <code>2.0</code></td> </tr><tr> <td class="param-col"><code>linetype</code></td> <td class="type-col">character / numeric</td> <td class="func-col"><code>element_line()</code><br><code>element_rect()</code></td> <td class="desc-col">Line pattern. Character: <code>"solid"</code>, <code>"dashed"</code>, <code>"dotted"</code>, <code>"dotdash"</code>, <code>"longdash"</code>, <code>"twodash"</code>, <code>"blank"</code>. Numeric: <code>1</code>–<code>6</code></td> </tr><tr> <td class="param-col"><code>fill</code></td> <td class="type-col">character</td> <td class="func-col"><code>element_rect()</code></td> <td class="desc-col">Interior fill color for rectangles. Common: <code>"white"</code>, <code>"grey95"</code>, <code>"#f4edf3"</code>, <code>NA</code> (transparent)</td> </tr><tr> <td class="param-col"><code>hjust</code></td> <td class="type-col">numeric (0–1)</td> <td class="func-col"><code>element_text()</code></td> <td class="desc-col">Horizontal justification: <code>0</code> (left), <code>0.5</code> (center), <code>1</code> (right)</td> </tr><tr> <td class="param-col"><code>vjust</code></td> <td class="type-col">numeric (0–1)</td> <td class="func-col"><code>element_text()</code></td> <td class="desc-col">Vertical justification: <code>0</code> (bottom), <code>0.5</code> (middle), <code>1</code> (top)</td> </tr><tr> <td class="param-col"><code>angle</code></td> <td class="type-col">numeric</td> <td class="func-col"><code>element_text()</code></td> <td class="desc-col">Rotation angle in degrees: <code>0</code> (horizontal), <code>45</code>, <code>90</code> (vertical), <code>-45</code>, <code>270</code></td> </tr><tr> <td class="param-col"><code>lineheight</code></td> <td class="type-col">numeric</td> <td class="func-col"><code>element_text()</code></td> <td class="desc-col">Line spacing multiplier: <code>1</code> (normal), <code>1.5</code> (loose), <code>0.8</code> (tight)</td> </tr><tr> <td class="param-col"><code>margin</code></td> <td class="type-col">margin object</td> <td class="func-col"><code>element_text()</code></td> <td class="desc-col">Space around text: <code>margin(t=10, r=5, b=10, l=5)</code>. t=top, r=right, b=bottom, l=left</td> </tr><tr> <td class="param-col"><code>lineend</code></td> <td class="type-col">character</td> <td class="func-col"><code>element_line()</code></td> <td class="desc-col">Line cap style: <code>"round"</code>, <code>"butt"</code>, <code>"square"</code>. Most visible on thick lines</td> </tr><tr> <td class="param-col"><code>arrow</code></td> <td class="type-col">arrow object</td> <td class="func-col"><code>element_line()</code></td> <td class="desc-col">Arrow specification: <code>arrow(angle=20, length=unit(0.3,"cm"), ends="last", type="closed")</code></td> </tr><tr> <td class="param-col"><code>debug</code></td> <td class="type-col">logical</td> <td class="func-col"><code>element_text()</code></td> <td class="desc-col">Draw debug rectangle: <code>TRUE</code>, <code>FALSE</code> (default). Useful for layout debugging</td> </tr><tr> <td class="param-col"><code>inherit.blank</code></td> <td class="type-col">logical</td> <td class="func-col"><code>element_line()</code><br><code>element_rect()</code></td> <td class="desc-col">Inherit blank from parent element: <code>TRUE</code>, <code>FALSE</code> (default). Advanced usage only</td> </tr></tbody> </table></div><div class="note-box"> <strong>Quick Tip:</strong> The <code>colour</code> parameter accepts both British (<code>colour</code>) and American (<code>color</code>) spellings. They are completely interchangeable in ggplot2. </div>
+
+
+
+
+
+
+
+
+## `element_rect()` Reference
+
+
+Core Parameters for Borders and Backgrounds
+
+fill : The fill color for the rectangular area (e.g., the panel or plot background). Accepts color names, hex codes, or RGB values. Use fill_alpha() to set transparency .
+
+colour / color : The border line color. color is an alias for colour .
+
+linewidth : The border size, measured in mm . (Note: the older size parameter is deprecated for this purpose).
+
+linetype : The border line type. Can be specified as an integer (0-8), a name ("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash"), or a hexadecimal string (e.g., "44") .
+
+Additional Styling Parameters
+linejoin : Controls how corners of the border are rendered. Options include "round", "mitre", or "bevel" .
+
+inherit.blank : Logical value. If TRUE and a parent element is element_blank(), this element will also be blank. If FALSE, it ignores blank parents .
+
+Deprecated Parameter
+size : This parameter is deprecated. Use linewidth for border thickness or fontsize for text-related sizing instead .
+
+Usage Tip: This function is most commonly used within theme() to modify elements such as panel.background, plot.background, or legend.background .
+
+
+
+
+
+  
+  
+  
+# Step-by-Step Custom Theme Creation
+
+This section use working examples to demonstrate the steps for create a custom theme.
+
+
+## Step 1: Create the Theme Function Skeleton
+
+```{r}
+# Step 1: Define the theme function
+theme_custom <- function(base_size = 12, base_family = "") {
+  # Start with a complete theme and replace everything
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      # We'll fill this in through the following steps
+    )
+}
+
+# Test the skeleton
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_custom() +
+  labs(title = "Step 1: Theme Skeleton")
+```
+
+
+<div class="note-box"> <strong>Important:</strong> Always start with <code>base_size</code> and <code>base_family</code> as parameters. This makes your theme reusable and scalable. </div>
+
+  
+  
+## Step 2: Configure Plot and Panel Backgrounds
+
+```{r}
+theme_custom <- function(base_size = 12, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      # Plot background (behind everything)
+      plot.background = element_rect(
+        fill = "white",
+        colour = NA,
+        linewidth = 0
+      ),
+      # Panel background (the plotting area)
+      panel.background = element_rect(
+        fill = "grey95",
+        colour = NA
+      ),
+      # Panel border
+      panel.border = element_rect(
+        fill = NA,
+        colour = "grey80",
+        linewidth = 0.5
+      )
+    )
+}
+
+# Test the backgrounds
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 3, colour = "#6E3061") +
+  theme_custom() +
+  labs(title = "Step 2: Custom Backgrounds",
+       subtitle = "Grey panel with border")
+```
+
+
+## Step 3: Define Grid Lines
+
+```{r}
+theme_custom <- function(base_size = 12, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      plot.background = element_rect(fill = "white", colour = NA),
+      panel.background = element_rect(fill = "grey95", colour = NA),
+      panel.border = element_rect(fill = NA, colour = "grey80", linewidth = 0.5),
+      
+      # Major grid lines
+      panel.grid.major = element_line(
+        colour = "grey85",
+        linewidth = 0.3,
+        linetype = "dashed"
+      ),
+      # Minor grid lines
+      panel.grid.minor = element_line(
+        colour = "grey90",
+        linewidth = 0.15,
+        linetype = "dotted"
+      )
+    )
+}
+
+# Test grid lines
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 3, colour = "#6E3061") +
+  theme_custom() +
+  labs(title = "Step 3: Custom Grid Lines",
+       subtitle = "Dashed major grid, dotted minor grid")
+```
+
+
+## Step 4: Configure Axis Elements
+
+
+```{r}
+theme_custom <- function(base_size = 12, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      plot.background = element_rect(fill = "white", colour = NA),
+      panel.background = element_rect(fill = "grey95", colour = NA),
+      panel.border = element_rect(fill = NA, colour = "grey80", linewidth = 0.5),
+      panel.grid.major = element_line(colour = "grey85", linewidth = 0.3, linetype = "dashed"),
+      panel.grid.minor = element_line(colour = "grey90", linewidth = 0.15, linetype = "dotted"),
+      
+      # Axis lines
+      axis.line = element_line(colour = "black", linewidth = 0.5),
+      # Axis ticks
+      axis.ticks = element_line(colour = "grey50", linewidth = 0.3),
+      axis.ticks.length = unit(2, "mm"),
+      # Axis titles
+      axis.title = element_text(
+        size = rel(1.1),
+        face = "bold",
+        colour = "grey30"
+      ),
+      # Axis text (tick labels)
+      axis.text = element_text(
+        size = rel(0.9),
+        colour = "grey40"
+      ),
+      # Individual axis title margins
+      axis.title.x = element_text(margin = margin(t = 10)),
+      axis.title.y = element_text(angle = 90, margin = margin(r = 10))
+    )
+}
+
+# Test axis configuration
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 3, colour = "#6E3061") +
+  theme_custom(base_size = 14) +
+  labs(title = "Step 4: Custom Axis Elements",
+       x = "Weight (1000 lbs)",
+       y = "Miles per Gallon")
+```
+
+
+## Step 5: Configure the Legend
+
+```{r}
+theme_custom <- function(base_size = 12, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      plot.background = element_rect(fill = "white", colour = NA),
+      panel.background = element_rect(fill = "grey95", colour = NA),
+      panel.border = element_rect(fill = NA, colour = "grey80", linewidth = 0.5),
+      panel.grid.major = element_line(colour = "grey85", linewidth = 0.3, linetype = "dashed"),
+      panel.grid.minor = element_line(colour = "grey90", linewidth = 0.15, linetype = "dotted"),
+      axis.line = element_line(colour = "black", linewidth = 0.5),
+      axis.ticks = element_line(colour = "grey50", linewidth = 0.3),
+      axis.ticks.length = unit(2, "mm"),
+      axis.title = element_text(size = rel(1.1), face = "bold", colour = "grey30"),
+      axis.text = element_text(size = rel(0.9), colour = "grey40"),
+      axis.title.x = element_text(margin = margin(t = 10)),
+      axis.title.y = element_text(angle = 90, margin = margin(r = 10)),
+      
+      # Legend background
+      legend.background = element_rect(
+        fill = "white",
+        colour = "grey80",
+        linewidth = 0.3
+      ),
+      # Legend title
+      legend.title = element_text(
+        size = rel(0.95),
+        face = "bold",
+        colour = "grey30"
+      ),
+      # Legend text
+      legend.text = element_text(
+        size = rel(0.85),
+        colour = "grey40"
+      ),
+      # Legend key (the symbol area)
+      legend.key = element_rect(
+        fill = "white",
+        colour = NA
+      ),
+      # Legend position and spacing
+      legend.position = "bottom",
+      legend.margin = margin(5, 5, 5, 5),
+      legend.spacing = unit(5, "mm")
+    )
+}
+
+# Test legend configuration
+ggplot(mtcars, aes(wt, mpg, colour = factor(cyl), shape = factor(gear))) +
+  geom_point(size = 3) +
+  theme_custom(base_size = 14) +
+  labs(title = "Step 5: Custom Legend",
+       colour = "Cylinders",
+       shape = "Gears")
+```
+
+
+## Step 6: Define Plot Titles and Labels
+
+```{r}
+theme_custom <- function(base_size = 12, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      # Previous steps...
+      plot.background = element_rect(fill = "white", colour = NA),
+      panel.background = element_rect(fill = "grey95", colour = NA),
+      panel.border = element_rect(fill = NA, colour = "grey80", linewidth = 0.5),
+      panel.grid.major = element_line(colour = "grey85", linewidth = 0.3, linetype = "dashed"),
+      panel.grid.minor = element_line(colour = "grey90", linewidth = 0.15, linetype = "dotted"),
+      axis.line = element_line(colour = "black", linewidth = 0.5),
+      axis.ticks = element_line(colour = "grey50", linewidth = 0.3),
+      axis.ticks.length = unit(2, "mm"),
+      axis.title = element_text(size = rel(1.1), face = "bold", colour = "grey30"),
+      axis.text = element_text(size = rel(0.9), colour = "grey40"),
+      axis.title.x = element_text(margin = margin(t = 10)),
+      axis.title.y = element_text(angle = 90, margin = margin(r = 10)),
+      legend.background = element_rect(fill = "white", colour = "grey80", linewidth = 0.3),
+      legend.title = element_text(size = rel(0.95), face = "bold", colour = "grey30"),
+      legend.text = element_text(size = rel(0.85), colour = "grey40"),
+      legend.key = element_rect(fill = "white", colour = NA),
+      legend.position = "bottom",
+      
+      # Plot title
+      plot.title = element_text(
+        size = rel(1.4),
+        face = "bold",
+        colour = "#6E3061",
+        hjust = 0.5,
+        margin = margin(b = 10)
+      ),
+      # Subtitle
+      plot.subtitle = element_text(
+        size = rel(1.1),
+        colour = "grey40",
+        hjust = 0.5,
+        margin = margin(b = 15)
+      ),
+      # Caption
+      plot.caption = element_text(
+        size = rel(0.8),
+        colour = "grey60",
+        hjust = 1,
+        margin = margin(t = 10)
+      ),
+      # Tag (for labeling subplots)
+      plot.tag = element_text(
+        size = rel(1.2),
+        face = "bold",
+        colour = "#6E3061"
+      ),
+      # Overall plot margins
+      plot.margin = margin(20, 20, 20, 20)
+    )
+}
+
+# Test title configuration
+ggplot(mtcars, aes(wt, mpg, colour = factor(cyl))) +
+  geom_point(size = 3) +
+  theme_custom(base_size = 14) +
+  labs(
+    title = "Step 6: Custom Titles & Labels",
+    subtitle = "Complete text hierarchy with custom styling",
+    caption = "Source: mtcars dataset",
+    colour = "Cylinders",
+    tag = "A"
+  )
+```
+
+
+## Step 7: Configure Facet Strips
+
+
+```{r}
+theme_custom <- function(base_size = 12, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      # All previous steps...
+      plot.background = element_rect(fill = "white", colour = NA),
+      panel.background = element_rect(fill = "grey95", colour = NA),
+      panel.border = element_rect(fill = NA, colour = "grey80", linewidth = 0.5),
+      panel.grid.major = element_line(colour = "grey85", linewidth = 0.3, linetype = "dashed"),
+      panel.grid.minor = element_line(colour = "grey90", linewidth = 0.15, linetype = "dotted"),
+      axis.line = element_line(colour = "black", linewidth = 0.5),
+      axis.ticks = element_line(colour = "grey50", linewidth = 0.3),
+      axis.ticks.length = unit(2, "mm"),
+      axis.title = element_text(size = rel(1.1), face = "bold", colour = "grey30"),
+      axis.text = element_text(size = rel(0.9), colour = "grey40"),
+      axis.title.x = element_text(margin = margin(t = 10)),
+      axis.title.y = element_text(angle = 90, margin = margin(r = 10)),
+      legend.background = element_rect(fill = "white", colour = "grey80", linewidth = 0.3),
+      legend.title = element_text(size = rel(0.95), face = "bold", colour = "grey30"),
+      legend.text = element_text(size = rel(0.85), colour = "grey40"),
+      legend.key = element_rect(fill = "white", colour = NA),
+      legend.position = "bottom",
+      plot.title = element_text(size = rel(1.4), face = "bold", colour = "#6E3061", hjust = 0.5, margin = margin(b = 10)),
+      plot.subtitle = element_text(size = rel(1.1), colour = "grey40", hjust = 0.5, margin = margin(b = 15)),
+      plot.caption = element_text(size = rel(0.8), colour = "grey60", hjust = 1, margin = margin(t = 10)),
+      plot.tag = element_text(size = rel(1.2), face = "bold", colour = "#6E3061"),
+      plot.margin = margin(20, 20, 20, 20),
+      
+      # Strip background (facet headers)
+      strip.background = element_rect(
+        fill = "#6E3061",
+        colour = "#4a2040",
+        linewidth = 0.3
+      ),
+      # Strip text
+      strip.text = element_text(
+        size = rel(1.1),
+        face = "bold",
+        colour = "white"
+      ),
+      # Strip placement
+      strip.placement = "outside"
+    )
+}
+
+# Test facet configuration
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 3, colour = "#6E3061") +
+  facet_wrap(~ gear, nrow = 2) +
+  theme_custom(base_size = 14) +
+  labs(
+    title = "Step 7: Custom Facet Strips",
+    subtitle = "Styled strip headers with custom colors",
+    caption = "Source: mtcars dataset"
+  )
+```
+
+
+
+## Putting It All Together: A Complete Theme Example
+
+Now that we've covered all four element functions and their parameters, here's a complete theme that demonstrates proper usage of every function:
+
+```{r}
+theme_master_demo <- function(base_size = 14, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      # === element_rect() usage ===
+      plot.background = element_rect(
+        fill = "#fdfafd",
+        colour = NA
+      ),
+      panel.background = element_rect(
+        fill = "white",
+        colour = NA
+      ),
+      panel.border = element_rect(
+        fill = NA,
+        colour = "#6E3061",
+        linewidth = 0.8
+      ),
+      legend.background = element_rect(
+        fill = "white",
+        colour = "#d4c0d1",
+        linewidth = 0.3
+      ),
+      legend.key = element_rect(
+        fill = "white",
+        colour = NA
+      ),
+      strip.background = element_rect(
+        fill = "#6E3061",
+        colour = "#4a2040",
+        linewidth = 0.3
+      ),
+      
+      # === element_line() usage ===
+      panel.grid.major = element_line(
+        colour = "grey90",
+        linewidth = 0.3,
+        linetype = "solid"
+      ),
+      panel.grid.minor = element_line(
+        colour = "grey95",
+        linewidth = 0.15,
+        linetype = "dotted"
+      ),
+      axis.line = element_line(
+        colour = "#6E3061",
+        linewidth = 0.6
+      ),
+      axis.ticks = element_line(
+        colour = "grey60",
+        linewidth = 0.4
+      ),
+      
+      # === element_text() usage ===
+      plot.title = element_text(
+        family = base_family,
+        face = "bold",
+        colour = "#6E3061",
+        size = rel(1.4),
+        hjust = 0.5,
+        margin = margin(b = 12)
+      ),
+      plot.subtitle = element_text(
+        colour = "grey40",
+        size = rel(1.1),
+        hjust = 0.5,
+        margin = margin(b = 15)
+      ),
+      plot.caption = element_text(
+        colour = "grey50",
+        size = rel(0.8),
+        hjust = 1,
+        margin = margin(t = 12)
+      ),
+      plot.tag = element_text(
+        face = "bold",
+        colour = "#6E3061",
+        size = rel(1.2)
+      ),
+      axis.title = element_text(
+        face = "bold",
+        colour = "grey30",
+        size = rel(1.05)
+      ),
+      axis.text = element_text(
+        colour = "grey40",
+        size = rel(0.9)
+      ),
+      legend.title = element_text(
+        face = "bold",
+        colour = "grey30",
+        size = rel(0.95)
+      ),
+      legend.text = element_text(
+        colour = "grey40",
+        size = rel(0.85)
+      ),
+      strip.text = element_text(
+        face = "bold",
+        colour = "white",
+        size = rel(1.1)
+      ),
+      
+      # === element_blank() usage ===
+      # (we keep these, but they would be element_blank() if removed)
+      
+      # === Spacing ===
+      axis.ticks.length = unit(2.5, "mm"),
+      legend.position = "bottom",
+      legend.margin = margin(8, 8, 8, 8),
+      plot.margin = margin(20, 20, 20, 20),
+      strip.placement = "outside"
+    )
+}
+```
+
+```{r fig.align='center', fig.width=7, fig.height=7, alt = "Complete theme use cases"}
+# Apply the complete theme to a comprehensive plot
+ggplot(mtcars, aes(wt, mpg, colour = factor(cyl), size = hp)) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(method = "lm", se = TRUE, alpha = 0.1, linewidth = 0.8) +
+  facet_wrap(~ gear, nrow = 2) +
+  theme_master_demo(base_size = 14) +
+  labs(
+    title = "Complete Theme: All Four Element Functions",
+    subtitle = "Demonstrating element_text(), element_line(),\n element_rect(), and element_blank()",
+    caption = "Data: mtcars | Theme: theme_master_demo()",
+    x = "Weight (1000 lbs)",
+    y = "Miles per Gallon",
+    colour = "Cylinders",
+    size = "Horsepower",
+    tag = "Fig. 1"
+  )
+```
+
+
+
+
+
+
+# Complete Custom Theme Examples
+
+Recall that the primary purpose of `theme()` is to separate data representation from stylistic decoration, ensuring that visual clutter does not distract from the underlying insights. It enables consistency across multiple plots, supports branding or journal formatting, and adheres to principles like maximizing the data-ink ratio by removing unnecessary grid lines or backgrounds. Ultimately, mastering `theme()` empowers you to transform a default ggplot into a clear, professional, and customized visualization that effectively communicates your data's story.
+
+
+This section offers a few complete examples for different purposes.
+
+
+## Publication-Ready Theme
+
+Because different journals require different visual styles, `theme()` enables you to generate plots that are consistent with the specific formatting requirements of each publication.
+
+```{r}
+theme_publication <- function(base_size = 14, base_family = "serif") {
+  theme_bw(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      # Clean background
+      panel.background = element_rect(fill = "white"),
+      panel.border = element_rect(fill = NA, colour = "black", linewidth = 0.8),
+      panel.grid.major = element_line(colour = "grey90", linewidth = 0.2),
+      panel.grid.minor = element_blank(),
+      
+      # Axis formatting
+      axis.line = element_blank(),
+      axis.ticks = element_line(colour = "black", linewidth = 0.5),
+      axis.ticks.length = unit(2, "mm"),
+      axis.text = element_text(size = rel(0.9), colour = "black"),
+      axis.title = element_text(size = rel(1.1), face = "bold"),
+      
+      # Legend
+      legend.background = element_rect(fill = "white", colour = "black", linewidth = 0.3),
+      legend.key = element_rect(fill = "white", colour = NA),
+      legend.position = "bottom",
+      
+      # Titles
+      plot.title = element_text(size = rel(1.3), face = "bold", hjust = 0),
+      plot.subtitle = element_text(size = rel(1), hjust = 0),
+      plot.caption = element_text(size = rel(0.8), hjust = 1),
+      plot.margin = margin(15, 15, 15, 15),
+      
+      # Strips
+      strip.background = element_rect(fill = "grey90", colour = "black"),
+      strip.text = element_text(size = rel(1), face = "bold")
+    )
+}
+
+# Demonstrate publication theme
+ggplot(mtcars, aes(wt, mpg, colour = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE, alpha = 0.15) +
+  facet_wrap(~ gear) +
+  theme_publication(base_size = 14, base_family = "serif") +
+  labs(
+    title = "Fuel Efficiency by Weight and Cylinders",
+    subtitle = "Linear regression with 95% confidence intervals",
+    caption = "Data: 1974 Motor Trend US magazine",
+    x = "Weight (1000 lbs)",
+    y = "Miles per Gallon",
+    colour = "Cylinders"
+  )
+```
+
+
+<div class="tip-box"> <strong>Publication Tip:</strong> Always use <code>base_family = "serif"</code>  for academic publications. Most journals prefer serif fonts. Set <code>base_size = 14</code> or higher for readability. </div>
+  
+  
+  
+## Dashboard Minimal Theme
+
+Dashboard environments demand visual clarity and fast interpretation. Unlike publication-ready plots that may tolerate decorative elements, dashboards benefit from a restrained, minimalist approach. The Dashboard Minimal Theme strips away unnecessary chart junk—including background fills, minor grid lines, and excess borders—to focus entirely on the data. This clean aesthetic reduces cognitive load, ensures consistency across multiple panels, and allows end users to extract insights at a glance, making it the optimal choice for interactive and real-time dashboards.
+
+```{r}
+theme_dashboard <- function(base_size = 12, base_family = "") {
+  theme_void(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      # Minimal grid
+      panel.grid.major = element_line(colour = "grey95", linewidth = 0.2),
+      panel.grid.minor = element_blank(),
+      
+      # Simple axis lines
+      axis.line = element_line(colour = "grey60", linewidth = 0.3),
+      axis.ticks = element_line(colour = "grey60", linewidth = 0.3),
+      axis.text = element_text(size = rel(0.9), colour = "grey40", margin = margin(5)),
+      axis.title = element_text(size = rel(0.9), face = "bold", colour = "grey30"),
+      
+      # Floating legend
+      legend.position = c(0.9, 0.9),
+      legend.justification = c(1, 1),
+      legend.background = element_rect(fill = alpha("white", 0.8), colour = NA),
+      legend.key = element_blank(),
+      
+      # Compact titles
+      plot.title = element_text(size = rel(1.2), face = "bold", hjust = 0.5),
+      plot.margin = margin(10, 10, 10, 10)
+    )
+}
+
+# Demonstrate dashboard theme
+ggplot(mtcars, aes(factor(cyl), mpg, fill = factor(cyl))) +
+  geom_boxplot(alpha = 0.7, outlier.colour = "#6E3061", outlier.size = 2) +
+  theme_dashboard(base_size = 12) +
+  labs(
+    title = "MPG Distribution by Cylinder Count",
+    x = "Cylinders",
+    y = "MPG",
+    fill = "Cylinders"
+  ) #+
+ # scale_fill_brewer
+```
+
+
+<div class="tip-box"> <strong>Dashboard Tip:</strong> Use <code>theme_void()</code> as the base for maximum control. Floating legends save space. Keep margins compact for dashboard layouts. </div>
+
+  
+## Dark Presentation Theme
+
+A well-built plot answers a question, but a well-themed plot commands attention and credibility. The "presentation theme" in ggplot2 encompasses all stylistic choices that are independent of the underlying data—from panel backgrounds and grid lines to legend placement and title fonts. Mastering the `theme()` function allows you to adapt any graphic for its final medium, ensuring consistency across a report, adherence to journal guidelines, or alignment with a brand’s visual identity.
+
+
+```{r}
+theme_dark_presentation <- function(base_size = 16, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      # Dark background
+      plot.background = element_rect(fill = "grey20", colour = NA),
+      panel.background = element_rect(fill = "grey25", colour = NA),
+      
+      # Grid lines visible on dark
+      panel.grid.major = element_line(colour = "grey40", linewidth = 0.3),
+      panel.grid.minor = element_line(colour = "grey35", linewidth = 0.15),
+      
+      # Light text for contrast
+      axis.text = element_text(colour = "grey90", size = rel(0.9)),
+      axis.title = element_text(colour = "white", size = rel(1.1), face = "bold"),
+      plot.title = element_text(colour = "white", size = rel(1.4), face = "bold", hjust = 0.5),
+      plot.subtitle = element_text(colour = "grey80", size = rel(1), hjust = 0.5),
+      plot.caption = element_text(colour = "grey70", size = rel(0.7)),
+      
+      # Legend on dark
+      legend.text = element_text(colour = "grey90"),
+      legend.title = element_text(colour = "white", face = "bold"),
+      legend.background = element_rect(fill = "grey30", colour = "grey40"),
+      legend.key = element_rect(fill = "grey25", colour = NA),
+      
+      # Strip formatting
+      strip.background = element_rect(fill = "grey40", colour = "grey50"),
+      strip.text = element_text(colour = "white", face = "bold")
+    )
+}
+
+# Demonstrate dark theme
+ggplot(mtcars, aes(wt, mpg, colour = factor(cyl), size = hp)) +
+  geom_point(alpha = 0.8) +
+  theme_dark_presentation(base_size = 16) +
+  labs(
+    title = "Vehicle Performance Analysis",
+    subtitle = "Weight vs. Fuel Efficiency by Cylinder Count",
+    caption = "Bubble size indicates horsepower",
+    x = "Weight (1000 lbs)",
+    y = "Miles per Gallon",
+    colour = "Cylinders",
+    size = "Horsepower"
+  ) +
+  scale_colour_brewer(palette = "Set1")
+```
+
+
+<div class="warning-box"> <strong>Accessibility Note:</strong> Ensure sufficient color contrast in dark themes. Use <a href="https://webaim.org/resources/contrastchecker/">WebAIM's Contrast Checker</a> to verify WCAG 2.1 AA compliance (4.5:1 for normal text, 3:1 for large text). </div>
+
+
+# Theme Inheritance and Modification
+
+Theme inheritance in ggplot2 follows a clear hierarchical structure: a complete theme provides default settings for all elements, and you can then modify individual components without disrupting the rest. This layered approach saves time and ensures consistency—you define global styles once, then make targeted overrides for titles, legends, or grid lines as needed.
+
+
+## `%+replace%` vs `+` Operator Revsited
+
+As we have discuss these two operators earlier, the `+` operator modifies theme elements while preserving unspecified settings, whereas `%+replace%` completely replaces them—a critical distinction for avoiding unexpected overrides when customizing ggplot2 themes. Here is another example. 
+
+```{r}
+# Create a base custom theme
+theme_my_base <- function(base_size = 12) {
+  theme_minimal(base_size = base_size) %+replace%
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.title = element_text(face = "bold", colour = "#6E3061")
+    )
+}
+
+# COMPLETE REPLACEMENT: %+replace% removes ALL inherited elements
+theme_complete_replace <- theme_my_base() %+replace%
+  theme(
+    panel.grid.major = element_line(colour = "red", linewidth = 1)
+  )
+
+# INCREMENTAL ADDITION: + keeps other elements, only adds/overrides
+theme_incremental_add <- theme_my_base() +
+  theme(
+    panel.grid.major = element_line(colour = "blue", linewidth = 1)
+  )
+
+# Compare the results
+p1 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_complete_replace +
+  labs(title = "%+replace% : Only red grid remains")
+
+p2 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  theme_incremental_add +
+  labs(title = "+ : Blue grid + bold title retained")
+
+p1 + p2
+```
+
+
+
+<div class="note-box"> <strong>Rule of Thumb:</strong> Use <code>%+replace%</code> when building a theme from scratch inside a function. Use <code>+</code> when making ad-hoc modifications to a plot. </div>
+
+## Creating Theme Variants
+
+
+```{r fig.align='center', fig.width=7, fig.height=8}
+# Base theme with parameterized color
+theme_branded <- function(base_size = 12, brand_color = "#6E3061") {
+  theme_minimal(base_size = base_size) %+replace%
+    theme(
+      panel.grid.minor = element_blank(),
+      axis.title = element_text(colour = brand_color, face = "bold"),
+      plot.title = element_text(colour = brand_color, face = "bold", hjust = 0.5),
+      strip.background = element_rect(fill = brand_color),
+      strip.text = element_text(colour = "white", face = "bold")
+    )
+}
+
+# Create variants with different brand colors
+p_purple <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#6E3061", size = 3) +
+  facet_wrap(~ gear) +
+  theme_branded(brand_color = "#6E3061") +
+  labs(title = "Purple Brand (#6E3061)")
+
+p_blue <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#2196F3", size = 3) +
+  facet_wrap(~ gear) +
+  theme_branded(brand_color = "#2196F3") +
+  labs(title = "Blue Brand (#2196F3)")
+
+p_red <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#E74C3C", size = 3) +
+  facet_wrap(~ gear) +
+  theme_branded(brand_color = "#E74C3C") +
+  labs(title = "Red Brand (#E74C3C)")
+
+# Display variants
+p_purple / p_blue / p_red
+```
+
+# Advanced Techniques
+
+## Responsive Theme with Scaling
+
+
+```{r}
+theme_responsive <- function(base_size = 12, ratio = 1) {
+  theme_minimal(base_size = base_size) %+replace%
+    theme(
+      # Scale elements based on ratio parameter
+      axis.text = element_text(size = base_size * ratio * 0.8),
+      axis.title = element_text(size = base_size * ratio * 0.9),
+      plot.title = element_text(size = base_size * ratio * 1.2, face = "bold"),
+      panel.grid.major = element_line(linewidth = 0.5 * ratio),
+      plot.margin = margin(
+        t = 10 * ratio,
+        r = 10 * ratio,
+        b = 10 * ratio,
+        l = 10 * ratio
+      )
+    )
+}
+
+# Compare different scales
+p_small <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#6E3061") +
+  theme_responsive(ratio = 0.7) +
+  labs(title = "Ratio = 0.7 (Small)")
+
+p_normal <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#6E3061") +
+  theme_responsive(ratio = 1.0) +
+  labs(title = "Ratio = 1.0 (Normal)")
+
+p_large <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#6E3061") +
+  theme_responsive(ratio = 1.5) +
+  labs(title = "Ratio = 1.5 (Large)")
+
+p_small + p_normal + p_large
+```
+
+## Conditional Theme Elements
+
+
+
+```{r}
+theme_conditional <- function(base_size = 12, show_grid = TRUE, show_border = FALSE) {
+  t <- theme_minimal(base_size = base_size)
+  
+  if (!show_grid) {
+    t <- t %+replace% theme(
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+  }
+  
+  if (show_border) {
+    t <- t %+replace% theme(
+      panel.border = element_rect(fill = NA, colour = "#6E3061", linewidth = 1)
+    )
+  }
+  
+  return(t)
+}
+
+# Demonstrate conditional themes
+p1 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#6E3061") +
+  theme_conditional(show_grid = TRUE, show_border = FALSE) +
+  labs(title = "Grid: ON | Border: OFF")
+
+p2 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#6E3061") +
+  theme_conditional(show_grid = FALSE, show_border = FALSE) +
+  labs(title = "Grid: OFF | Border: OFF")
+
+p3 <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#6E3061") +
+  theme_conditional(show_grid = FALSE, show_border = TRUE) +
+  labs(title = "Grid: OFF | Border: ON")
+
+p1 + p2 + p3
+```
+
+## Global Theme Settings
+
+
+```{r}
+# Save the current theme
+old_theme <- theme_get()
+
+# Set a custom theme globally
+theme_set(
+  theme_minimal(base_size = 12) +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.title = element_text(face = "bold", colour = "#6E3061", hjust = 0.5),
+      axis.title = element_text(face = "bold")
+    )
+)
+
+# All subsequent plots will use this theme
+p_global <- ggplot(mtcars, aes(wt, mpg, colour = factor(cyl))) +
+  geom_point(size = 3) +
+  labs(
+    title = "This plot uses the global theme",
+    subtitle = "No explicit theme() call needed"
+  )
+
+print(p_global)
+
+# Restore the original theme
+theme_set(old_theme)
+```
+
+
+<div class="warning-box"> <strong>Caution:</strong> <code>theme_set()</code> affects all subsequent plots in the R session. Always restore the original theme or use it in a controlled environment like a dedicated script. </div>
+
+
+## Debugging and Testing Themes
+
+
+
+```{r}
+# Create a theme for testing
+my_test_theme <- theme_custom(base_size = 12)
+
+# 1. Inspect individual elements
+cat("Panel grid major setting:\n")
+print(my_test_theme$panel.grid.major)
+
+cat("\nPlot title setting:\n")
+print(my_test_theme$plot.title)
+
+# 2. Use calc_element() for computed values
+cat("\nComputed panel background:\n")
+print(calc_element("panel.background", my_test_theme))
+
+# 3. Check for missing elements compared to a complete theme
+missing_elements <- setdiff(names(theme_grey()), names(my_test_theme))
+if (length(missing_elements) > 0) {
+  cat("\nMissing elements compared to theme_grey():\n")
+  print(missing_elements)
+} else {
+  cat("\nNo missing elements found!\n")
+}
+
+# 4. Create a comprehensive test plot
+test_all_features <- ggplot(mtcars, aes(wt, mpg, colour = factor(cyl))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE, alpha = 0.1) +
+  facet_wrap(~ gear, nrow = 2) +
+  my_test_theme +
+  labs(
+    title = "Comprehensive Theme Test",
+    subtitle = "Tests points, lines, facets, and legends",
+    caption = "Verify all elements render correctly",
+    colour = "Cylinders",
+    tag = "A"
+  )
+
+print(test_all_features)
+```
+
+
+# Best Practices Summary
+
+
+```{r}
+#' Custom ggplot2 theme - Best Practice Example
+#'
+#' @param base_size Base font size in points (default: 12)
+#' @param base_family Base font family (default: "")
+#' @param accent_color Primary accent color for titles and highlights
+#'
+#' @return A complete ggplot2 theme object
+#' @export
+#'
+#' @examples
+#' library(ggplot2)
+#' ggplot(mtcars, aes(wt, mpg)) +
+#'   geom_point() +
+#'   theme_best_practice(accent_color = "#6E3061")
+theme_best_practice <- function(base_size = 12,
+                                 base_family = "",
+                                 accent_color = "#6E3061") {
+
+  # Validate font availability
+  if (base_family != "") {
+    available_fonts <- systemfonts::system_fonts()$family
+    if (!base_family %in% available_fonts) {
+      warning("Font family '", base_family, "' not found. Using system default.")
+      base_family <- ""
+    }
+  }
+
+  # Build the theme
+  theme_minimal(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      # Use rel() for scalable sizes
+      plot.title = element_text(
+        size = rel(1.3),
+        face = "bold",
+        colour = accent_color
+      ),
+      axis.title = element_text(size = rel(1.1)),
+      axis.text = element_text(size = rel(0.9)),
+      # ... (remaining theme elements)
+    )
+}
+```
+
+<div class="note-box"> <strong>Final Checklist for Production Themes:</strong> <ul> <li>✅ Always provide <code>base_size</code> and <code>base_family</code> parameters</li> <li>✅ Use <code>rel()</code> for scalable font sizes</li> <li>✅ Handle missing fonts gracefully</li> <li>✅ Test with scatter, bar, facet, and multi-legend plots</li> <li>✅ Include complete Roxygen documentation</li> <li>✅ Verify WCAG 2.1 AA color contrast ratios</li> <li>✅ Test on both screen and print output</li> </ul> </div>
+
+# Session Information
+
+```{r}
+sessionInfo()
+```
+
+This R Markdown document provides:
+
+**Complete structure:**
+
+- YAML header with table of contents, code folding, and syntax highlighting
+- Organized into clear sections matching the original flash card content
+- Embedded CSS for professional lecture note formatting
+
+**Working examples throughout:**
+
+- Every concept demonstrated with executable R code
+- Side-by-side plot comparisons using `patchwork`
+- Step-by-step theme building from skeleton to complete theme
+- Three complete theme examples (Publication, Dashboard, Dark)
+
+**Visual design:**
+
+- Purple `#6E3061` accent color consistent with the original
+- Custom styled callout boxes (note, tip, warning)
+- Formatted tables for parameter references
+- Clean code blocks with syntax highlighting
+
+**Key features:**
+- Floating table of contents
+- Numbered sections
+- Collapsible code blocks
+- Professional figure formatting
+- Complete session information at the end
+
+
+
+
+

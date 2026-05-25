@@ -1,0 +1,707 @@
+---
+title: "ggplotly() – Bridging Static and Interactive Graphics"
+author: "Cheng Peng"
+date: "West Chester University"
+output:
+  html_document:
+    theme: yeti
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    number_sections: yes
+    toc_collapsed: yes
+    code_folding: hide
+    code_download: yes
+    smooth_scroll: yes
+    highlight: tango
+    css: styles.css
+---
+
+```{r setup, include=FALSE}
+if (!require("tidyverse")) {
+   install.packages("tidyverse")
+   library(tidyverse)
+}
+if (!require("knitr")) {
+   install.packages("knitr")
+   library(knitr)
+}
+if (!require("plotly")) {
+   install.packages("plotly")
+   library(plotly)
+}
+if (!require("ggplot2")) {
+   install.packages("ggplot2")
+   library(ggplot2)
+}
+if (!require("patchwork")) {
+   install.packages("patchwork")
+   library(patchwork)
+}
+if (!require("dplyr")) {
+   install.packages("dplyr")
+   library(dplyr)
+}
+##
+## knitr::opts_knit$set(root.dir = "C:\\STA490\\w05")
+##
+knitr::opts_chunk$set(echo = TRUE,       
+                      warning = FALSE,   
+                      result = TRUE,   
+                      message = FALSE,
+                      fig.width = 8,
+                      fig.height = 5,
+                      fig.align = "center",
+                      comment = NA)
+```
+
+
+```{css echo = FALSE}
+/* ============ CSS Styling for Lecture Notes ============ */
+
+body {
+  font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.7;
+  color: #2d1b29;
+  background-color: #fdfafd;
+}
+
+h1 {
+  color: #6E3061;
+  border-bottom: 3px solid #6E3061;
+  padding-bottom: 8px;
+  margin-top: 40px;
+  font-weight: bold;
+  font-size: 2.2rem;
+}
+
+h2 {
+  color: #6E3061;
+  border-left: 5px solid #6E3061;
+  padding-left: 12px;
+  margin-top: 30px;
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+h3 {
+  color: #8b4a7d;
+  margin-top: 24px;
+  font-weight: bold;
+  font-size: 1.8m;
+}
+
+h4 {
+  color: #a05f92;
+  margin-top: 18px;
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+code {
+  background-color: #f4edf3;
+  color: #4a2040;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.9em;
+  border: 1px solid #d4c0d1;
+}
+
+pre {
+  background-color: #f9f5f9;
+  border: 1px solid #d4c0d1;
+  border-left: 4px solid #6E3061;
+  border-radius: 6px;
+  padding: 14px;
+}
+
+pre code {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+blockquote {
+  background-color: #f4edf3;
+  border-left: 4px solid #6E3061;
+  padding: 12px 18px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  color: #4a2040;
+}
+
+.note-box {
+  background-color: #f0e6ee;
+  border: 1px solid #c49bb8;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 18px 0;
+}
+
+.note-box strong {
+  color: #6E3061;
+}
+
+.tip-box {
+  background-color: #e8f5e9;
+  border: 1px solid #81c784;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 18px 0;
+}
+
+.tip-box strong {
+  color: #2e7d32;
+}
+
+.warning-box {
+  background-color: #fff3e0;
+  border: 1px solid #ffb74d;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 18px 0;
+}
+
+.warning-box strong {
+  color: #e65100;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+table th {
+  background-color: #6E3061;
+  color: white;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #d4c0d1;
+}
+
+table tr:nth-child(even) td {
+  background-color: #faf5f9;
+}
+
+table tr:hover td {
+  background-color: #f0e6ee;
+}
+
+.toc {
+  background-color: #faf5f9;
+  border: 1px solid #d4c0d1;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.figure {
+  border: 1px solid #e0d1db;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(110, 48, 97, 0.08);
+}
+```
+
+\
+
+# Introduction
+
+The transition from static to interactive graphics represents a paradigm shift in data visualization. While ggplot2 has become the gold standard for static publication-ready plots in R, its interactive capabilities are limited. The plotly package bridges this gap through the `ggplotly()` function, which converts a static ggplot2 object into an interactive web-based visualization with minimal additional coding. This lecture explores the fundamentals, benefits, limitations, and specific graphical features that are lost — or partially lost — during this conversion, along with practical workarounds. Understanding these trade-offs is essential for data scientists who need to decide when `ggplotly()` is appropriate and when native plotly or other solutions should be preferred.
+
+# Fundamentals of `ggplotly()`
+
+The `ggplotly()` function serves as a wrapper that translates ggplot2 grammar into Plotly's JavaScript-based visualization library. At its core, this function maps geometries, aesthetics, and scales to their Plotly equivalents, producing an HTML widget that supports zooming, panning, hovering, and selection. The beauty of this approach lies in its simplicity: a user who masters ggplot2 can produce interactive plots without learning a new syntax. However, this convenience comes with constraints that emerge from fundamental differences between the two systems.
+
+## The Wrapper Concept
+
+The wrapper concept is deceptively simple: you create a ggplot object as usual, then pass it to `ggplotly()`. The function recursively processes layers, scales, and coordinates, generating a Plotly trace for each geometric layer. This automation handles most common geoms — points, lines, bars, and smooths — and preserves color mappings, fill patterns, and basic themes. Hover tooltips are automatically populated with the variables mapped to aesthetics, providing immediate interactive feedback.
+
+```{r}
+# Basic wrapper demonstration
+p_base <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  labs(
+    title = "Fuel Efficiency vs. Vehicle Weight",
+    x = "Weight (1000 lbs)",
+    y = "Miles per Gallon",
+    color = "Cylinders"
+  ) +
+  theme_minimal()
+
+# Convert to interactive
+ggplotly(p_base)
+```
+
+When running the above code, we will notice that the interactive plot retains nearly all visual characteristics of the original. Hovering over any point displays the weight, miles per gallon, and cylinder count. The legend remains clickable, allowing users to toggle groups on and off. This pattern — full preservation of standard `geom_point()` with mapped aesthetics — holds reliably. However, observe that the default tooltip includes all aesthetic mappings, which may be excessive. The pattern suggests that `ggplotly()` works best when the original ggplot2 code uses simple geoms with intuitive aesthetic mappings.
+
+## Key Features Carried Over
+
+Beyond basic conversion, `ggplotly()` preserves several advanced features. Color gradients, shape scales, and continuous color mappings translate correctly. Facets — both `facet_wrap()` and `facet_grid()` — become interactive subplots, each maintaining independent tooltips and zoom capabilities. Statistical transformations like `geom_smooth(method = "lm")` produce interactive confidence bands. Even animation, created with `gganimate` and `transition_time()`, can be converted to an interactive Plotly animation slider.
+
+```{r}
+# Statistical transformation and faceting
+p_stats <- ggplot(mpg, aes(x = displ, y = hwy, color = class)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE) +
+  facet_wrap(~drv, ncol = 3) +
+  theme_bw()
+
+ggplotly(p_stats) %>%
+  layout(
+    title = "Engine Displacement vs. Highway MPG by Drive Type",
+    hoverlabel = list(bgcolor = "white", font = list(size = 10))
+  )
+```
+
+The smooth's confidence band becomes an interactive shaded region; hovering reveals the fitted value and standard error. Facets appear as separate panels, each with independent hover information. A crucial pattern emerges: the more statistical transformation performed by ggplot2 (e.g., `stat_smooth()`, `stat_summary()`), the more likely that `ggplotly()` will succeed, because these computations occur before conversion. However, the interactive tooltip for the smooth line shows only the fitted value, not the original data points — a limitation when detailed point-level information is needed alongside aggregate statistics.
+
+## Quick Reference Checklist
+
+Before using `ggplotly()`, a systematic verification ensures compatibility. First, confirm that plotly and ggplot2 are installed and loaded. Second, verify that the ggplot object renders correctly as a static plot — any static rendering error will persist or worsen in the interactive version. Third, wrap the object with `ggplotly()` and inspect the tooltip content. Fourth, test interactive features (zoom, pan, legend toggling) to confirm that JavaScript event handlers attached correctly. This checklist saves debugging time when conversions fail unexpectedly.
+
+```{r}
+# Systematic verification workflow
+#library(ggplot2)
+#library(plotly)
+
+# Step 1: Create and verify static plot
+p_check <- ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
+  geom_point() +
+  stat_ellipse(level = 0.95)
+print(p_check)  # Confirm static rendering
+
+# Step 2: Convert and inspect
+p_interactive <- ggplotly(p_check)
+print(p_interactive)  # Test interactivity
+
+# Step 3: Check tooltip structure
+tooltip_info <- plotly_build(p_interactive)$x$data[[1]]$text
+head(tooltip_info)
+```
+
+A reliable pattern is that `ggplotly()` preserves the visual output almost perfectly but alters the interactive metadata. The tooltip text, for instance, is constructed from aesthetic mappings in the original ggplot call. If you want custom tooltips (e.g., only specific variables), you must use the tooltip argument in `ggplotly()`. Another pattern: `stat_ellipse()` converts correctly, but the ellipse itself lacks a hover tooltip — only the generated points (if any) are interactive. This reveals that `ggplotly()` maps geometric layers to Plotly traces, but statistical transformations that do not produce explicit geometric objects may lose interactivity.
+
+# Benefits and Advantages
+
+`ggplotly()` offers compelling advantages that justify its use despite limitations. For exploratory data analysis, the ability to instantly add interactivity to familiar ggplot2 syntax accelerates insight discovery. For Shiny applications, `ggplotly()` objects integrate seamlessly, responding to reactive inputs and updating without page reloads. For report generation, interactive plots can be embedded in R Markdown documents, HTML dashboards, and even exported as standalone web pages. These benefits make `ggplotly()` an attractive tool for data scientists who need to communicate findings to non-technical audiences.
+
+## Rapid Interactivity
+
+The most significant advantage is the low barrier to entry. A static ggplot2 visualization becomes interactive with a single function call — no learning curve for Plotly's syntax, no manual configuration of hover events, and no JavaScript coding. This rapid prototyping capability is invaluable during the exploratory phase, when analysts need to quickly inspect outliers, examine clusters, or verify relationships. The interactive zoom feature, for instance, allows detailed examination of dense regions without recalculating axis limits.
+
+```{r}
+# One-line interactivity for large datasets
+p_rapid <- ggplot(diamonds[sample(1:nrow(diamonds), 1000), ], 
+                  aes(x = carat, y = price, color = cut)) +
+  geom_point(alpha = 0.5) +
+  scale_y_log10() +
+  labs(title = "Diamond Price vs. Carat (log scale)")
+
+ggplotly(p_rapid, tooltip = c("carat", "price", "cut"))
+```
+
+The pattern here is that `ggplotly()` retains `scale_y_log10()` correctly, which is not always true for all transformations. The `alpha = 0.5` transparency renders properly, and hover events work even with thousands of points. However, observe that performance degrades noticeably when the point count exceeds 10,000; the browser struggles to manage that many DOM elements. A practical pattern emerges: for large datasets, sample or aggregate before conversion, or use plotly's native webgl rendering via `type = "scattergl"` (which `ggplotly()` does not automatically invoke).
+
+## Web and Shiny Integration
+
+`ggplotly()` objects are HTML widgets, meaning they can be embedded in R Markdown documents (with html_document output), Shiny applications, and FlexDashboards. In Shiny, these plots respond to reactive inputs — for example, filtering a dataset based on user selection updates the interactive plot. The plots can also communicate with other widgets: clicking a point in `ggplotly()` can trigger updates in a table or another plot using Shiny's `event_data()` function. This bidirectional interactivity is not possible with static ggplot2 graphics.
+
+```{}
+# Conceptual Shiny integration pattern
+#library(shiny)
+
+ui <- fluidPage(
+  selectInput("var", "Choose variable:", choices = names(mtcars)[3:6]),
+  plotlyOutput("interactive_plot")
+)
+
+server <- function(input, output) {
+  output$interactive_plot <- renderPlotly({
+    p <- ggplot(mtcars, aes(x = wt, y = mpg, color = .data[[input$var]])) +
+      geom_point(size = 3)
+    ggplotly(p) %>%
+      layout(dragmode = "select")
+  })
+}
+
+# shinyApp(ui, server)
+```
+
+
+A key pattern is that `ggplotly()` inside `renderPlotly()` works identically to `renderPlot()` for static graphics, but with additional interactive capabilities. The `event_data()` function allows capturing plotly hover or click events. However, a crucial limitation: `ggplotly()` does not automatically expose selection events (e.g., box-select) to Shiny. To capture selections, you must use plotly's native `plotly_click` or `plotly_selected` events, which are more reliable when you construct plots with `plot_ly()` instead of `ggplotly()`. The pattern suggests that for complex Shiny interactivity, investing in native plotly syntax pays off.
+
+## Enhanced Data Exploration
+
+Beyond basic hovering, `ggplotly()` enables sophisticated exploratory workflows. Users can zoom into dense scatterplots by drawing a rectangle, pan across large time series, toggle legend groups to isolate subsets, and compare values using the hover compare feature (which displays tooltips for all traces simultaneously). These capabilities, which would require custom JavaScript in static graphics, are built into every `ggplotly()` output. The double-click reset feature returns the plot to its original view, facilitating iterative exploration.
+
+```{r}
+# Demonstrating exploration-enhancing features
+p_explore <- ggplot(msleep, aes(x = bodywt, y = sleep_total, size = brainwt, color = vore)) +
+  geom_point(alpha = 0.7) +
+  scale_x_log10() +
+  scale_size_continuous(range = c(2, 15)) +
+  labs(
+    title = "Mammalian Sleep Patterns",
+    x = "Body Weight (kg, log scale)",
+    y = "Total Sleep (hours/day)",
+    size = "Brain Weight (kg)",
+    color = "Diet Type"
+  )
+
+ggplotly(p_explore, dynamicTicks = TRUE)
+```
+
+
+The `dynamicTicks = TRUE` argument is a powerful pattern: it forces Plotly to recalculate axis ticks when zooming, rather than showing fractional ticks at original intervals. Size and color mappings work correctly, but observe that the legend for size is not interactive (cannot toggle size groups). Another pattern: when using log scales, the hover tooltip still shows the original values, not the logged values — this is usually desirable, but be aware that the visual position corresponds to the log-transformed coordinate. The most valuable pattern for exploration is the ability to click legend items: clicking "carni" removes carnivores, allowing focused comparison of herbivores and omnivores.
+
+
+# Disadvantages and Caveats
+
+Despite its strengths, `ggplotly()` has significant drawbacks that can frustrate experienced users. Performance degrades sharply with large data, complex plots may fail to convert entirely, and the resulting interactive objects are less customizable than native Plotly or JavaScript solutions. Understanding these limitations prevents over-reliance on `ggplotly()` for all interactive visualization needs.
+
+## Performance Constraints
+
+The performance limitation is the most practically significant. Each geometric element in a `ggplotly()` plot becomes an SVG (Scalable Vector Graphics) element or a WebGL point. For scatterplots with 50,000 points, the browser must manage 50,000 DOM nodes, leading to sluggish panning, zooming, and hover responses. In extreme cases, the browser tab may crash. This performance issue is not unique to `ggplotly()` — it affects all SVG-based interactive graphics — but it is more severe because `ggplotly()` cannot automatically switch to WebGL rendering.
+
+```{r}
+# Performance comparison demonstration (conceptual)
+set.seed(123)
+large_data <- data.frame(
+  x = rnorm(50000),
+  y = rnorm(50000),
+  group = sample(letters[1:5], 50000, replace = TRUE)
+)
+
+p_large <- ggplot(large_data, aes(x, y, color = group)) +
+  geom_point(alpha = 0.3)
+
+# This will be very slow in an interactive browser
+# ggplotly(p_large)
+
+# Workaround: use plotly directly with WebGL
+# plot_ly(large_data, x = ~x, y = ~y, color = ~group, type = "scattergl", mode = "markers")
+```
+
+
+The degradation pattern is nonlinear: up to about 3,000 points, performance is smooth; from 3,000 to 10,000, noticeable lag appears; beyond 10,000, interactivity becomes frustrating. The alpha transparency exacerbates the problem because browsers must composite semi-transparent layers. A reliable pattern for large data is to sample randomly, use `geom_bin2d()` or `geom_hex()` for density visualization, or switch to native `plot_ly()` with `type = "scattergl"`. The latter renders using WebGL, which can handle millions of points smoothly, but `ggplotly()` does not support this trace type.
+
+## Imperfect Conversion
+
+No translation between two complex graphics systems is perfect. `ggplotly()` fails to convert certain ggplot2 features silently — the plot renders without error messages, but visual elements are missing or altered. Custom annotations with `annotate(geom = "text", angle = ...)` often lose rotation. Complex `geom_label()` with repulsive geoms may position incorrectly. `geom_raster()` and `geom_tile()` with irregular spacing may distort. Perhaps most frustratingly, `coord_flip()` produces plots where axes are swapped but tooltips reference the original coordinates, confusing users.
+
+```{r}
+# Example of imperfect conversion
+df <- data.frame(
+  category = c("A", "B", "C", "D"),
+  value = c(23, 45, 12, 67)
+)
+
+p_flip <- ggplot(df, aes(x = category, y = value, fill = category)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Horizontal Bar Chart", x = "Category", y = "Value")
+
+# This converts but tooltips may mislabel axes
+ggplotly(p_flip)
+```
+
+In the `coord_flip()` example, the visual output shows horizontal bars, but hovering reveals that the tooltip still refers to "x" and "y" in the original orientation — "x: A, y: 23" appears where "A" is the category and 23 the value. This pattern — axis mislabeling after coordinate transformation — occurs consistently. Another pattern: `geom_text()` with `check_overlap = TRUE` often fails, causing overlapping labels instead of the expected collision avoidance. The underlying issue is that `ggplotly()` translates the visual representation but not the underlying computational geometry that ggplot2 performs for collision detection and coordinate transformations.
+
+## Limited Customization
+
+While ggplot2 offers extensive customization via `theme()` and manual scale adjustments, `ggplotly()` provides only limited post-conversion modification. Tooltip content and formatting require either pre-specification in the ggplotly(`tooltip = ...`) argument or post-hoc manipulation of the Plotly object using `style()` and `layout()`. The default tooltip includes all aesthetics, which is often too verbose. Customizing tooltip text to include computed values (e.g., residuals, percentages) is difficult because those values are not present in the original data.
+
+```{r}
+# Attempting tooltip customization
+p_custom <- ggplot(mpg, aes(x = displ, y = hwy, color = class)) +
+  geom_point() +
+  geom_smooth(method = "loess", se = FALSE)
+
+# Limited customization options
+ggplotly(p_custom, tooltip = c("displ", "hwy"))  # Only shows these two
+
+# More complex tooltip requires manual construction
+p_custom_label <- ggplot(mpg, aes(x = displ, y = hwy, 
+                                   text = paste("Model:", model, "<br>",
+                                                "Year:", year, "<br>",
+                                                "Class:", class))) +
+  geom_point()
+
+ggplotly(p_custom_label, tooltip = "text")
+```
+
+The pattern for custom tooltips is to map a text aesthetic containing HTML-formatted content, then specify `tooltip = "text"` in `ggplotly()`. This works but requires pre-computing the tooltip content in the data frame or via `aes(text = ...)`. However, this pattern fails for statistical layers like `geom_smooth()` because the smooth line does not have a text aesthetic. A critical pattern emerges: you cannot add tooltips to computed layers (smooths, densities, ellipses) without reconstructing those layers as explicit data frames. This limitation pushes users toward native plotly for complex interactive annotations.
+
+# Graphical Features Not Carried Over
+
+Understanding which ggplot2 features `ggplotly()` cannot translate is essential for avoiding false expectations. The lost features fall into several categories: complex annotations, specialized geoms, theme details, and coordinate transformations. In each case, the underlying issue is that Plotly's architecture does not support the same graphical primitives or layout algorithms as ggplot2.
+
+## Complex Annotations
+
+Text annotations with rotation, multiple lines, or background rectangles often fail or render incorrectly. `annotate("text", angle = 45)` typically loses the rotation, appearing horizontal. `annotate("label", fill = ...)` may lose the background fill or border. Annotations positioned using relative coordinates (e.g., x = Inf, y = -Inf with hjust and vjust) often appear in unexpected locations because Plotly's coordinate system handles Inf differently. Mathematical expressions using `expression()` or bquote()` do not render — they appear as raw LaTeX code.
+
+```{r}
+# Annotation that fails
+p_ann <- ggplot(mtcars, aes(wt, mpg)) +
+  geom_point() +
+  annotate("text", x = 4, y = 30, label = "High weight, low MPG", 
+           angle = 45, color = "red", fontface = "bold") +
+  annotate("rect", xmin = 3.5, xmax = 5, ymin = 10, ymax = 20,
+           alpha = 0.2, fill = "yellow")
+
+# The rotation and rectangle may be lost or corrupted
+# ggplotly(p_ann)
+
+# Workaround: add annotations after conversion
+p_plotly <- ggplotly(p_ann)
+p_plotly %>%
+  layout(annotations = list(
+    list(x = 4, y = 30, text = "High weight, low MPG",
+         xref = "x", yref = "y", showarrow = FALSE,
+         font = list(color = "red", size = 12))
+  ))
+```
+
+The pattern for annotations is clear: do not use ggplot2 annotations for rotated text or geometric shapes that must survive conversion. Instead, convert the plot with `ggplotly()`, then use `layout(annotations = list(...))` to add text and shapes post-conversion. This pattern gives full control over positioning and styling but requires learning Plotly's annotation syntax. A more efficient pattern is to add simple, non-rotated annotations in ggplot2 and reserve complex annotations for post-conversion layout modifications.
+
+## Specialized Geoms
+
+Several geoms have no direct Plotly equivalents. `geom_sf()` for spatial data fails entirely; you must convert to `plot_ly()` with `type = "scattermapbox"` or use the `mapview` package. `geom_hex()` and `geom_bin2d()` for binned aggregations convert but lose the hexagonal or rectangular binning — they often become scatterplots or fail to render. `geom_density_2d_filled()` produces filled contours in ggplot2 but only the contour lines convert, losing the fill gradient. `geom_quasirandom()` for jittered points converts but loses the quasirandom distribution algorithm.
+
+```{r}
+# Hexbin conversion failure
+set.seed(1)
+p_hex <- ggplot(data.frame(x = rnorm(1000), y = rnorm(1000)), aes(x, y)) +
+  geom_hex(bins = 30) +
+  scale_fill_viridis_c()
+
+# The hexbin pattern is lost; points may appear as scatter
+# ggplotly(p_hex)
+
+# Workaround: pre-compute hexbin aggregates
+library(hexbin)
+hb <- hexbin(p_hex$data$x, p_hex$data$y, xbins = 30)
+hex_df <- data.frame(hcell2xy(hb), count = hb@count)
+hex_df <- hex_df[hex_df$count > 0, ]
+
+p_fixed <- ggplot(hex_df, aes(x, y, fill = count)) +
+  geom_tile() +  # Approximates hex with squares
+  scale_fill_viridis_c()
+ggplotly(p_fixed)
+```
+
+For specialized geoms, the pattern is to pre-compute the statistical transformation and then use a simpler geom that `ggplotly()` handles reliably. For `geom_hex()`, this means using `hexbin::hexbin()` to compute bin counts, then plotting with `geom_tile()` or `geom_point()` using the binned coordinates. For `geom_density_2d_filled()`, compute a 2D density grid with `MASS::kde2d()` and plot with `geom_contour_filled()`, which converts better. The underlying pattern is that `ggplotly()` works best with geoms that have direct Plotly analogues: points, lines, bars, polygons, and paths.
+
+
+## Theme and Facet Details
+
+Fine-grained theme customizations often disappear. `element_rect(fill = ...)` for plot backgrounds may not survive; `element_line(size = ...)` for grid lines may revert to default thickness; minor grid lines vanish entirely because Plotly only supports major grids. Facet strip formatting — backgrounds, text colors, margins — often resets to Plotly defaults. `theme(legend.position = "bottom")` may place the legend correctly but the orientation or spacing may differ. These issues are cosmetic but can be frustrating when a polished static plot becomes an unpolished interactive one.
+
+```{r}
+# Elaborate theme that simplifies in conversion
+p_theme <- ggplot(iris, aes(Sepal.Length, Petal.Length, color = Species)) +
+  geom_point() +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_line(color = "grey90", linewidth = 0.5),
+    panel.grid.major = element_line(color = "grey70", linewidth = 0.8),
+    strip.background = element_rect(fill = "lightblue", color = "darkblue"),
+    strip.text = element_text(face = "bold", size = 12),
+    legend.background = element_rect(fill = "white", color = "black")
+  )
+
+# Minor grid lines disappear, strip backgrounds may default
+ggplotly(p_theme)
+
+# Workaround: manually set Plotly layout
+p_plotly <- ggplotly(p_theme)
+p_plotly %>%
+  layout(
+    xaxis = list(showgrid = TRUE, gridcolor = "lightgrey", gridwidth = 0.5),
+    yaxis = list(showgrid = TRUE, gridcolor = "lightgrey", gridwidth = 0.5),
+    legend = list(bordercolor = "black", borderwidth = 1)
+  )
+```
+
+
+The pattern for theme preservation is to accept that only major theme elements survive: colors, font families (basic), and legend positions. Custom grid lines, minor ticks, and complex strip backgrounds require manual specification in `layout()`. A pragmatic pattern is to design interactive plots with simpler themes from the outset — `theme_minimal()` or `theme_bw()` convert better than highly customized themes. The most reliable approach is to treat `ggplotly()` as a rapid prototyping tool and switch to native plotly for production-ready interactive graphics requiring precise styling.
+
+## Coordinate Transformations
+
+Coordinate transformations beyond the basic Cartesian system fail or produce misleading results. `coord_polar()` for pie charts and radial plots converts to a distorted Cartesian representation, not a true polar plot. `coord_map()` and `coord_quickmap()` for geographic projections lose their projections entirely, reverting to a basic Cartesian coordinate system. `coord_trans()` for non-linear axis transformations (e.g., y = "log10") is already handled by scale transformations, but `coord_trans(y = "reverse")` fails because Plotly does not support reversed axes in the same way.
+
+```{r}
+# Polar coordinate failure
+p_polar <- ggplot(data.frame(x = 1:4, y = c(10, 20, 15, 30)), 
+                  aes(x = factor(x), y = y, fill = factor(x))) +
+  geom_col(width = 1) +
+  coord_polar(theta = "y") +
+  labs(title = "Pie Chart via coord_polar")
+
+# This produces a distorted, non-circular output
+# ggplotly(p_polar)
+
+# Alternative: use plotly native pie chart
+# plot_ly(labels = ~c("A","B","C","D"), values = ~c(10,20,15,30), type = "pie")
+```
+
+For `coord_polar()`, the conversion pattern is so poor that no workaround within `ggplotly()` is advisable. The correct pattern is to abandon `ggplotly()` entirely and use `plot_ly(type = "pie")` for pie charts or `plot_ly(type = "scatterpolar")` for radial plots. For geographic maps, use `ggplotly()` only if the map uses `geom_point()` or `geom_polygon()` with predefined coordinates; for actual spatial objects with `geom_sf()`, switch to `plot_ly()` with mapbox or leaflet. The overarching pattern is that `ggplotly()` is fundamentally designed for Cartesian coordinates; any deviation from that standard warrants considering native Plotly alternatives.
+
+
+# Possible Fixes and Workarounds
+
+The limitations described above are not insurmountable. A combination of pre-processing, hybrid approaches, and alternative packages can restore most lost functionality. The key is to recognize when `ggplotly()` is the right tool and when a different approach — native plotly, ggiraph, highcharter, or rbokeh — would be more effective.
+
+## Hybrid Approaches
+
+The hybrid approach retains ggplot2 for static components that convert well and adds interactive layers selectively. For example, use ggplot2 for the base plot and statistical transformations, then use Plotly's `layout()` and `style()` to enhance tooltips, add annotations, and customize interactivity. This approach requires learning some Plotly syntax but preserves most of the ggplot2 workflow.
+
+```{r}
+# Hybrid: ggplot2 for base, plotly for enhancement
+p_hybrid <- ggplot(mtcars, aes(wt, mpg, color = factor(cyl), 
+                                text = paste("Model:", rownames(mtcars)))) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE, color = "black") +
+  theme_bw()
+
+# Convert and enhance
+ggplotly(p_hybrid, tooltip = "text", dynamicTicks = TRUE) %>%
+  layout(
+    title = list(text = "Interactive Regression with Custom Tooltips",
+                 font = list(size = 16)),
+    xaxis = list(title = "Weight (1000 lbs)", showgrid = TRUE),
+    yaxis = list(title = "MPG", showgrid = TRUE),
+    hoverlabel = list(bgcolor = "white", font = list(size = 11))
+  ) %>%
+  style(hoverinfo = "skip", traces = 2)  # Disable hover on smooth line
+```
+
+The hybrid pattern uses text aesthetic to store custom tooltip information, then suppresses hover on the smooth line (trace 2) to avoid clutter. The dynamicTicks = TRUE ensures that zooming works correctly. A key pattern is identifying which trace indices correspond to which layers; use `plotly_build()` to inspect the trace structure. This hybrid approach works well for plots with 2-5 traces (layers) but becomes unwieldy for complex multi-layered plots. The pattern suggests using hybrid methods for publication-quality interactive plots where you need precise control over a limited set of interactive elements.
+
+## Native Plotly as an Alternative
+
+When `ggplotly()` fails completely or when you need advanced interactivity (e.g., 3D surfaces, network graphs, WebGL rendering), switching to native `plot_ly()` is the best solution. The learning curve is moderate: `plot_ly()` uses a formula `interface (~x, ~y)` and supports layering via `add_trace()`. While the syntax differs from ggplot2, it offers complete control over every aspect of the interactive visualization. Native Plotly also supports features that `ggplotly()` cannot: `type = "scattergl"` for large data, `type = "heatmap"` for efficient matrix visualization, and `type = "surface"` for 3D plots.
+
+```{r}
+# Native plotly for large data and custom interactivity
+#library(plotly)
+
+# Large dataset with WebGL rendering
+set.seed(123)
+n <- 50000
+big_data <- data.frame(
+  x = rnorm(n), y = rnorm(n), 
+  color = sample(letters[1:5], n, replace = TRUE)
+)
+
+plot_ly(big_data, x = ~x, y = ~y, color = ~color, 
+        type = "scattergl", mode = "markers",
+        marker = list(size = 3, opacity = 0.6)) %>%
+  layout(
+    title = "50,000 Points with WebGL",
+    xaxis = list(title = "X"),
+    yaxis = list(title = "Y")
+  )
+```
+
+
+Native Plotly's scattergl trace type renders 50,000 points smoothly, a performance level `ggplotly()` cannot achieve. The formula interface `~x` is similar to ggplot2 but requires explicit variable referencing. A pattern for transitioning from ggplot2 to native Plotly: start by replicating your ggplot code with `plot_ly()`, using `add_markers()`, `add_lines()`, and `add_smooth()` (the latter requires manual computation). The plotly package also provides `ggplotly()`'s `layout()` and `style()` functions, so the post-processing skills transfer directly. The main cost is losing ggplot2's concise statistical transformation syntax (e.g., `geom_smooth(se = TRUE)` becomes manual computation of confidence bands).
+
+# Pre-processing Data for Statistical Layers
+
+Many `ggplotly()` failures with statistical layers occur because the conversion occurs before statistical transformations are computed. By pre-computing these transformations — aggregations, density estimates, confidence intervals — you convert the statistical output into geometric primitives that `ggplotly()` handles reliably. This approach is more work but yields predictable, reproducible interactive plots.
+ 
+```{r}
+# Pre-compute confidence intervals for stat_summary
+# library(dplyr)
+
+summary_data <- mtcars %>%
+  group_by(cyl) %>%
+  summarise(
+    mean_mpg = mean(mpg),
+    se_mpg = sd(mpg) / sqrt(n()),
+    lower = mean_mpg - 1.96 * se_mpg,
+    upper = mean_mpg + 1.96 * se_mpg,
+    .groups = "drop"
+  )
+
+p_summary <- ggplot(summary_data, aes(x = factor(cyl), y = mean_mpg)) +
+  geom_point(size = 4, color = "darkred") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2) +
+  labs(title = "Pre-computed confidence intervals", 
+       x = "Cylinders", y = "Mean MPG") +
+  theme_minimal()
+
+ggplotly(p_summary, tooltip = c("y", "ymin", "ymax"))
+```
+
+Pre-computation transfers the statistical work from ggplot2 (which happens during rendering) to the data preparation phase. This pattern works for any summary statistic: means with error bars, proportions with confidence intervals, density estimates, and fitted values with residuals. The advantage is complete control over tooltip content and guaranteed conversion. The disadvantage is that the plot is no longer reactive to changes in the original data (e.g., filtering by another variable would require recomputing summaries). The pattern is most valuable for static reports where the dataset does not change interactively.
+
+
+## Specialized Alternatives for Specific Use Cases
+
+For certain domains, `ggplotly()` is not the optimal tool, and specialized packages offer better interactive graphics. ggiraph extends ggplot2 with interactivity while preserving nearly all ggplot2 features, but it outputs SVG with limited interactivity compared to Plotly. highcharter provides a native R interface to Highcharts, excellent for time series and financial data, but with a different syntax. rbokeh (Bokeh binding) offers another interactive grammar, though it is less actively maintained. echarts4r provides an interface to Apache ECharts, which excels at large data and animations.
+
+```{r}
+# ggiraph example (preserves ggplot2 features better)
+# library(ggiraph)
+# p_ggiraph <- ggplot(mtcars, aes(wt, mpg, tooltip = rownames(mtcars))) +
+#   geom_point_interactive(size = 3)
+# girafe(ggobj = p_ggiraph)
+
+# highcharter example (excellent for time series)
+# library(highcharter)
+# hchart(mtcars, "scatter", hcaes(x = wt, y = mpg, group = cyl))
+
+# echarts4r example (good for large data)
+# library(echarts4r)
+# mtcars |> e_charts(wt) |> e_scatter(mpg, size = cyl)
+```
+
+
+
+Each alternative has a specific strength: ggiraph maximizes ggplot2 compatibility but has limited interactivity; highcharter produces beautiful, performant plots but requires learning Highcharts API; echarts4r handles large datasets well but has a unique pipe-based syntax. The pattern for choosing among alternatives is: use `ggplotly()` for quick conversion of small-to-medium datasets with standard geoms; use ggiraph when you need to preserve complex ggplot2 features but can accept limited tooltips; use native plotly for large datasets, 3D, or maps; use highcharter for time series and dashboards; use echarts4r for animations and large streaming data. No single tool dominates all use cases.
+
+
+# Conclusion
+
+`ggplotly()` represents a remarkable achievement in bridging two powerful graphics systems. Its ability to convert static ggplot2 plots into interactive visualizations with a single function call has democratized interactive graphics for R users. However, this convenience comes with trade-offs: performance degradation with large data, imperfect conversion of complex features, and limited customization. The lost features — annotations, specialized geoms, fine theme details, and coordinate transformations — reflect fundamental architectural differences between ggplot2 and Plotly.
+
+The practical recommendations from this lecture are as follows. For exploratory data analysis with datasets under 10,000 observations and standard Cartesian geometries, `ggplotly()` is an excellent choice that saves hours of coding. For publication-ready interactive graphics, use the hybrid approach: ggplot2 for base plotting and data transformation, followed by Plotly's `layout()` and `style()` for refinement. For large data (over 10,000 points), geographic data, polar coordinates, or complex statistical transformations that fail to convert, switch to native `plot_ly()` or specialized alternatives like echarts4r or highcharter. Finally, always pre-compute statistical summaries when you need reliable conversion of error bars, confidence bands, or density contours.
+
+The key insight is that `ggplotly()` is not a replacement for either ggplot2 or native Plotly; rather, it occupies a middle ground ideal for rapid prototyping and communication with non-technical audiences. By understanding its limitations and workarounds, you can deploy `ggplotly()` effectively while knowing when to reach for more powerful tools.
+
+
+# References
+
+Sievert, C. (2020). Interactive Web-Based Data Visualization with R, plotly, and shiny. Chapman and Hall/CRC.
+
+
+Wickham, H. (2016). ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York.
+
+
+Plotly Technologies Inc. (2024). Plotly R Open Source Graphing Library. https://plotly.com/r/
+
+
+Peng, C. (2019-2024). STA 553 Data Visualization Course Materials. West Chester University.
+
+
+
+
+
+# Appendix: Session Information
+
+```{r}
+sessionInfo()
+```
+
+

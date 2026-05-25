@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ggplot2 Themes – Fundamentals & Structure Reference</title>
+    <style>
+        :root {
+            --bg: #f9f6f9;
+            --card-bg: #ffffff;
+            --text: #2d1b29;
+            --header-bg: #6E3061;
+            --footer-bg: #6E3061;
+            --border: #d4c0d1;
+            --accent: #6E3061;
+            --accent-light: #8b4a7d;
+            --code-bg: #f4edf3;
+            --shadow: 0 2px 12px rgba(110, 48, 97, 0.12);
+            --shadow-hover: 0 8px 24px rgba(110, 48, 97, 0.18);
+            --checkbox-bg: #fff;
+            --checkbox-border: #6E3061;
+            --tag-bg: #e8dce5;
+            --tag-text: #4a2040;
+            --table-stripe: #faf5f9;
+            --footer-text: #f0e6ee;
+            --divider: #e0d1db;
+            --card-accent-line: #6E3061;
+        }
+
+        body.dark {
+            --bg: #1a1318;
+            --card-bg: #231b21;
+            --text: #e4d8e1;
+            --header-bg: #4a1e3f;
+            --footer-bg: #4a1e3f;
+            --border: #4a3445;
+            --accent: #c49bb8;
+            --accent-light: #d4a8cb;
+            --code-bg: #2d2029;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
+            --checkbox-bg: #3a2835;
+            --checkbox-border: #c49bb8;
+            --tag-bg: #3a2835;
+            --tag-text: #d4bcd0;
+            --table-stripe: #291e26;
+            --footer-text: #d4bcd0;
+            --divider: #4a3445;
+            --card-accent-line: #c49bb8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.55;
+            transition: background 0.35s ease, color 0.35s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============ HEADER ============ */
+        .page-header {
+            background: var(--header-bg);
+            color: #ffffff;
+            padding: 26px 32px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
+            position: relative;
+            z-index: 10;
+        }
+       .page-header .main-title0 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            margin-bottom: 2px;
+        }
+        .page-header .main-title {
+            font-size: 2.0rem;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            margin-bottom: 2px;
+        }
+        .page-header .subtitle {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.85;
+            letter-spacing: 0.2px;
+        }
+        .toggle-bar {
+            position: absolute;
+            bottom: 18px;
+            /*top: 18px;*/
+            right: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toggle-label {
+            color: #ffffff;
+            font-size: 0.88rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        .toggle-btn {
+            width: 52px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.22);
+            border-radius: 28px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+        }
+        .toggle-btn::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+        }
+        body.dark .toggle-btn {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        body.dark .toggle-btn::after {
+            transform: translateX(24px);
+        }
+
+        /* ============ MAIN CONTENT ============ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 26px 22px 22px;
+        }
+
+        .block {
+            margin-bottom: 30px;
+            break-inside: avoid;
+        }
+        .block-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            border-left: 6px solid var(--accent);
+            padding-left: 14px;
+            margin-bottom: 14px;
+            letter-spacing: -0.2px;
+        }
+
+        /* ============ REFERENCE CARDS – Equal size grid ============ */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--card-accent-line);
+            border-radius: 10px;
+            padding: 18px 20px 16px;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.3s, transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-width: 0;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        .card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 10px;
+            letter-spacing: -0.1px;
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            flex-shrink: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .card h3 .icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .card .card-subtitle {
+            font-size: 0.82rem;
+            color: var(--accent-light);
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.1px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .card .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .card ul {
+            list-style: none;
+            padding: 0;
+            flex: 1;
+        }
+        .card ul li {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+        .card ul li .item-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .card table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.84rem;
+            margin-top: 4px;
+            table-layout: fixed;
+        }
+        .card table th {
+            text-align: left;
+            font-weight: 700;
+            color: var(--accent);
+            padding: 7px 5px;
+            border-bottom: 2px solid var(--border);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .card table td {
+            padding: 6px 5px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .card table tr:nth-child(even) td {
+            background: var(--table-stripe);
+        }
+        .param-table td:first-child {
+            font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            white-space: nowrap;
+            width: 30%;
+        }
+        .card .card-footer-tags {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--divider);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Checkboxes */
+        .card ul li input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 17px;
+            height: 17px;
+            min-width: 17px;
+            border: 2px solid var(--checkbox-border);
+            border-radius: 4px;
+            background: var(--checkbox-bg);
+            cursor: pointer;
+            margin-top: 2px;
+            transition: background 0.2s, border-color 0.2s;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .card ul li input[type="checkbox"]:checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .card ul li input[type="checkbox"]:checked::after {
+            content: "✓";
+            position: absolute;
+            top: -3px;
+            left: 2px;
+            font-size: 13px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Inline code */
+        code {
+            background: var(--code-bg);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 0.82rem;
+            letter-spacing: -0.2px;
+            border: 1px solid var(--border);
+            white-space: normal;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+        }
+        .tag {
+            display: inline-block;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 3px 10px;
+            border-radius: 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1px;
+        }
+
+        /* ============ FOOTER ============ */
+        .page-footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            text-align: center;
+            padding: 16px 24px;
+            font-size: 0.82rem;
+            margin-top: 30px;
+            box-shadow: 0 -3px 14px rgba(0, 0, 0, 0.22);
+        }
+        .page-footer a {
+            color: #f0d9ea;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .page-footer .footer-row {
+            margin: 3px 0;
+        }
+        .page-footer .footer-divider {
+            display: inline-block;
+            margin: 0 8px;
+            opacity: 0.5;
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 850px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            .page-header .main-title {
+                font-size: 1.5rem;
+            }
+            .toggle-bar {
+                top: 10px;
+                right: 14px;
+            }
+            code {
+                white-space: normal;
+                word-break: break-all;
+            }
+        }
+
+        /* ============ PRINT STYLES ============ */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #1a1a1a !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            body.dark {
+                background: #ffffff !important;
+                color: #1a1a1a !important;
+                --card-bg: #ffffff;
+                --text: #1a1a1a;
+                --accent: #6E3061;
+                --accent-light: #8b4a7d;
+                --border: #ccc;
+                --code-bg: #f5f0f5;
+                --tag-bg: #e8dce5;
+                --tag-text: #4a2040;
+                --table-stripe: #faf5f9;
+                --footer-text: #4a2040;
+                --header-bg: #6E3061;
+                --footer-bg: #6E3061;
+                --divider: #ddd;
+                --card-accent-line: #6E3061;
+            }
+            .toggle-bar {
+                display: none !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                border-top: 4px solid #6E3061 !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+                height: auto !important;
+            }
+            .card:hover {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .page-header,
+            .page-footer {
+                background: #6E3061 !important;
+                color: #ffffff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .block {
+                page-break-inside: avoid;
+            }
+            @page {
+                size: auto;
+                margin: 12mm;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0 6px;
+            }
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            code {
+                white-space: normal;
+                word-break: break-all;
+            }
+        }
+
+        /* A3-specific print */
+        @media print and (min-width: 297mm) {
+            @page {
+                size: A3;
+                margin: 15mm;
+            }
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .card {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Letter-specific print */
+        @media print and (min-width: 215.9mm) and (max-width: 296.9mm) {
+            @page {
+                size: letter;
+                margin: 13mm;
+            }
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="page-header">
+        <div class="main-title">STA 553 DATA VISUALIZATION</div>
+        <div class="main-title">📊 ggplot2 Themes – Reference Cards</div>
+        <div class="subtitle">Fundamentals, Hierarchy & Step-by-Step Custom Theme Creation</div>
+         <div class="toggle-bar">
+            <span class="toggle-label" id="toggleLabel">☀️ Light</span>
+            <button class="toggle-btn" id="themeToggle" aria-label="Toggle dark/light mode"></button>
+        </div>
+    </header>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="container">
+
+        <!-- ========== BLOCK 1: Theme Fundamentals & Element Hierarchy ========== -->
+        <div class="block">
+            <h2 class="block-title">1. Theme Fundamentals & Element Hierarchy</h2>
+            <div class="card-grid">
+
+                <!-- Card 1A: Complete vs Incomplete -->
+                <div class="card">
+                    <h3><span class="icon">🔷</span> Complete vs. Incomplete Themes</h3>
+                    <div class="card-subtitle">Understanding theme types</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Complete themes</strong> override all plot elements — use as base</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Built-in: <code>theme_grey()</code> (default), <code>theme_bw()</code>, <code>theme_minimal()</code>, <code>theme_classic()</code>, <code>theme_void()</code>, <code>theme_light()</code>, <code>theme_dark()</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Incomplete themes</strong> modify only specific elements — use <code>+ theme(...)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Example: <code>+ theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Use <code>%+replace%</code> to completely replace inherited elements</span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">base_size</span> <span class="tag">%+replace%</span> <span class="tag">inheritance</span>
+                    </div>
+                </div>
+
+                <!-- Card 1B: Plot Element Hierarchy -->
+                <div class="card">
+                    <h3><span class="icon">🏗️</span> Plot Element Hierarchy</h3>
+                    <div class="card-subtitle">Full inheritance tree</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text"><code>plot</code> → <strong>panel</strong> (background, border, grid.major, grid.minor, spacing, ontop)</span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>plot</code> → <strong>axis</strong> (title, text, ticks, ticks.length, line — each for x, y, top, right)</span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>plot</code> → <strong>legend</strong> (background, title, text, key, key.size, margin, spacing, position, justification, direction)</span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>plot</code> → <strong>strip</strong> (background, text, placement, switch — for faceted plots)</span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>plot</code> → <strong>plot</strong>.title, .subtitle, .caption, .tag, .margin, aspect.ratio</span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">panel.grid</span> <span class="tag">strip.placement</span> <span class="tag">aspect.ratio</span>
+                    </div>
+                </div>
+
+                <!-- Card 1C: Four Element Functions -->
+                <div class="card">
+                    <h3><span class="icon">🧱</span> Four Element Functions</h3>
+                    <div class="card-subtitle">Building blocks for every theme</div>
+                    <div class="card-body">
+                        <table>
+                            <tr><th>Function</th><th>Applies To</th><th>Key Parameters</th></tr>
+                            <tr><td><code>element_text()</code></td><td>All text</td><td>family, face, colour, size, hjust, vjust, angle, lineheight, margin</td></tr>
+                            <tr><td><code>element_line()</code></td><td>Lines &amp; borders</td><td>colour, linewidth, linetype, lineend, arrow</td></tr>
+                            <tr><td><code>element_rect()</code></td><td>Rectangles &amp; bg</td><td>fill, colour, linewidth, linetype</td></tr>
+                            <tr><td><code>element_blank()</code></td><td>Remove element</td><td>(no parameters — sets element to NULL)</td></tr>
+                        </table>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">rel()</span> <span class="tag">margin()</span> <span class="tag">unit()</span>
+                    </div>
+                </div>
+
+                <!-- Card 1D: element_text() Parameters -->
+                <div class="card">
+                    <h3><span class="icon">🔤</span> <code>element_text()</code> Full Reference</h3>
+                    <div class="card-subtitle">Every parameter explained</div>
+                    <div class="card-body">
+                        <table class="param-table">
+                            <tr><td>family</td><td>Font family (e.g., <code>"sans"</code>, <code>"serif"</code>, <code>"mono"</code>)</td></tr>
+                            <tr><td>face</td><td><code>"plain"</code> | <code>"italic"</code> | <code>"bold"</code> | <code>"bold.italic"</code></td></tr>
+                            <tr><td>colour / color</td><td>Text color (named, hex, or RGB)</td></tr>
+                            <tr><td>size</td><td>Font size in pts — use <code>rel(0.8)</code> for relative scaling</td></tr>
+                            <tr><td>hjust / vjust</td><td>Horizontal/vertical justification (0–1)</td></tr>
+                            <tr><td>angle</td><td>Rotation angle (e.g., <code>45</code> for slanted labels)</td></tr>
+                            <tr><td>lineheight</td><td>Line height multiplier</td></tr>
+                            <tr><td>margin</td><td>Use <code>margin(t, r, b, l)</code> for spacing</td></tr>
+                        </table>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">typography</span> <span class="tag">scaling</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========== BLOCK 2: Step-by-Step Theme Creation ========== -->
+        <div class="block">
+            <h2 class="block-title">2. Step-by-Step Custom Theme Creation</h2>
+            <div class="card-grid">
+
+                <!-- Card 2A: Steps 1–2 -->
+                <div class="card">
+                    <h3><span class="icon">📝</span> Steps 1–2: Function Skeleton & Background</h3>
+                    <div class="card-subtitle">Foundation of every custom theme</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Step 1:</strong> <code>theme_custom &lt;- function(base_size = 12, base_family = "") { }</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Always start with <code>theme_minimal()</code> or <code>theme_bw()</code> + <code>%+replace%</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Step 2:</strong> <code>plot.background = element_rect(fill = "white", colour = NA)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>panel.background = element_rect(fill = "grey95", colour = NA)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>panel.border = element_rect(fill = NA, colour = "grey80", linewidth = 0.5)</code></span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">base_size</span> <span class="tag">base_family</span> <span class="tag">skeleton</span>
+                    </div>
+                </div>
+
+                <!-- Card 2B: Steps 3–4 -->
+                <div class="card">
+                    <h3><span class="icon">📏</span> Steps 3–4: Grid Lines & Axis Elements</h3>
+                    <div class="card-subtitle">Grid and axis configuration</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Step 3:</strong> <code>panel.grid.major = element_line(colour = "grey85", linewidth = 0.3)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>panel.grid.minor = element_line(colour = "grey90", linewidth = 0.15, linetype = "dotted")</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Step 4:</strong> <code>axis.line = element_line(colour = "black", linewidth = 0.5)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>axis.ticks = element_line(colour = "grey50")</code> + <code>axis.ticks.length = unit(2, "mm")</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>axis.title = element_text(face = "bold", margin = margin(t = 10))</code></span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">linetype</span> <span class="tag">unit()</span> <span class="tag">dotted</span>
+                    </div>
+                </div>
+
+                <!-- Card 2C: Steps 5–6 -->
+                <div class="card">
+                    <h3><span class="icon">🏷️</span> Steps 5–6: Legend & Plot Titles</h3>
+                    <div class="card-subtitle">Legend positioning and text hierarchy</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Step 5:</strong> <code>legend.position = "bottom"</code> | <code>"right"</code> | <code>"none"</code> | <code>c(0.9, 0.9)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>legend.background = element_rect(fill, colour, linewidth)</code>, <code>legend.key = element_rect()</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Step 6:</strong> <code>plot.title = element_text(size = rel(1.4), face = "bold", hjust = 0.5)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>plot.subtitle = element_text(size = rel(1.1), colour = "grey40", hjust = 0.5)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>plot.caption = element_text(size = rel(0.8), hjust = 1)</code> + <code>plot.margin = margin(20,20,20,20)</code></span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">legend.justification</span> <span class="tag">plot.tag</span>
+                    </div>
+                </div>
+
+                <!-- Card 2D: Step 7 -->
+                <div class="card">
+                    <h3><span class="icon">📋</span> Step 7: Facet Strips & Final Assembly</h3>
+                    <div class="card-subtitle">Facet strip styling and complete theme</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text"><code>strip.background = element_rect(fill = "grey80", colour = "grey50")</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>strip.text = element_text(size = rel(1.1), face = "bold", colour = "grey20")</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>strip.placement = "outside"</code> (or <code>"inside"</code>)</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Combine all 7 steps into one <code>theme()</code> call inside <code>%+replace%</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Return the complete theme object — test with <code>test_plot + theme_custom()</code></span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">facet_wrap</span> <span class="tag">facet_grid</span> <span class="tag">strip.switch</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========== BLOCK 3: Complete Theme Examples ========== -->
+        <div class="block">
+            <h2 class="block-title">3. Complete Theme Examples — Publication, Dashboard & Dark</h2>
+            <div class="card-grid">
+
+                <!-- Card 3A: Publication-Ready -->
+                <div class="card">
+                    <h3><span class="icon">📄</span> Publication-Ready Theme</h3>
+                    <div class="card-subtitle">Clean, academic, print-optimized</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text">Base: <code>theme_bw(base_size = 14, base_family = "serif")</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">White panel, black border (<code>linewidth = 0.8</code>), major grid only</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Black axis ticks (<code>linewidth = 0.5</code>), <code>axis.ticks.length = unit(2, "mm")</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Legend at bottom with bordered background, bold strip text on grey90</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Left-aligned title (<code>hjust = 0</code>), right-aligned caption, generous margins</span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">Academic</span> <span class="tag">serif</span> <span class="tag">print</span>
+                    </div>
+                </div>
+
+                <!-- Card 3B: Dashboard Minimal -->
+                <div class="card">
+                    <h3><span class="icon">📊</span> Dashboard Minimal Theme</h3>
+                    <div class="card-subtitle">Compact, modern, business-oriented</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text">Base: <code>theme_void(base_size = 12)</code> + faint major grid lines only</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Simple axis lines (<code>colour = "grey60", linewidth = 0.3</code>), minimal ticks</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Floating legend: <code>legend.position = c(0.9, 0.9)</code>, <code>legend.justification = c(1, 1)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Transparent legend background: <code>fill = alpha("white", 0.8)</code>, no key border</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Compact plot margins: <code>margin(10, 10, 10, 10)</code>, centered title</span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">Business</span> <span class="tag">alpha()</span> <span class="tag">floating</span>
+                    </div>
+                </div>
+
+                <!-- Card 3C: Dark Presentation -->
+                <div class="card">
+                    <h3><span class="icon">🌙</span> Dark Presentation Theme</h3>
+                    <div class="card-subtitle">High-contrast for slides & dark UIs</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text">Base: <code>theme_minimal(base_size = 16)</code>, dark backgrounds throughout</span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>plot.background = element_rect(fill = "grey20")</code>, panel = <code>"grey25"</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Grid lines visible: major <code>"grey40"</code>, minor <code>"grey35"</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Light text: axis <code>"grey90"</code>, titles <code>"white"</code>, bold face for emphasis</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Legend on dark: <code>fill = "grey30"</code>, <code>colour = "grey40"</code>, key = <code>"grey25"</code></span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">Slides</span> <span class="tag">contrast</span> <span class="tag">presentation</span>
+                    </div>
+                </div>
+
+                <!-- Card 3D: Custom Color Variant -->
+                <div class="card">
+                    <h3><span class="icon">🎨</span> Theme Variant with Accent Color</h3>
+                    <div class="card-subtitle">Extending a base theme with branding</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text">Create <code>theme_base()</code> first, then extend with <code>%+replace%</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>theme_colorful &lt;- function(base_size = 12, accent_color = "#2196F3") { }</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Apply accent to: <code>axis.title</code>, <code>plot.title</code>, <code>strip.background</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Strip text becomes white for contrast on colored background</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Test variants: <code>theme_colorful(accent_color = "#E74C3C")</code></span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">branding</span> <span class="tag">extension</span> <span class="tag">variants</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========== BLOCK 4: Inheritance, Best Practices & Advanced ========== -->
+        <div class="block">
+            <h2 class="block-title">4. Theme Inheritance, Best Practices & Advanced Techniques</h2>
+            <div class="card-grid">
+
+                <!-- Card 4A: %+replace% vs + -->
+                <div class="card">
+                    <h3><span class="icon">🔁</span> <code>%+replace%</code> vs <code>+</code> — Deep Dive</h3>
+                    <div class="card-subtitle">Understanding theme composition</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text"><code>%+replace%</code> completely <strong>replaces</strong> the entire element subtree — no inheritance from parent</span></li>
+                            <li><input type="checkbox"> <span class="item-text"><code>+</code> <strong>adds or overrides</strong> specific properties while keeping others from the parent theme</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Example: <code>theme_bw() %+replace% theme(panel.grid.minor = element_blank())</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Use <code>%+replace%</code> when building a <em>complete</em> custom theme from scratch</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Use <code>+</code> for <em>incremental</em> tweaks: <code>theme_custom() + theme(axis.text = element_text(size = 14))</code></span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">composition</span> <span class="tag">override</span>
+                    </div>
+                </div>
+
+                <!-- Card 4B: Best Practices -->
+                <div class="card">
+                    <h3><span class="icon">✅</span> Best Practices Checklist</h3>
+                    <div class="card-subtitle">Production-ready theme development</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text">Always provide <code>base_size</code> and <code>base_family</code> parameters</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Use <code>rel()</code> for scalable font sizes — never hardcode absolute sizes</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Handle missing fonts gracefully with <code>tryCatch()</code> or font availability checks</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Test with: scatter plots, bar charts, faceted plots, multi-legends, and empty data</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Include Roxygen documentation: <code>@param base_size</code>, <code>@param base_family</code>, <code>@return</code>, <code>@export</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Ensure WCAG 2.1 AA contrast ratios for accessibility (4.5:1 for text)</span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">accessibility</span> <span class="tag">testing</span> <span class="tag">docs</span>
+                    </div>
+                </div>
+
+                <!-- Card 4C: Responsive & Conditional -->
+                <div class="card">
+                    <h3><span class="icon">🧪</span> Responsive & Conditional Themes</h3>
+                    <div class="card-subtitle">Dynamic theming techniques</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Responsive scaling:</strong> <code>theme_responsive &lt;- function(ratio = 1) { element_text(size = base_size * ratio) }</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Conditional grid:</strong> <code>if (!grid) panel.grid.major = element_blank()</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text"><strong>Conditional border:</strong> <code>if (border) panel.border = element_rect(...)</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Combine with <code>ggplot2::theme_get()</code> / <code>theme_set()</code> for global defaults</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Use <code>theme_update()</code> to modify the active theme globally in a session</span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">theme_set()</span> <span class="tag">theme_update()</span> <span class="tag">dynamic</span>
+                    </div>
+                </div>
+
+                <!-- Card 4D: Debugging Themes -->
+                <div class="card">
+                    <h3><span class="icon">🐛</span> Debugging & Testing Themes</h3>
+                    <div class="card-subtitle">Tools for verifying theme behavior</div>
+                    <div class="card-body">
+                        <ul>
+                            <li><input type="checkbox"> <span class="item-text">Inspect elements: <code>my_theme$panel.grid.major</code> — returns the element definition</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Use <code>ggplot2::calc_element("panel.grid.major", my_theme)</code> for computed values</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Create a standard test plot with points, lines, facets, and legends</span></li>
+                            <li><input type="checkbox"> <span class="item-text">Compare themes side-by-side with <code>patchwork</code> or <code>gridExtra</code></span></li>
+                            <li><input type="checkbox"> <span class="item-text">Check for missing elements: <code>setdiff(names(theme_grey()), names(my_theme))</code></span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer-tags">
+                        <span class="tag">calc_element()</span> <span class="tag">patchwork</span> <span class="tag">debugging</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="page-footer">
+        <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+    
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center> 
+        
+    </footer>
+
+    <script>
+         // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();   
+    
+        (function() {
+            const body = document.body;
+            const toggleBtn = document.getElementById('themeToggle');
+            const toggleLabel = document.getElementById('toggleLabel');
+
+            const savedTheme = localStorage.getItem('ggplot2-ref-theme-v4');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark');
+                toggleLabel.textContent = '🌙 Dark';
+            } else if (savedTheme === 'light') {
+                body.classList.remove('dark');
+                toggleLabel.textContent = '☀️ Light';
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                body.classList.add('dark');
+                toggleLabel.textContent = '🌙 Dark';
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                body.classList.toggle('dark');
+                const isDark = body.classList.contains('dark');
+                toggleLabel.textContent = isDark ? '🌙 Dark' : '☀️ Light';
+                localStorage.setItem('ggplot2-ref-theme-v4', isDark ? 'dark' : 'light');
+            });
+
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            allCheckboxes.forEach((cb, index) => {
+                const saved = localStorage.getItem('ggplot2-cb-v4-' + index);
+                if (saved === 'true') cb.checked = true;
+                cb.addEventListener('change', () => {
+                    localStorage.setItem('ggplot2-cb-v4-' + index, cb.checked);
+                });
+            });
+
+            console.log('✅ ggplot2 Themes Reference Card v4 loaded — all cards identical width & height.');
+            console.log('🖨️ Print with Ctrl+P / Cmd+P — supports A3 & Letter paper.');
+            console.log('🌓 Toggle dark/light with the button in the header.');
+            console.log('📋 ' + allCheckboxes.length + ' interactive checkboxes available.');
+        })();
+    </script>
+</body>
+</html>
