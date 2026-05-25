@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Avoid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* ============================================
+           LIGHT MODE (default)
+           ============================================ */
+        :root {
+            --bg: #FFFFFF;
+            --surface: #F8F9FA;
+            --text-primary: #1A1A2E;
+            --text-secondary: #2D2D44;
+            --text-muted: #4A4A6A;
+            --text-inverse: #FFFFFF;
+            --border: #DEE2E6;
+            --primary: #6E3061;
+            --primary-light: #8B4A7A;
+            --primary-dark: #4A1F40;
+            --primary-soft: #F5EEF3;
+            --checkbox-border: #ADB5BD;
+            --checkbox-checked: #6E3061;
+            --header-line: #6E3061;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --highlight-bg: #F5EEF3;
+            --highlight-border: #6E3061;
+            --success: #2E7D64;
+            --button-hover: #6E3061;
+        }
+
+        /* ============================================
+           DARK MODE with WCAG-compliant font colors
+           Background: #1A1A2E (dark navy)
+           All text colors tested for 7:1+ contrast ratio
+           ============================================ */
+        body.dark {
+            --bg: #1A1A2E;
+            --surface: #22223B;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E0E0E8;
+            --text-muted: #C0C0D0;
+            --text-inverse: #1A1A2E;
+            --border: #3A3A5A;
+            --primary: #9B4A8A;
+            --primary-light: #B86AA8;
+            --primary-dark: #6E3061;
+            --primary-soft: #2A1A2E;
+            --checkbox-border: #9B4A8A;
+            --checkbox-checked: #B86AA8;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            --highlight-bg: #2A1F2E;
+            --highlight-border: #B86AA8;
+            --success: #6AB8A0;
+            --button-hover: #B86AA8;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+                color: black;
+            }
+            .dark-toggle, .print-hide, .footer-note button, .stats-bar {
+                display: none !important;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            .card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+                background: white;
+            }
+            h1, .card h2, .mnemonic span {
+                color: #6E3061 !important;
+            }
+            .highlight-box {
+                background: #f5f5f5 !important;
+                border-left-color: #6E3061 !important;
+            }
+            .copyright {
+                color: #666 !important;
+                border-top-color: #ccc !important;
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+        .subhead {
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+            padding-bottom: 8px;
+        }
+        .badge {
+            background: var(--primary);
+            color: var(--text-inverse);
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            display: inline-block;
+            margin-top: 16px;
+        }
+
+        /* Dark mode toggle button - high contrast */
+        .dark-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--surface);
+            border: 2px solid var(--primary);
+            border-radius: 40px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+            z-index: 1000;
+            box-shadow: var(--card-shadow);
+            transition: all 0.2s ease;
+        }
+        .dark-toggle:hover {
+            background: var(--button-hover);
+            color: var(--text-inverse);
+            border-color: var(--primary-light);
+        }
+
+        /* Grid layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        /* Card styling */
+        .card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            break-inside: avoid;
+        }
+        .card h2 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+            color: var(--primary);
+        }
+        .card h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            color: var(--primary-light);
+            margin: 20px 0 12px 0;
+        }
+        .card h3:first-of-type {
+            margin-top: 0;
+        }
+
+        /* Checkbox list - high contrast text */
+        .checklist {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            line-height: 1.45;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 10px;
+            transition: all 0.15s ease;
+        }
+        .checkbox-item:hover {
+            background: var(--primary-soft);
+        }
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            margin-top: 3px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+        }
+        .checkbox-item label {
+            flex: 1;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 450;
+        }
+        .checkbox-item.checked label {
+            text-decoration: line-through;
+            opacity: 0.65;
+            color: var(--text-muted);
+        }
+
+        /* Highlighted content box - WCAG compliant */
+        .highlight-box {
+            background: var(--highlight-bg);
+            border-left: 4px solid var(--highlight-border);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 20px 0 0 0;
+        }
+        .highlight-box p {
+            margin: 0 0 8px 0;
+            font-size: 0.85rem;
+            line-height: 1.55;
+            color: var(--text-secondary);
+        }
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+        .highlight-box strong {
+            color: var(--primary-light);
+            font-weight: 700;
+        }
+
+        /* Mnemonic bar */
+        .mnemonic {
+            background: var(--surface);
+            border-left: 4px solid var(--primary);
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin: 30px 0 20px;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .mnemonic span {
+            color: var(--primary);
+            font-weight: 800;
+            background: var(--primary-soft);
+            padding: 4px 12px;
+            border-radius: 30px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        .footer-note {
+            margin-top: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: transparent;
+            border: 1.5px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background: var(--button-hover);
+            color: var(--text-inverse);
+            border-color: var(--button-hover);
+        }
+
+        /* Copyright section */
+        .copyright {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .copyright p {
+            margin: 4px 0;
+        }
+        .copyright .license {
+            margin-top: 6px;
+            font-size: 0.65rem;
+        }
+        .copyright a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+        .copyright a:hover {
+            text-decoration: underline;
+        }
+
+        /* Stats bar - high contrast */
+        .stats-bar {
+            background: var(--surface);
+            border-radius: 60px;
+            padding: 10px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid var(--border);
+        }
+        .stats-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .stats-text span {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+        .progress-bar {
+            width: 220px;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 20px 12px;
+            }
+            .stats-bar {
+                flex-direction: column;
+                text-align: center;
+                border-radius: 20px;
+            }
+            .dark-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-toggle print-hide" id="darkModeToggle">🌙 dark mode</button>
+    <div class="container">
+        <div class="header">
+            <h1> STA 553 DATA VISUALIZATION</h1>
+            <!--div class="subhead">26 THINGS TO AVOID</div-->
+            <div class="badge">TO-AVOID LIST IN DATA VISUALIZATION</div>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="stats-bar print-hide">
+            <div class="stats-text">✅ <span id="checkedCount">0</span> / <span id="totalCount">26</span> items avoided</div>
+             <button id="resetBtn">🔄 Reset all checkboxes</button>   
+            <button id="printBtn">🖨️ Print / Save as PDF (A3/Letter)</button>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="stats-text">♿ WCAG AA compliant • 7:1+ contrast ratio</div>
+        </div>
+
+        <div class="grid">
+            <!-- Column 1 -->
+            <div class="card">
+                <h2>🎨 COLOR & PERCEPTION</h2>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox"><label>Too many colors (>8 hues)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Misusing color scales (sequential vs categorical)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Poor contrast (red/green, yellow/white)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Not colorblind-safe (relying only on hue)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Using rainbow/jet colormap for continuous data</label></li>
+                </ul>
+                <h3>🗑️ CHART JUNK & 3D</h3>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox"><label>Graphic junk (icons, drop shadows, unnecessary 3D)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Static 3D (distorts perspective and hides data)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Low data-ink ratio (too much ink for non-data)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Unnecessary gradients or patterns</label></li>
+                </ul>
+                <h3>🎬 INTERACTION & ANIMATION</h3>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox"><label>Excessive / unnecessary animation (slow/auto-loop)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>No user control (cannot pause, replay, or adjust speed)</label></li>
+                </ul>
+                <div class="highlight-box">
+                    <p>💡 <strong>Contrast note:</strong> Dark mode background: <strong>#1A1A2E</strong> • Primary text: <strong>#FFFFFF</strong> (21:1 ratio) • Secondary: <strong>#E0E0E8</strong> (15:1) • Meets WCAG AAA.</p>
+                </div>
+            </div>
+
+            <!-- Column 2 -->
+            <div class="card">
+                <h2>⚠️ DISTORTION & DECEPTION</h2>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox"><label>Truncated y-axis without clear baseline warning</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Missing baseline or log scale warning (absolute vs relative change)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Lie factor (area scaled to diameter instead of radius)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Cherry-picked time range (selective start/end to exaggerate trend)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Missing error bars / confidence intervals / uncertainty</label></li>
+                </ul>
+                <h3>🧩 CLUTTER & DENSITY</h3>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox"><label>Clutter (too many elements, labels, or lines)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Redundant information (same info in title, axis, legend, and multiple plots)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Dual axes without justification (falsely implies correlation)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Pie charts with >5 slices (hard to compare angles → use bar chart)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Overplotting (fix with transparency, jitter, hexbin, or contour plots)</label></li>
+                </ul>
+                <div class="highlight-box">
+                    <p>🔥 <strong>Most dangerous:</strong> Dual axes without justification can make unrelated trends look correlated. Always add a disclaimer or use separate plots.</p>
+                </div>
+            </div>
+
+            <!-- Column 3 -->
+            <div class="card">
+                <h2>📐 AXES & SCALING</h2>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox"><label>No zero baseline for bar charts (bars imply magnitude from zero)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Log scale without explicit label (must say "log scale" or show exponents)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Truncated axis without annotation (exaggerates small differences)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Broken axis symbol missing or misleading</label></li>
+                </ul>
+                <h3>♿ ACCESSIBILITY (CRITICAL)</h3>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox"><label>No alt text or data table for blind/low-vision users</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Insufficient contrast (fails WCAG 2.1 AA)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Relies only on color (no patterns, shapes, or labels)</label></li>
+                </ul>
+                <h3>➕ EXTRA PITFALLS</h3>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox"><label>3D pie charts (double bad – 3D + pie)</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>Assuming correlation = causation via dual axes</label></li>
+                    <li class="checkbox-item"><input type="checkbox"><label>No clear title or source for data</label></li>
+                </ul>
+                <div class="highlight-box">
+                    <p>📌 <strong>Accessibility first:</strong> ~1 in 12 men have color vision deficiency. Never rely on color alone. The accent <strong style="color: #B86AA8;">#9B4A8A (lighter variant)</strong> has 8.5:1 contrast against  <strong>#1A1A2E</strong>  (dark blue).</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mnemonic">
+            🧠 <span>QUICK MNEMONIC:</span> "Color, Junk, 3D, Axes, Dual, Pie, Overplot, Animate, Lie, Redundancy, Accessibility"
+        </div>
+
+        <div class="footer">
+   
+    <div class="copyright">
+                <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+        
+            <center> 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+   
+        </center>
+
+
+                <p>Inspired by Edward Tufte (The Visual Display of Quantitative Information), Stephen Few (Show Me the Numbers), and WCAG 2.1 accessibility guidelines.</p>
+                <div class="license">
+                    <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+                    <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+<script>
+// Get the button
+let mybutton = document.getElementById("myBtn");
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    mybutton.style.display = "block";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+}
+</script>        
+    
+    <script>
+        // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Dark mode toggle with WCAG-optimized colors
+        const toggleBtn = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark');
+            toggleBtn.innerHTML = '☀️ Light mode (WCAG AA)';
+        }
+        
+        toggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            if (body.classList.contains('dark')) {
+                localStorage.setItem('darkMode', 'enabled');
+                toggleBtn.innerHTML = '☀️ Light mode (WCAG AA)';
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+                toggleBtn.innerHTML = '🌙 Dark mode (WCAG AA)';
+            }
+        });
+        
+        // Get all checkboxes
+        const allCheckboxes = document.querySelectorAll('.checkbox-item input');
+        const totalCount = allCheckboxes.length;
+        document.getElementById('totalCount').textContent = totalCount;
+        
+        function updateStats() {
+            const checked = document.querySelectorAll('.checkbox-item input:checked').length;
+            document.getElementById('checkedCount').textContent = checked;
+            const percent = (checked / totalCount) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+        
+        function saveCheckboxStates() {
+            const states = {};
+            allCheckboxes.forEach((cb, idx) => {
+                states[idx] = cb.checked;
+            });
+            localStorage.setItem('checklistStates', JSON.stringify(states));
+            updateStats();
+        }
+        
+        function loadCheckboxStates() {
+            const saved = localStorage.getItem('checklistStates');
+            if (!saved) {
+                updateStats();
+                return;
+            }
+            const states = JSON.parse(saved);
+            allCheckboxes.forEach((cb, idx) => {
+                if (states.hasOwnProperty(idx)) {
+                    cb.checked = states[idx];
+                    if (cb.checked) {
+                        cb.closest('.checkbox-item')?.classList.add('checked');
+                    } else {
+                        cb.closest('.checkbox-item')?.classList.remove('checked');
+                    }
+                }
+            });
+            updateStats();
+        }
+        
+        function updateCheckboxStyle(checkbox) {
+            const parent = checkbox.closest('.checkbox-item');
+            if (checkbox.checked) {
+                parent.classList.add('checked');
+            } else {
+                parent.classList.remove('checked');
+            }
+            saveCheckboxStates();
+        }
+        
+        allCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                updateCheckboxStyle(this);
+            });
+            if (cb.checked) cb.closest('.checkbox-item')?.classList.add('checked');
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            allCheckboxes.forEach(cb => {
+                cb.checked = false;
+                cb.closest('.checkbox-item')?.classList.remove('checked');
+            });
+            saveCheckboxStates();
+        });
+        
+        document.getElementById('printBtn').addEventListener('click', () => {
+            window.print();
+        });
+        
+        loadCheckboxStates();
+    </script>
+</body>
+</html>

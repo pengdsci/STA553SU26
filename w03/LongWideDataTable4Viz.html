@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, print-scale=1">
+  <title>STA 553 · Long vs Wide Data Formats</title>
+  <style>
+    /* ---------- RESET & ROOT VARIABLES ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --purple-deep: #6E3061;
+      --purple-soft: #8E4A7C;
+      --bg-light: #FDF7FA;
+      --surface-light: #FFFFFF;
+      --text-light: #1E1A1C;
+      --text-muted-light: #4B3A44;
+      --border-light: #DCC9D6;
+      --card-shadow-light: 0 8px 20px rgba(110, 48, 97, 0.08);
+      --accent-check: #6E3061;
+      
+      --bg-dark: #1F1820;
+      --surface-dark: #2C2129;
+      --text-dark: #F0E6EE;
+      --text-muted-dark: #CFBCC9;
+      --border-dark: #543F4F;
+      --card-shadow-dark: 0 8px 20px rgba(0,0,0,0.4);
+      
+      --transition-speed: 0.25s;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* ---------- TYPOGRAPHY ---------- */
+    h1, h2, h3 {
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .course-title {
+      font-size: 2.8rem;
+      font-weight: 700;
+      text-align: center;
+      color: white;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.25rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      width: 100%;
+    }
+
+    .main-header-sub {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: #F5E6F0;
+      margin-top: 0.1rem;
+      width: 100%;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1.2rem;
+      color: var(--purple-deep);
+      border-left: 5px solid var(--purple-deep);
+      padding-left: 1rem;
+    }
+
+    body.dark h2 {
+      color: #E2B8D5;
+      border-left-color: #E2B8D5;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+      color: #3D2736;
+    }
+
+    body.dark h3 {
+      color: #F3D9EC;
+    }
+
+    /* ---------- LAYOUT & HEADER/FOOTER ---------- */
+    .page-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    header {
+      background: linear-gradient(135deg, #6E3061 0%, #8A406F 100%);
+      color: white;
+      padding: 2rem 2rem 1.8rem;
+      border-radius: 24px;
+      margin-bottom: 2.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 12px 28px rgba(110, 48, 97, 0.3);
+      flex-direction: column;
+    }
+
+    .header-top-row {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-text-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .theme-toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: rgba(255,255,255,0.12);
+      padding: 0.2rem 0.2rem;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+    }
+
+    .theme-toggle-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.6rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0.3rem;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .theme-toggle-btn:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    .size-selector {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .size-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.5);
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .size-btn.active {
+      background: white;
+      color: #6E3061;
+      font-weight: 700;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      padding: 1.5rem 2rem;
+      background: var(--surface-light);
+      border-radius: 20px;
+      /*display: flex; */
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--text-muted-light);
+      border: 1px solid var(--border-light);
+      transition: background var(--transition-speed), border var(--transition-speed);
+    }
+
+    body.dark footer {
+      background: var(--surface-dark);
+      border-color: var(--border-dark);
+      color: var(--text-muted-dark);
+    }
+
+    .site-meter {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .meter-dot {
+      width: 10px;
+      height: 10px;
+      background: #6E3061;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    body.dark .meter-dot {
+      background: #E2B8D5;
+    }
+
+    /* ---------- CARDS GRID ---------- */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.8rem;
+      margin: 2rem 0 2.2rem;
+    }
+
+    .card {
+      background: var(--surface-light);
+      border-radius: 24px;
+      padding: 1.8rem 1.5rem;
+      box-shadow: var(--card-shadow-light);
+      border: 1px solid var(--border-light);
+      transition: background var(--transition-speed), border var(--transition-speed), box-shadow var(--transition-speed);
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.dark .card {
+      background: var(--surface-dark);
+      border-color: var(--border-dark);
+      box-shadow: var(--card-shadow-dark);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .card-icon {
+      font-size: 1.8rem;
+    }
+
+    /* ---------- CHECKBOX STYLE ---------- */
+    .checklist {
+      list-style: none;
+      margin-top: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+
+    .checklist input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #6E3061;
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      margin-top: 2px;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    body.dark .checklist input[type="checkbox"] {
+      background: #3A2D36;
+      border-color: #C79BBA;
+    }
+
+    .checklist input[type="checkbox"]:checked {
+      background-color: #6E3061;
+      border-color: #6E3061;
+    }
+
+    body.dark .checklist input[type="checkbox"]:checked {
+      background-color: #C79BBA;
+      border-color: #C79BBA;
+    }
+
+    .checklist input[type="checkbox"]:checked::after {
+      content: "✓";
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      position: absolute;
+      left: 3px;
+      top: -1px;
+    }
+
+    body.dark .checklist input[type="checkbox"]:checked::after {
+      color: #1F1820;
+    }
+
+    .checklist label {
+      cursor: pointer;
+      font-weight: 450;
+      color: var(--text-light);
+      transition: color 0.2s;
+    }
+
+    body.dark .checklist label {
+      color: var(--text-dark);
+    }
+
+    /* ---------- TABLE ---------- */
+    .decision-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0 1rem;
+      font-size: 0.95rem;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .decision-table th {
+      background-color: #6E3061;
+      color: white;
+      font-weight: 600;
+      padding: 0.9rem 1rem;
+      text-align: left;
+    }
+
+    .decision-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-light);
+      background-color: var(--surface-light);
+    }
+
+    body.dark .decision-table td {
+      background-color: var(--surface-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .highlight-wide {
+      font-weight: 700;
+      color: #6E3061;
+      background: #F3E3F0;
+      padding: 0.15rem 0.5rem;
+      border-radius: 20px;
+    }
+
+    body.dark .highlight-wide {
+      color: #F5D2EB;
+      background: #4A2F42;
+    }
+
+    .highlight-long {
+      font-weight: 700;
+      color: #2D5F4C;
+      background: #DCF2E9;
+      padding: 0.15rem 0.5rem;
+      border-radius: 20px;
+    }
+
+    body.dark .highlight-long {
+      color: #C2F0DA;
+      background: #254B3A;
+    }
+
+    /* ---------- PRINT STYLES ---------- */
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      body.dark {
+        background: white !important;
+        color: black !important;
+      }
+      .page-container {
+        max-width: 100%;
+        padding: 0.5cm;
+      }
+      header {
+        background: #6E3061 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .course-title, .main-header-sub {
+        color: white !important;
+      }
+      .card, footer, .decision-table td {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc;
+        box-shadow: none;
+      }
+      body.dark .card, body.dark footer, body.dark .decision-table td {
+        background: white !important;
+        color: black !important;
+      }
+      .checklist input[type="checkbox"] {
+        border: 2px solid black;
+        background: white;
+      }
+      .checklist input[type="checkbox"]:checked {
+        background: black;
+        border-color: black;
+      }
+      .theme-toggle-wrapper, .size-selector {
+        display: none;
+      }
+    }
+
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- HEADER with centered STA 553 -->
+    <header>
+      <!--div class="header-top-row">
+        <div class="header-text-group">
+          <span style="color:white; font-size:1rem; opacity:0.9;">📊 Data Visualization Basics</span>
+        </div>
+        <div class="flex-row">
+          <div class="size-selector">
+            <button id="btnA3" class="size-btn active">A3</button>
+            <button id="btnLetter" class="size-btn">Letter</button>
+          </div>
+          <div class="theme-toggle-wrapper">
+            <span style="color:white;">☀️</span>
+            <button id="themeToggle" class="theme-toggle-btn" aria-label="Switch dark/light mode">🌙</button>
+          </div>
+        </div>
+      </div-->
+      <!-- CENTERED COURSE TITLE -->
+      <h1 class="course-title">STA 553 DATA VISUALIZATION</h1>
+      <p class="main-header-sub">Long vs Wide Format · When to Use What</p>
+      <div class="theme-toggle-wrapper">
+            <!--span style="color:white;">☀️</span-->
+            <button id="themeToggle" class="theme-toggle-btn" aria-label="Switch dark/light mode">🌙</button>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT: Cards -->
+    <div class="cards-grid">
+      <!-- Card 1: Wide Format -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">📋</span>
+          <h3>Wide Format</h3>
+        </div>
+        <p style="margin-bottom:0.8rem; font-style:italic;">“Human & Summary Table”</p>
+        <p><strong>Example:</strong> One row per store, columns for Jan/Feb/Mar revenue.</p>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="wide1" checked>
+            <label for="wide1">📄 Printed reports & reading directly</label>
+          </li>
+          <li>
+            <input type="checkbox" id="wide2" checked>
+            <label for="wide2">📈 Excel charts (each series in column)</label>
+          </li>
+          <li>
+            <input type="checkbox" id="wide3">
+            <label for="wide3">🔥 Correlation heatmaps / matrices</label>
+          </li>
+          <li>
+            <input type="checkbox" id="wide4">
+            <label for="wide4">🗺️ Choropleth maps (one row per region)</label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Card 2: Long Format -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">🧬</span>
+          <h3>Long (Tidy) Format</h3>
+        </div>
+        <p style="margin-bottom:0.8rem; font-style:italic;">“Machine & Code Ready”</p>
+        <p><strong>Example:</strong> Each row is one observation (Store-Month-Revenue).</p>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="long1" checked>
+            <label for="long1">📊 ggplot2 / Seaborn / Plotly</label>
+          </li>
+          <li>
+            <input type="checkbox" id="long2" checked>
+            <label for="long2">🧩 Faceting (small multiples)</label>
+          </li>
+          <li>
+            <input type="checkbox" id="long3">
+            <label for="long3">🔍 Easy filtering across categories</label>
+          </li>
+          <li>
+            <input type="checkbox" id="long4">
+            <label for="long4">📐 Statistical modeling (ANOVA, regression)</label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Card 3: Golden Rule -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">✨</span>
+          <h3>Golden Rule</h3>
+        </div>
+        <p style="font-weight:600; margin-bottom:0.7rem;">Start with <span class="highlight-long">long format</span> for BI tools & code.</p>
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="rule1" checked>
+            <label for="rule1">Tableau: map dimensions to color</label>
+          </li>
+          <li>
+            <input type="checkbox" id="rule2" checked>
+            <label for="rule2">Power BI: unpivot columns first</label>
+          </li>
+          <li>
+            <input type="checkbox" id="rule3">
+            <label for="rule3">Python/R: pivot_longer before plotting</label>
+          </li>
+        </ul>
+        <p style="margin-top:0.5rem; font-size:0.9rem;">Exception: Excel & correlation matrices need wide.</p>
+      </div>
+
+      <!-- Card 4: Decision Flowchart -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">🔀</span>
+          <h3>Quick Decision Flow</h3>
+        </div>
+        <table class="decision-table">
+          <thead>
+             <tr><th>Question</th><th>Format</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Correlation matrix or Excel chart?</td><td><span class="highlight-wide">Wide</span></td></tr>
+            <tr><td>Printed report table?</td><td><span class="highlight-wide">Wide</span></td></tr>
+            <tr><td>Using code / Tableau / BI?</td><td><span class="highlight-long">Long</span></td></tr>
+            <tr><td>Multi-series line/bar chart?</td><td><span class="highlight-long">Long</span></td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:0.6rem; font-size:0.85rem;">✅ Checkboxes above are interactive.</p>
+      </div>
+    </div>
+
+    <!-- Additional reference tables -->
+    <div style="display: flex; flex-wrap: wrap; gap: 2rem; margin-top: 1rem;">
+      <div style="flex:1; min-width:250px;">
+        <h2>📌 At a Glance</h2>
+        <table class="decision-table" style="margin-top:0;">
+          <thead><tr><th>Use case</th><th>Best format</th></tr></thead>
+          <tbody>
+            <tr><td>Plotting with code</td><td><span class="highlight-long">Long</span></td></tr>
+            <tr><td>Excel charts & pivot</td><td><span class="highlight-wide">Wide</span></td></tr>
+            <tr><td>Display summary for reading</td><td><span class="highlight-wide">Wide</span></td></tr>
+            <tr><td>Statistical analysis</td><td><span class="highlight-long">Long</span></td></tr>
+            <tr><td>Multi-series charts</td><td><span class="highlight-long">Long</span></td></tr>
+            <tr><td>Correlation heatmaps</td><td><span class="highlight-wide">Wide</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="flex:1; min-width:240px;">
+        <h2>🧠 Remember</h2>
+        <div class="card" style="padding:1.2rem;">
+          <p style="font-weight:500;">“If your data is wide, <strong>pivot longer</strong> before visualizing.”</p>
+          <p style="margin-top:0.6rem;">Most tools expect tidy data. Use <code>pivot_longer()</code> in R or <code>melt()</code> in pandas.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        
+        <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+             
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center> 
+        
+    </footer>
+
+    <script>
+         // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();  
+        
+    (function() {
+      const body = document.body;
+      const themeToggle = document.getElementById('themeToggle');
+      const btnA3 = document.getElementById('btnA3');
+      const btnLetter = document.getElementById('btnLetter');
+
+      // Dark/Light toggle
+      function setDarkMode(isDark) {
+        if (isDark) {
+          body.classList.add('dark');
+          themeToggle.innerHTML = '☀️';
+          localStorage.setItem('sta553Theme', 'dark');
+        } else {
+          body.classList.remove('dark');
+          themeToggle.innerHTML = '🌙';
+          localStorage.setItem('sta553Theme', 'light');
+        }
+      }
+
+      const savedTheme = localStorage.getItem('sta553Theme');
+      if (savedTheme === 'dark') {
+        setDarkMode(true);
+      } else {
+        setDarkMode(false);
+      }
+
+      themeToggle.addEventListener('click', () => {
+        setDarkMode(!body.classList.contains('dark'));
+      });
+
+      // A3 / Letter print size
+      function setActiveSize(size) {
+        if (size === 'A3') {
+          btnA3.classList.add('active');
+          btnLetter.classList.remove('active');
+          body.classList.remove('letter-print');
+          localStorage.setItem('sta553PrintSize', 'A3');
+        } else {
+          btnLetter.classList.add('active');
+          btnA3.classList.remove('active');
+          body.classList.add('letter-print');
+          localStorage.setItem('sta553PrintSize', 'Letter');
+        }
+      }
+
+      const storedSize = localStorage.getItem('sta553PrintSize') || 'A3';
+      if (storedSize === 'Letter') {
+        setActiveSize('Letter');
+      } else {
+        setActiveSize('A3');
+      }
+
+      btnA3.addEventListener('click', () => setActiveSize('A3'));
+      btnLetter.addEventListener('click', () => setActiveSize('Letter'));
+
+      window.addEventListener('beforeprint', () => {
+        const style = document.createElement('style');
+        style.id = 'print-page-size';
+        if (body.classList.contains('letter-print')) {
+          style.textContent = `@page { size: letter; margin: 1.2cm; }`;
+        } else {
+          style.textContent = `@page { size: A3; margin: 1.2cm; }`;
+        }
+        const oldStyle = document.getElementById('print-page-size');
+        if (oldStyle) oldStyle.remove();
+        document.head.appendChild(style);
+      });
+
+    })();
+  </script>
+</body>
+</html>

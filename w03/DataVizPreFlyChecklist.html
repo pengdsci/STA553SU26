@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataViz | Purple Interactive Checklist | High Contrast Dark Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ========== ROOT VARIABLES ========== */
+        :root {
+            /* Primary purple background: #6E3061 */
+            --purple-bg: #6E3061;
+            --purple-dark: #4A1F41;
+            --purple-soft: #8E4C7E;
+            --purple-light: #F3EAF1;
+            
+            /* Light mode (default) - high contrast compliant */
+            --bg-primary: #F9F6F8;
+            --bg-surface: #FFFFFF;
+            --text-primary: #1E1020;
+            --text-secondary: #2D1F2B;
+            --text-muted: #5A4B55;
+            --border-light: #E2D4DE;
+            --border-medium: #CBB5C3;
+            --accent: #6E3061;
+            --accent-dark: #4A1F41;
+            --accent-light: #F0E4EC;
+            --highlight-bg: #FFF8E7;
+            --highlight-border: #D4A373;
+            --success-green: #2E7D64;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+            --header-gradient: linear-gradient(135deg, #4A1F41 0%, #6E3061 100%);
+            --code-bg: #EEE6EA;
+            --footer-border: #D6C4D0;
+            --focus-ring: #6E3061;
+            --progress-bg: #E2D4DE;
+            --progress-fill: #6E3061;
+        }
+
+        /* Dark mode - ENHANCED CONTRAST (WCAG AA/AAA compliant) */
+        body.dark {
+            --bg-primary: #0D0A0F;
+            --bg-surface: #1A1420;
+            --text-primary: #F5EEF2;
+            --text-secondary: #EADCE5;
+            --text-muted: #CBB7C2;
+            --border-light: #4A3A47;
+            --border-medium: #6B5666;
+            --accent: #CFA0C1;
+            --accent-dark: #E2BBD4;
+            --accent-light: #332A30;
+            --highlight-bg: #2C241E;
+            --highlight-border: #F2B179;
+            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+            --header-gradient: linear-gradient(135deg, #2A1D28 0%, #3D2A3A 100%);
+            --code-bg: #2D212B;
+            --footer-border: #4A3A47;
+            --focus-ring: #CFA0C1;
+            --progress-bg: #3D2A3A;
+            --progress-fill: #CFA0C1;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--purple-bg);
+            color: var(--text-primary);
+            padding: 2rem 1.5rem;
+            transition: background-color 0.25s ease, color 0.2s;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: var(--bg-surface);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            padding: 2rem 2rem 1.8rem 2rem;
+            border: 1px solid var(--border-light);
+            transition: background 0.2s;
+        }
+
+        /* ========== HEADER SECTION ========== */
+        .main-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 1.5rem;
+        }
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: var(--header-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: var(--text-secondary);
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .subhead-main {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .badge-group {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: var(--accent-light);
+            color: var(--accent-dark);
+            padding: 0.25rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid var(--border-light);
+        }
+
+        /* Progress Counter Card - New Feature */
+        .progress-card {
+            background: var(--bg-primary);
+            border-radius: 1.2rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-medium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+        .progress-info {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .progress-label {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--accent-dark);
+            background: var(--accent-light);
+            padding: 0.3rem 0.9rem;
+            border-radius: 40px;
+        }
+        body.dark .progress-label {
+            color: var(--accent);
+        }
+        .progress-stats {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .progress-stats strong {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-right: 0.2rem;
+        }
+        .progress-bar-container {
+            flex: 1;
+            min-width: 200px;
+            background: var(--progress-bg);
+            border-radius: 40px;
+            height: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--progress-fill);
+            border-radius: 40px;
+            transition: width 0.3s ease;
+        }
+        .progress-message {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: var(--accent-light);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+        }
+        @media (max-width: 750px) {
+            .progress-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .progress-bar-container {
+                width: 100%;
+            }
+        }
+
+        /* Dark Mode Toggle Button - improved visibility */
+        .dark-toggle {
+            position: fixed;
+            top: 1.2rem;
+            right: 1.5rem;
+            background: var(--bg-surface);
+            border: 2px solid var(--accent);
+            border-radius: 60px;
+            padding: 0.55rem 1.2rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            z-index: 1100;
+            backdrop-filter: blur(8px);
+            box-shadow: var(--card-shadow);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .dark-toggle:hover {
+            background: var(--accent);
+            color: var(--bg-surface);
+            border-color: var(--accent);
+            transform: scale(1.01);
+        }
+
+        /* Section styles */
+        .section {
+            margin-bottom: 2.4rem;
+            border-left: 5px solid var(--accent);
+            padding-left: 1.2rem;
+        }
+        .section-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: var(--accent);
+            display: inline-block;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0 1.2rem 0;
+        }
+        .checklist-card {
+            background: var(--bg-primary);
+            border-radius: 1.2rem;
+            padding: 1.3rem;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .checklist-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .checklist-card h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.9rem;
+            color: var(--accent-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        body.dark .checklist-card h4 {
+            color: var(--accent);
+        }
+        .checklist {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            cursor: pointer;
+            padding: 0.2rem 0;
+            border-radius: 0.5rem;
+        }
+        .checkbox-item:hover {
+            background: var(--accent-light);
+        }
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+        }
+        .checkbox-item label {
+            flex: 1;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 450;
+        }
+        body.dark .checkbox-item label {
+            color: var(--text-secondary);
+            font-weight: 450;
+        }
+        .checkbox-item.checked label {
+            text-decoration: line-through;
+            opacity: 0.75;
+            color: var(--text-muted);
+        }
+        .highlight-tip {
+            background: var(--highlight-bg);
+            border-left: 4px solid var(--highlight-border);
+            padding: 0.8rem 1rem;
+            border-radius: 0.9rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        /* footer sections */
+        .site-footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--footer-border);
+            /*display: flex; */
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .copyright {
+            font-weight: 500;
+            text-align: center;
+        }
+        .site-meter {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .meter-badge {
+            background: var(--accent-light);
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .mnemonic {
+            background: var(--accent-light);
+            padding: 0.9rem 1.2rem;
+            border-radius: 1.2rem;
+            margin: 2rem 0 0.5rem;
+            text-align: center;
+            font-weight: 500;
+            border: 1px solid var(--border-medium);
+            color: var(--text-primary);
+        }
+        .footer-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin: 1.8rem 0 0.5rem;
+            flex-wrap: wrap;
+        }
+        button {
+            background: transparent;
+            border: 0px solid var(--border-medium);
+            padding: 0.1rem 0.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        button:hover {
+            background: var(--accent);
+            color: var(--bg-surface);
+            border-color: var(--accent);
+        }
+        .credit-line {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 1.2rem;
+            color: var(--text-muted);
+        }
+        /* focus ring accessibility */
+        button:focus-visible, input:focus-visible, .dark-toggle:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 3px;
+        }
+        
+        /* Print styles: A3 + Letter */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+                color: black;
+            }
+            body.dark {
+                background: white;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0.4in;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                background: white;
+                border: 1px solid #ccc;
+            }
+            .dark-toggle, .footer-actions button, .print-hide, .progress-card {
+                display: none !important;
+            }
+            .checkbox-item input {
+                border: 1px solid #000;
+                accent-color: #6E3061;
+            }
+            .checkbox-item.checked label {
+                text-decoration: line-through;
+            }
+            .section {
+                break-inside: avoid;
+            }
+            .card-grid {
+                break-inside: avoid;
+            }
+            .checklist-card {
+                break-inside: avoid;
+                border: 1px solid #aaa;
+                background: #fefefe;
+            }
+            h1, .section-title {
+                color: #4A1F41;
+            }
+            .badge {
+                border: 1px solid #aaa;
+                background: #f0f0f0;
+                color: black;
+            }
+            .main-header {
+                border-bottom: 2px solid #6E3061;
+            }
+            .site-footer {
+                border-top: 1px solid #aaa;
+                color: #333;
+            }
+            @page {
+                size: A3;
+                margin: 1.5cm;
+            }
+            @page letter {
+                size: Letter;
+            }
+            body.dark .container {
+                background: white;
+                color: black;
+            }
+            body.dark .checklist-card {
+                background: #f9f9f9;
+            }
+        }
+        @media (max-width: 750px) {
+            .container {
+                padding: 1.2rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .site-footer {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<button class="dark-toggle print-hide" id="darkModeToggle" aria-label="Toggle dark/light mode (high contrast)">🌙 Dark Mode</button>
+
+<div class="container">
+    <!-- HEADER SECTION: Main title & subtitle -->
+    <div class="main-header">
+        <h1>STA 553 Data Visualization</h1>
+        <div class="subhead-main">Interactive Pre-Flight Checklist | Clarity, Color, Proportion, Labels</div>
+        <div class="badge-group">
+            <span class="badge">📐 Accurate Proportions</span>
+            <span class="badge">🎨 Accessible Purple Theme</span>
+            <span class="badge">✅ Click & Track</span>
+            <span class="badge">🏷️ Clear Narrative</span>
+            <span class="badge">♿ High Contrast Dark Mode</span>
+        </div>
+    </div>
+
+    <!-- PROGRESS COUNTER CARD - NEW FEATURE (Live tracking) -->
+    <div class="progress-card print-hide" id="progressCard">
+        <div class="progress-info">
+            <span class="progress-label">📋 Checklist Progress</span>
+            <span class="progress-stats">
+                <strong id="checkedCount">0</strong> / <span id="totalCount">0</span> completed
+            </span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progressFillBar"></div>            
+        </div>
+       <!-- Action Buttons -->
+       <!--div class="footer-actions print-hide"-->
+       <div class="progress-label">    
+            <button id="resetAllBtn" aria-label="Reset all checklist items">✓ Reset All Checkboxes</button>
+        </div>
+       <div class="progress-label"> 
+            <button id="printPdfBtn" aria-label="Save as PDF (A3/Letter)">🖨️ Save as PDF (A3 / Letter)</button>
+       </div>
+    </div>
+
+    <!-- 1. CONTENT PRINCIPLES -->
+    <div class="section">
+        <h2 class="section-title">📄 1. CONTENT PRINCIPLES</h2>
+        <div class="card-grid">
+            <div class="checklist-card">
+                <h4>📌 Clarity & Narrative</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="c1"><label for="c1">Data visual is clear and concise</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c2"><label for="c2">Audience centric (tailored to stakeholders)</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c3"><label for="c3">Deliver relevant information, eliminate jargon</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c4"><label for="c4">Tells a story — all graphs need a narrative</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c5"><label for="c5">Graphs warrant their presence (no chart clutter)</label></li>
+                </ul>
+            </div>
+            <div class="checklist-card">
+                <h4>📊 Data Selection & Type</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="c6"><label for="c6">Data selected carefully; avoid too many datapoints</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c7"><label for="c7">Avoid over-generalization / absolutes with survey data</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c8"><label for="c8">Graphs for "big data", not little data — use words/numbers for small datasets</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c9"><label for="c9">Graph type appropriate for data & precision level</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c10"><label for="c10">Bar charts for precision; pie/circle charts when precision is less important</label></li>
+                </ul>
+            </div>
+            <div class="checklist-card">
+                <h4>📈 Chart Best Practices</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="c11"><label for="c11">Use bar charts to visualize achievement of an objective</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c12"><label for="c12">Time series for patterns or change over time</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c13"><label for="c13">If horizontal axis has natural sequence → line graph or scatter plot</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c14"><label for="c14">Sufficient documentation: cite sources for credibility</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="c15"><label for="c15">Link to raw data when possible</label></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. COLOR STRATEGY -->
+    <div class="section">
+        <h2 class="section-title">🎨 2. COLOR STRATEGY</h2>
+        <div class="card-grid">
+            <div class="checklist-card">
+                <h4>🎨 Intentional Schemes</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="col1"><label for="col1">Intentional color scheme (not random)</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="col2"><label for="col2">Use organization brand color template (purple inclusive)</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="col3"><label for="col3">Suitable for printing in B&W & color-blindness (high contrast)</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="col4"><label for="col4">Color highlights key patterns / action colors guide the viewer</label></li>
+                </ul>
+            </div>
+            <div class="checklist-card">
+                <h4>🌈 Contrast & Hierarchy</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="col5"><label for="col5">Less important or supporting data → muted colors</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="col6"><label for="col6"><strong>⚠️ No more than 3 core colors;</strong> use shading/contrast instead of extra hues</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="col7"><label for="col7">Action colors stand out, background elements subdued</label></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ARRANGEMENT & PROPORTIONS -->
+    <div class="section">
+        <h2 class="section-title">🗂️ 3. ARRANGEMENT & PROPORTIONS</h2>
+        <div class="card-grid">
+            <div class="checklist-card">
+                <h4>🧭 Spatial Flow</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="arr1"><label for="arr1">Spatial flow intuitive to reader (position first, then color/size/shape)</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="arr2"><label for="arr2">Layout sets priorities for readers</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="arr3"><label for="arr3">Time moves left-to-right, linear fashion</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="arr4"><label for="arr4">Individual chart elements reinforce unified takeaway</label></li>
+                </ul>
+            </div>
+            <div class="checklist-card">
+                <h4>📏 Accurate Proportions</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="arr5"><label for="arr5">Graphs must match relationship in underlying data</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="arr6"><label for="arr6">Axes clear & intervals equidistant</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="arr7"><label for="arr7">Graph is two-dimensional: avoid 3D displays, bevels, distortions</label></li>
+                </ul>
+            </div>
+            <div class="checklist-card">
+                <h4>🚫 Distraction-Free</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="arr8"><label for="arr8">Avoid distracting graphics & animations</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="arr9"><label for="arr9">No components solely for decoration</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="arr10"><label for="arr10">Remove chart-junk (gridlines not useful for interpretation)</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="arr11"><label for="arr11">White space is desired on graphs</label></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. LABELS & TYPOGRAPHY -->
+    <div class="section">
+        <h2 class="section-title">🏷️ 4. LABELS & TYPOGRAPHY</h2>
+        <div class="card-grid">
+            <div class="checklist-card">
+                <h4>📝 Descriptive & Scannable</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="lab1"><label for="lab1">Descriptive title: sentence that encapsulates graph's finding</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="lab2"><label for="lab2">Short, clear titles enable readers to skim quickly</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="lab3"><label for="lab3">Be precise and consistent in naming every object</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="lab4"><label for="lab4">Text is scannable — high-contrast (black/dark on light bg)</label></li>
+                </ul>
+            </div>
+            <div class="checklist-card">
+                <h4>📐 Text Hierarchy & Labels</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="lab5"><label for="lab5">Text size hierarchy: Titles > subtitles > labels > axis labels > source</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="lab6"><label for="lab6">Labels clear and used sparingly. Avoid redundancy.</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="lab7"><label for="lab7">Few numeric labels need decimal places</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="lab8"><label for="lab8">Position data labels near data (avoid separate legend when possible)</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="lab9"><label for="lab9">Horizontally oriented labels are easier to read than vertical</label></li>
+                </ul>
+            </div>
+        </div>
+        <div class="highlight-tip">
+            <strong>📌 Pro Tip (High Contrast Ready):</strong> “Subtitles and call-out text for answering questions or highlighting key data points. Quality over quantity — remove redundant labelling. Dark mode now meets WCAG contrast standards.”
+        </div>
+    </div>
+
+    <!-- 5. PRODUCTION READINESS & ACCESSIBILITY -->
+    <div class="section">
+        <h2 class="section-title">⚙️ 5. PRODUCTION READINESS</h2>
+        <div class="card-grid">
+            <div class="checklist-card">
+                <h4>🖨️ Output & Integrity</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="prod1"><label for="prod1">Know when to use logo and when to leave it out</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="prod2"><label for="prod2">Avoid over-plotting / redundancy across dashboards</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="prod3"><label for="prod3">Dual axes avoided unless justified — never imply false correlation</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="prod4"><label for="prod4">Check for missing baseline or truncated axes distortion</label></li>
+                </ul>
+            </div>
+            <div class="checklist-card">
+                <h4>♿ Accessibility & WCAG</h4>
+                <ul class="checklist">
+                    <li class="checkbox-item"><input type="checkbox" id="acc1"><label for="acc1">Colorblind-safe palette + high contrast (WCAG AA/AAA)</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="acc2"><label for="acc2">Alt text / data table for screen readers (critical)</label></li>
+                    <li class="checkbox-item"><input type="checkbox" id="acc3"><label for="acc3">Sufficient font size: not too small, responsive scaling</label></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mnemonic section -->
+    <div class="mnemonic print-hide">
+        🧠 <strong>Mnemonic (Process Guide):</strong> “Clear Content → Intentional Color → Spatial Flow → Accurate Proportions → Scannable Labels”
+    </div>
+
+
+    <!-- FOOTER: copyright & site meter -->
+    <div class="site-footer">
+           
+    <div class="copyright">
+                <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+        
+            <center> 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+   
+        </center>
+
+
+                <p>Inspired by Edward Tufte (The Visual Display of Quantitative Information), Stephen Few (Show Me the Numbers), and WCAG 2.1 accessibility guidelines.</p>
+                <div class="license">
+                    <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+                    <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+                </div>
+            </div>
+        
+    
+</div>
+
+<script>
+    
+            // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    
+    (function() {
+        // DARK MODE with improved contrast & localStorage
+        const toggleBtn = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        function setDarkMode(isDark) {
+            if (isDark) {
+                body.classList.add('dark');
+                localStorage.setItem('vizDarkMode', 'purple-dark');
+                toggleBtn.innerHTML = '☀️ Light Mode (High Contrast)';
+                toggleBtn.setAttribute('aria-label', 'Switch to light mode');
+            } else {
+                body.classList.remove('dark');
+                localStorage.setItem('vizDarkMode', 'purple-light');
+                toggleBtn.innerHTML = '🌙 Dark Mode (Enhanced Contrast)';
+                toggleBtn.setAttribute('aria-label', 'Switch to dark mode');
+            }
+        }
+        const savedTheme = localStorage.getItem('vizDarkMode');
+        if (savedTheme === 'purple-dark') {
+            setDarkMode(true);
+        } else {
+            setDarkMode(false);
+        }
+        toggleBtn.addEventListener('click', () => {
+            const willBeDark = !body.classList.contains('dark');
+            setDarkMode(willBeDark);
+        });
+        
+        // ----- PROGRESS COUNTER FUNCTIONALITY (integrated with existing system) -----
+        function updateProgressCounter() {
+            const allCheckboxes = document.querySelectorAll('.checkbox-item input');
+            const total = allCheckboxes.length;
+            let checked = 0;
+            allCheckboxes.forEach(cb => {
+                if (cb.checked) checked++;
+            });
+            
+            // Update DOM elements
+            const checkedSpan = document.getElementById('checkedCount');
+            const totalSpan = document.getElementById('totalCount');
+            const fillBar = document.getElementById('progressFillBar');
+            const msgDiv = document.getElementById('progressMessage');
+            
+            if (checkedSpan) checkedSpan.innerText = checked;
+            if (totalSpan) totalSpan.innerText = total;
+            
+            const percent = total === 0 ? 0 : (checked / total) * 100;
+            if (fillBar) fillBar.style.width = percent + '%';
+            
+            // Dynamic message based on progress
+            if (msgDiv) {
+                if (checked === 0) {
+                    msgDiv.innerHTML = '✨ Start your pre-flight review';
+                } else if (checked === total) {
+                    msgDiv.innerHTML = '🎉 Perfect! Your visualization is fully optimized! 🎉';
+                } else if (checked >= total * 0.75) {
+                    msgDiv.innerHTML = '🚀 Almost there! Final checks remaining.';
+                } else if (checked >= total * 0.5) {
+                    msgDiv.innerHTML = '📈 Great momentum! More than halfway.';
+                } else if (checked >= total * 0.25) {
+                    msgDiv.innerHTML = '✅ Good start! Keep reviewing.';
+                } else {
+                    msgDiv.innerHTML = '📝 Click items as you verify each guideline.';
+                }
+            }
+        }
+        
+        // Save checkbox states to localStorage
+        function saveCheckboxStates() {
+            const allBoxes = document.querySelectorAll('.checkbox-item input');
+            const states = {};
+            allBoxes.forEach((cb) => {
+                states[cb.id] = cb.checked;
+            });
+            localStorage.setItem('datavizChecklistStates', JSON.stringify(states));
+        }
+        
+        function loadCheckboxStates() {
+            const saved = localStorage.getItem('datavizChecklistStates');
+            if (!saved) return;
+            const states = JSON.parse(saved);
+            for (const [id, isChecked] of Object.entries(states)) {
+                const checkbox = document.getElementById(id);
+                if (checkbox) {
+                    checkbox.checked = isChecked;
+                    const parentItem = checkbox.closest('.checkbox-item');
+                    if (isChecked) {
+                        parentItem?.classList.add('checked');
+                    } else {
+                        parentItem?.classList.remove('checked');
+                    }
+                }
+            }
+            updateProgressCounter(); // update after loading
+        }
+        
+        function handleCheckChange(e) {
+            const checkbox = e.target;
+            const container = checkbox.closest('.checkbox-item');
+            if (checkbox.checked) {
+                container?.classList.add('checked');
+            } else {
+                container?.classList.remove('checked');
+            }
+            saveCheckboxStates();
+            updateProgressCounter();  // Update progress bar & text on every change
+        }
+        
+        function attachCheckListeners() {
+            const allCb = document.querySelectorAll('.checkbox-item input');
+            allCb.forEach(cb => {
+                cb.removeEventListener('change', handleCheckChange);
+                cb.addEventListener('change', handleCheckChange);
+                const liParent = cb.closest('.checkbox-item');
+                if (cb.checked) {
+                    liParent?.classList.add('checked');
+                } else {
+                    liParent?.classList.remove('checked');
+                }
+            });
+        }
+        
+        // Reset all checkboxes and update progress
+        const resetBtn = document.getElementById('resetAllBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                const allChecks = document.querySelectorAll('.checkbox-item input');
+                allChecks.forEach(cb => {
+                    cb.checked = false;
+                    const parentLi = cb.closest('.checkbox-item');
+                    if (parentLi) parentLi.classList.remove('checked');
+                });
+                saveCheckboxStates();
+                updateProgressCounter(); // Refresh progress display
+            });
+        }
+        
+        const printBtn = document.getElementById('printPdfBtn');
+        if (printBtn) {
+            printBtn.addEventListener('click', () => {
+                window.print();
+            });
+        }
+        
+        // Set total count initially
+        function setInitialTotal() {
+            const totalCheckboxes = document.querySelectorAll('.checkbox-item input').length;
+            const totalSpan = document.getElementById('totalCount');
+            if (totalSpan) totalSpan.innerText = totalCheckboxes;
+            updateProgressCounter();
+        }
+        
+        loadCheckboxStates();
+        attachCheckListeners();
+        setInitialTotal();
+        
+        // Re-attach after any dynamic changes (though static page, but safe)
+        window.addEventListener('load', () => {
+            attachCheckListeners();
+            setInitialTotal();
+        });
+    })();
+</script>
+</body>
+</html>

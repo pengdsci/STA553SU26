@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Tidyverse & Data Management in R | Course Summary</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* CSS Variables for Light/Dark modes */
+    :root {
+      /* Purple theme base (light accessible) */
+      --bg-page: #f9f7fc;
+      --surface-card: #ffffff;
+      --primary-purple: #6E3061;
+      --primary-dark: #4a1f41;
+      --primary-light: #e0cce0;
+      --text-main: #1e1a2f;
+      --text-muted: #2d2a3e;
+      --border-light: #ddd8e8;
+      --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.05);
+      --code-bg: #f2eef5;
+      --toggle-bg: #ddd0e0;
+      --toggle-handle: #6E3061;
+      --footer-text: #4a3b55;
+      --checkbox-accent: #6E3061;
+    }
+
+    body.dark {
+      --bg-page: #121212;
+      --surface-card: #1e1e2a;
+      --primary-purple: #6E3061;
+      --primary-dark: #9e6094;
+      --primary-light: #34223d;
+      --text-main: #eaeef2;
+      --text-muted: #cfd5e2;
+      --border-light: #333344;
+      --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.4);
+      --code-bg: #2a2333;
+      --toggle-bg: #3e2e46;
+      --toggle-handle: #c97cb9;
+      --footer-text: #bcb0cc;
+      --checkbox-accent: #b87db0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: system-ui, 'Segoe UI', 'Roboto', 'Noto Sans', sans-serif;
+      line-height: 1.55;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* main container: supports A3/Letter print */
+    .document-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--surface-card);
+      box-shadow: var(--shadow-sm);
+      border-radius: 28px;
+      margin-top: 28px;
+      margin-bottom: 32px;
+      transition: background 0.2s;
+    }
+
+    /* Header (purple background) */
+    .hero-header {
+      background: var(--primary-purple);
+      color: white;
+      padding: 2rem 2rem 1.8rem;
+      border-radius: 28px 28px 28px 28px;
+      margin: 0;
+      text-align: center;
+    }
+
+    .hero-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .hero-header h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      color: white;
+      }
+      
+    .hero-header .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.92;
+      font-weight: 400;
+      border-left: 3px solid rgba(255,255,255,0.6);
+      padding-left: 1rem;
+      margin-top: 0.25rem;
+    }
+
+    /* toolbar: toggle & print group */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      background: var(--surface-card);
+      border-bottom: 1px solid var(--border-light);
+      border-radius: 28px 28px 0 0;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-icon, .print-btn, .page-size-select {
+      background: var(--code-bg);
+      border: 1px solid var(--border-light);
+      padding: 0.5rem 1rem;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-icon:hover, .print-btn:hover, .page-size-select:hover {
+      background: var(--primary-light);
+      border-color: var(--primary-purple);
+    }
+
+    /* Dark mode toggle (slider style) */
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toggle-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 26px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--toggle-bg);
+      transition: 0.2s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--toggle-handle);
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* content styling */
+    .content-core {
+      padding: 2rem 2rem 1.5rem;
+    }
+
+    section {
+      margin-bottom: 2.6rem;
+      scroll-margin-top: 1rem;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      border-left: 5px solid var(--primary-purple);
+      padding-left: 1rem;
+      margin-bottom: 1.2rem;
+      margin-top: 0.5rem;
+      color: var(--text-main);
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin: 1.2rem 0 0.8rem 0;
+      color: var(--primary-purple);
+    }
+
+    .card-highlight {
+      background: var(--code-bg);
+      border-radius: 20px;
+      padding: 1.2rem 1.5rem;
+      margin: 1rem 0;
+      border-left: 4px solid var(--primary-purple);
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin: 0.8rem 0;
+      padding: 0.4rem 0.2rem;
+      border-bottom: 1px dashed var(--border-light);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      margin-top: 0.2rem;
+      accent-color: var(--checkbox-accent);
+      cursor: pointer;
+    }
+
+    .checkbox-item label {
+      font-size: 0.98rem;
+      line-height: 1.4;
+      color: var(--text-muted);
+      flex: 1;
+      cursor: pointer;
+    }
+
+    pre, code {
+      font-family: 'JetBrains Mono', 'SF Mono', monospace;
+      background: var(--code-bg);
+      border-radius: 12px;
+      font-size: 0.85rem;
+    }
+
+    pre {
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      border: 1px solid var(--border-light);
+    }
+
+    .inline-code {
+      background: var(--code-bg);
+      padding: 0.2rem 0.4rem;
+      border-radius: 8px;
+      font-family: monospace;
+    }
+
+    .badge {
+      background: var(--primary-purple);
+      color: white;
+      font-size: 0.7rem;
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+
+    footer {
+      background: var(--surface-card);
+      border-top: 1px solid var(--border-light);
+      padding: 1.5rem 2rem;
+      border-radius: 0 0 28px 28px;
+      font-size: 0.85rem;
+      color: var(--footer-text);
+      /*display: flex;
+      flex-wrap: wrap; */
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+    }
+
+    .copyright, .sitemeter {
+      opacity: 0.8;
+    }
+
+    /* print styles: ensures correct sizing & clean layout */
+    @media print {
+      body {
+        background: white;
+        margin: 0;
+        padding: 0;
+      }
+      .document-container {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .toolbar {
+        display: none;
+      }
+      .hero-header {
+        background: #6E3061 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .checkbox-item input[type="checkbox"] {
+        opacity: 1;
+        border: 1px solid black;
+      }
+      body.dark .content-core, body.dark .card-highlight {
+        background: #f9f9f9;
+        color: black;
+      }
+      .btn-icon, .toggle-switch, .print-btn, .page-size-select {
+        display: none;
+      }
+      footer {
+        border-top: 1px solid #ccc;
+        color: #333;
+      }
+      a {
+        text-decoration: none;
+        color: black;
+      }
+      @page {
+        size: A3; /* fallback, uses js to switch */
+        margin: 1.2cm;
+      }
+    }
+
+    /* small spacing */
+    hr {
+      margin: 1rem 0;
+      border-color: var(--border-light);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="document-container" id="mainContainer">
+  <div class="toolbar">
+    <div class="btn-group">
+      <select id="pageSizeSelect" class="page-size-select" aria-label="Select Print Paper Size">
+        <option value="A3">📄 A3 (Landscape/Portrait)</option>
+        <option value="Letter" selected>📄 Letter (8.5x11in)</option>
+      </select>
+      <button id="printButton" class="print-btn">🖨️ Print / Save as PDF</button>
+    </div>
+    <div class="toggle-switch">
+      <span class="toggle-label">🌙 Dark/Light</span>
+      <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <header class="hero-header">
+     <h1>STA 553 DATA VISUALIZATION</h1>
+    <h2>Tidyverse & Data Management with R</h2>
+    <div class="subtitle">Data Cleaning • Merging & Joins • Subsetting • dplyr • Reshaping • Pipe operator</div>
+  </header>
+
+  <div class="content-core">
+    <!-- Data Cleaning Section -->
+    <section id="cleaning">
+      <h2>🧹 1. Data Cleaning & Preparation</h2>
+      <div class="card-highlight">
+        <p><strong>Core tasks for visualization-ready data:</strong> removing unnecessary variables, duplicate rows, outliers, missing values, standardizing values, and typo correction.</p>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="clean1"> <label for="clean1">Remove unnecessary variables / columns</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="clean2"> <label for="clean2">Delete duplicate rows or invalid observations</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="clean3"> <label for="clean3">Address outliers & missing data (NA handling)</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="clean4"> <label for="clean4">Standardize / categorize values & correct typographical errors</label>
+      </div>
+    </section>
+
+    <!-- Merging / Joins -->
+    <section id="merging">
+      <h2>🔗 2. Merging Data Sets</h2>
+      <p><span class="badge">base R</span> <span class="badge">dplyr</span> Combine relational data using keys. <strong>Inner, Outer (Full), Left, Right joins</strong> with merge() and dplyr mutating joins.</p>
+        
+      <div class="grid-2">
+        <div>
+          <h3>⚙️ base::merge()</h3>
+          <pre>inner_join <- merge(employee, city, by.x='EmpID', by.y='ID', all=FALSE)</pre>
+          <pre>left_join  <- merge(x, y, all.x=TRUE)<br>right_join <- merge(x, y, all.y=TRUE)</pre>
+        </div>
+        
+        <div>
+          <h3>✨ dplyr joins</h3>
+          <pre>inner_join(x, y, by="key")<br>left_join() , right_join() , full_join()</pre>
+          <p><strong>Pipe operator %&gt;%</strong> chains operations: <code>employee %&gt;% inner_join(city, by=c("EmpID"="ID"))</code></p>
+        </div>
+      </div>
+            
+      <div class="checkbox-item">
+        <input type="checkbox" id="join1"> <label for="join1">✅ Understand Inner Join (only matching rows)</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="join2"> <label for="join2">✅ Left / Right Join (keep all from left/right table)</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="join3"> <label for="join3">✅ Full (Outer) Join – all rows from both tables</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="join4"> <label for="join4">✅ Using <code>%&gt;%</code> (pipe) for readable data pipelines</label>
+      </div>
+    </section>
+
+    <!-- Subsetting Data (Base R + dplyr) -->
+    <section id="subsetting">
+      <h2>✂️ 3. Subsetting Data</h2>
+      <p>Select rows (conditions) and columns. Accessors: <code>[, [[, $</code> . <strong>Base R <code>which()</code></strong> and <strong>dplyr::filter()</strong> + <strong>select()</strong>.</p>
+      <div class="card-highlight">
+        <p><strong>Example – subset setosa species:</strong> <code>setosa.id &lt;- which(iris$Species == "setosa"); setosa.flower &lt;- iris[setosa.id, ]</code><br>
+        <strong>With dplyr:</strong> <code>filter(iris, Species == "setosa")</code><br>
+        <strong>Multiple conditions:</strong> <code>filter(iris, Species == "setosa" &amp; Sepal.Length > 5)</code><br>
+        <strong>Using .data pronoun:</strong> dynamic column selection</p>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="sub1"> <label for="sub1">Select columns by index or name: <code>iris[, 1:4]</code> or <code>select(iris, -Species)</code></label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="sub2"> <label for="sub2">Select rows with <code>which()</code> and logical operators (==, !=, |, &)</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="sub3"> <label for="sub3">dplyr::filter() – combined criteria (AND / OR)</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="sub4"> <label for="sub4">Variable definition and type conversion (<code>as.numeric()</code>, <code>is.character()</code>)</label>
+      </div>
+    </section>
+
+    <!-- dplyr core functions + grouping + summarize -->
+    <section id="dplyr-verbs">
+      <h2>📦 4. Data Wrangling with dplyr</h2>
+      <p><strong>Key verbs:</strong> <code>select()</code>, <code>filter()</code>, <code>mutate()</code>, <code>group_by()</code>, <code>summarize()</code>, <code>arrange()</code>, <code>count()</code>. Powerful for analytical workflows.</p>
+      <pre>
+# Grouped summary example:
+iris %>%
+  filter(Petal.Length < 5) %>%
+  group_by(Species) %>%
+  summarise(avg_sepal_width = mean(Sepal.Width),
+            cor_sepal = cor(Sepal.Length, Sepal.Width)) %>%
+  arrange(desc(cor_sepal))
+      </pre>
+      <div class="checkbox-item">
+        <input type="checkbox" id="d1"> <label for="d1">select() – keep/drop columns by name</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="d2"> <label for="d2">filter() – row subsetting with complex logic</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="d3"> <label for="d3">mutate() – Add/transform columns</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="d3"> <label for="d3">group_by() + summarise() – compute aggregated stats</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="d4"> <label for="d4">arrange() – sorting with desc()</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="d5"> <label for="d5">count() – quick frequency tables</label>
+      </div>
+    </section>
+
+    <!-- Reshaping: gather & spread (tidyr) -->
+    <section id="reshaping">
+      <h2>🔄 5. Reshaping Data (tidyr)</h2>
+      <p><strong>gather()</strong> → wide to long (stack columns). <strong>spread()</strong> → long to wide. Essential for visualization and modeling.</p>
+      <pre>
+# Example: life expectancy from wide to long
+life_long <- life_expectancy %>%
+  gather(key = "Year", value = "lifeExp", -country, na.rm = TRUE)
+
+# spread back
+mini_wide <- mini_long %>% spread(key = "flower.att", value = "measurement")
+      </pre>
+      <div class="checkbox-item">
+        <input type="checkbox" id="reshape1"> <label for="reshape1">Convert wide data to long format using gather()</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="reshape2"> <label for="reshape2">Convert long data to wide format using spread()</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="reshape3"> <label for="reshape3">Working with key-value pairs for tidy data principles</label>
+      </div>
+    </section>
+
+    <!-- Import / Export + tidyverse overview -->
+    <section id="import-export">
+      <h2>📁 6. Import / Export Data</h2>
+      <p><strong>Base R:</strong> <code>read.csv()</code>, <code>read.table()</code> <br>
+      <strong>tidyverse (readr):</strong> <code>read_csv()</code>, <code>read_delim()</code><br>
+      <strong>Export:</strong> <code>write_csv(final_data, "data/final_data.csv")</code></p>
+      <div class="checkbox-item">
+        <input type="checkbox" id="io1"> <label for="io1">Read CSV / delimited files with readr vs base R.</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="io2"> <label for="io2">Export clean data as CSV for sharing.</label>
+      </div>
+    </section>
+
+    <!-- Optional tidyverse ecosystem -->
+    <section id="tidyverse-eco">
+      <h2>🧩 7. Tidyverse Ecosystem</h2>
+      <p><strong>Collection of packages:</strong> <code>dplyr</code> (manipulation), <code>tidyr</code> (reshaping), <code>stringr</code> (strings), <code>forcats</code> (factors), <code>ggplot2</code> (visualization), <code>readr</code> (import), <code>tibble</code> (modern data frames). <br> <code>purrr</code> for functional programming (optional).</p>
+      <div class="card-highlight">
+        <p>📈 <strong>ggplot2 Grammar:</strong> <code>ggplot(data, aes(x, y)) + geom_point()</code><br>
+        Data visualization workflow = data + aesthetics + geometry</p>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="tidy1"> <label for="tidy1">Recognize key packages in tidyverse for data science</label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="tidy2"> <label for="tidy2">ggplot2 basics: mapping aesthetics and geometries</label>
+      </div>
+    </section>
+
+    <!-- Additional code snippets: type conversion -->
+    <section>
+      <h3>🧪 Variable Definition & Type Conversion</h3>
+      <pre>
+# create new column based on existing
+iris <- iris %>% mutate(Sepal.Area = Sepal.Length * Sepal.Width)
+# type tests: is.numeric(), is.character(), as.numeric(), as.character()
+      </pre>
+    </section>
+
+    <hr>
+    <p><strong>✔️ Summary:</strong> This guide covers core data management – from joining multiple tables, subsetting rows/columns, using dplyr verbs, reshaping with tidyr, to preparing data for visualization. The checkbox system helps track your learning progress.</p>
+  </div>
+
+
+
+
+  <footer>
+   <div class="copyright">
+                <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+        
+      <center> 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+      </center>
+                <p>Inspired by Edward Tufte (The Visual Display of Quantitative Information), Stephen Few (Show Me the Numbers), and WCAG 2.1 accessibility guidelines.</p>
+                <div class="license">
+                    <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+                    <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+                </div>
+            </div>
+  </footer>
+</div>
+
+<script>
+            // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    
+  (function() {
+    // Dark mode toggle
+    const toggleCheckbox = document.getElementById('darkModeToggle');
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'dark') {
+      document.body.classList.add('dark');
+      toggleCheckbox.checked = true;
+    } else if (currentTheme === 'light') {
+      document.body.classList.remove('dark');
+      toggleCheckbox.checked = false;
+    } else {
+      // system preference - optional but keep light default
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme')) {
+        document.body.classList.add('dark');
+        toggleCheckbox.checked = true;
+      } else {
+        document.body.classList.remove('dark');
+      }
+    }
+    toggleCheckbox.addEventListener('change', function(e) {
+      if (e.target.checked) {
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    });
+
+    // Print-to-PDF with dynamic page size (A3 / Letter)
+    const printBtn = document.getElementById('printButton');
+    const pageSizeSelect = document.getElementById('pageSizeSelect');
+
+    function setPrintCSS(size) {
+      let styleEl = document.getElementById('dynamic-print-style');
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'dynamic-print-style';
+        document.head.appendChild(styleEl);
+      }
+      if (size === 'A3') {
+        styleEl.textContent = `@media print { @page { size: A3 landscape; margin: 1.2cm; } body { zoom: 0.95; } }`;
+      } else {
+        styleEl.textContent = `@media print { @page { size: Letter; margin: 1cm; } }`;
+      }
+    }
+    // initial setup as default Letter
+    setPrintCSS('Letter');
+    pageSizeSelect.addEventListener('change', (e) => {
+      setPrintCSS(e.target.value);
+    });
+
+    printBtn.addEventListener('click', () => {
+      // ensure correct page size applied before print dialog
+      const selected = pageSizeSelect.value;
+      setPrintCSS(selected);
+      // small delay to let styles apply
+      setTimeout(() => {
+        window.print();
+      }, 50);
+    });
+
+    // preserve checkboxes state across page refresh (bonus)
+    const allCheckboxes = document.querySelectorAll('.checkbox-item input[type="checkbox"]');
+    function loadCheckboxStates() {
+      const saved = localStorage.getItem('tidyCheckboxes');
+      if (saved) {
+        const states = JSON.parse(saved);
+        allCheckboxes.forEach((cb, idx) => {
+          if (states[idx] !== undefined) cb.checked = states[idx];
+        });
+      }
+    }
+    function saveCheckboxStates() {
+      const states = Array.from(allCheckboxes).map(cb => cb.checked);
+      localStorage.setItem('tidyCheckboxes', JSON.stringify(states));
+    }
+    loadCheckboxStates();
+    allCheckboxes.forEach(cb => cb.addEventListener('change', saveCheckboxStates));
+  })();
+</script>
+</body>
+</html>

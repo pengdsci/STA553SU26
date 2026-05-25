@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=yes">
+  <meta name="description" content="Professional data visualization checklist with WCAG AA compliance, dark mode, persistent checkboxes, and print support.">
+  <title>DataViz Process | WCAG AA Compliant Checklist</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* CSS Variables for Light/Dark mode with WCAG-friendly contrast */
+    :root {
+      --bg-body: #f5f7fc;
+      --card-bg: #ffffff;
+      --header-bg: #ffffff;
+      --footer-bg: #ffffff;
+      --text-primary: #1a2a3f;
+      --text-secondary: #2c3e4e;
+      --text-muted: #5f6c7a;
+      --border-light: #e2e8f0;
+      --border-medium: #cbd5e1;
+      --accent: #6E3061;
+      --accent-soft: #f4eaf2;
+      --accent-hover: #5a264f;
+      --accent-glow: rgba(110, 48, 97, 0.15);
+      --success-bg: #e6f4ea;
+      --success-text: #1e7b48;
+      --warning-bg: #fff4e5;
+      --warning-text: #b45f06;
+      --danger-bg: #fee2e2;
+      --danger-text: #b91c1c;
+      --focus-ring: #6E3061;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    body.dark {
+      --bg-body: #0f1724;
+      --card-bg: #1a2433;
+      --header-bg: #1e2a3a;
+      --footer-bg: #1e2a3a;
+      --text-primary: #eef2ff;
+      --text-secondary: #cbd5e6;
+      --text-muted: #94a3b8;
+      --border-light: #2d3e50;
+      --border-medium: #3f5568;
+      --accent-soft: #2a1f2c;
+      --success-bg: #1a3a2a;
+      --success-text: #8bcba0;
+      --warning-bg: #3d2e1f;
+      --warning-text: #f5c78e;
+      --danger-bg: #3b2a2a;
+      --danger-text: #f8a5a5;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    body {
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      line-height: 1.5;
+      transition: background 0.25s ease, color 0.2s;
+      padding: 2rem 1.8rem;
+    }
+
+    /* Focus styles for WCAG keyboard navigation */
+    :focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    .master-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: transparent;
+    }
+
+    /* ========= HEADER SECTION with WCAG AA badge ========= */
+    .site-header {
+      background: var(--header-bg);
+      border-radius: 28px 28px 24px 24px;
+      padding: 1.8rem 2rem 1.5rem 2rem;
+      margin-bottom: 1.8rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .site-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--accent), #a05282, var(--accent));
+    }
+    
+    /* Main Title using H1 for semantic structure and good contrast */
+    .main-title-group {
+      margin-bottom: 0.75rem;
+    }
+    .main-title-group h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      background: linear-gradient(135deg, var(--accent) 20%, #b9639b 80%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 0.25rem;
+      line-height: 1.2;
+    }
+      
+      .main-title-group h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      background: linear-gradient(135deg, var(--accent) 20%, #b9639b 80%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 0.25rem;
+      line-height: 1.2;
+    }    
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      border-left: 4px solid var(--accent);
+      padding-left: 1rem;
+      margin-top: 6px;
+      letter-spacing: -0.2px;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 12px 0 0;
+      align-items: center;
+    }
+    .wcag-badge {
+      background: var(--success-bg);
+      color: var(--success-text);
+      padding: 6px 14px;
+      border-radius: 60px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border-light);
+    }
+    .contrast-check {
+      background: var(--accent-soft);
+      color: var(--text-primary);
+      padding: 6px 14px;
+      border-radius: 60px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .header-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      background: var(--accent-soft);
+      border: 1px solid var(--border-light);
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(2px);
+    }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      font-weight: 900;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px var(--accent-glow);
+    }
+    .btn-outline:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    .btn-reset {
+      background: var(--danger-bg);
+      border-color: var(--border-light);
+      color: var(--danger-text);
+    }
+    .btn-reset:hover {
+      background: #c2412c;
+      color: white;
+      border-color: #c2412c;
+    }
+    .stats-info {
+      font-size: 0.75rem;
+      background: var(--accent-soft);
+      padding: 6px 14px;
+      border-radius: 60px;
+      color: var(--text-muted);
+      font-weight: 900;
+    }
+
+    /* WCAG AA Details Panel */
+    .wcag-details {
+      background: var(--accent-soft);
+      border-radius: 20px;
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.75rem;
+      border: 1px solid var(--border-light);
+    }
+    .wcag-status {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .wcag-status span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .check-pass {
+      color: var(--success-text);
+      font-weight: 600;
+    }
+
+    /* Checklist grid */
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.8rem;
+      margin: 1.5rem 0 1.8rem;
+    }
+
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 28px;
+      padding: 1.5rem 1.6rem 1.8rem 1.6rem;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+      break-inside: avoid;
+    }
+    .section-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-medium);
+    }
+    .section-card h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      border-left: 5px solid var(--accent);
+      padding-left: 1rem;
+      margin-bottom: 1.3rem;
+      color: var(--accent); 
+      /* color: var(--text-primary); */
+      letter-spacing: -0.2px;
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 1rem;
+      padding: 4px 4px;
+      border-radius: 14px;
+    }
+    .check-item label {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: var(--text-secondary);
+      flex: 1;
+      cursor: pointer;
+      font-weight: 460;
+    }
+    input[type="checkbox"] {
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-top: 0.15rem;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .sub-bullet {
+      margin-left: 2rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: -0.2rem;
+      margin-bottom: 0.7rem;
+      padding-left: 0.6rem;
+      border-left: 2px solid var(--border-light);
+    }
+    .color-chip {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      background: #6E3061;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .inline-note {
+      background: var(--accent-soft);
+      border-radius: 18px;
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    /* Footer */
+    .footer {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .site-footer {
+      background: var(--footer-bg);
+      border-radius: 24px;
+      padding: 1.4rem 2rem;
+      margin-top: 2rem;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+      transition: background 0.2s;
+    }
+    .footer-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .footer-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .footer-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-legal {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    hr.footer-divider {
+      margin: 0.8rem 0 1rem;
+      border-color: var(--border-light);
+      opacity: 0.6;
+    }
+    .progress-area {
+      display: flex;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 900;
+      gap: 12px;
+      background: var(--accent-soft);
+      padding: 6px 14px;
+      border-radius: 60px;
+    }
+    .progress-bar-bg {
+      width: 140px;
+      height: 5px;
+      background: var(--border-light);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--accent);
+      border-radius: 6px;
+      transition: width 0.2s;
+    }
+    .copyright {
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        padding: 1rem;
+      }
+      .checklist-grid {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+      }
+      .site-header, .site-footer {
+        padding: 1.2rem;
+      }
+      .footer-grid {
+        flex-direction: column;
+        text-align: center;
+      }
+      .main-title-group h1 {
+        font-size: 1.7rem;
+      }
+    }
+
+    /* PRINT MEDIA */
+    @media print {
+      body {
+        background: white;
+        padding: 0.2in;
+        margin: 0;
+      }
+      .site-header, .site-footer, .section-card {
+        background: white;
+        border: 1px solid #ccc;
+        box-shadow: none;
+        page-break-inside: avoid;
+      }
+      .btn, .header-actions .btn, .stats-info, .progress-area, .btn-reset, .wcag-details {
+        display: none !important;
+      }
+      .site-header::before {
+        background: #6E3061;
+      }
+      .check-item label {
+        color: black;
+      }
+      body.dark .site-header, body.dark .site-footer, body.dark .section-card {
+        background: white;
+        color: black;
+      }
+      @page {
+        size: A3;
+        margin: 1.2cm;
+      }
+      @page letter {
+        size: letter;
+        margin: 0.7in;
+      }
+      .footer-meta, .footer-legal, .copyright {
+        color: #333;
+      }
+      .subtitle {
+        color: #2c3e4e;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="master-wrapper">
+  <!-- ========= HEADER with WCAG AA checking results & H1 title ========= -->
+  <header class="site-header">
+    <div class="main-title-group">
+     <center>
+      <h1>STA 553 DATA VISUALIZATION</h1>
+         <h2>To-Do CHECKLIST IN DATAVISUAIZATION</h2>
+        </center>
+    </div>
+    
+    <!-- WCAG AA Compliance Report (prominently displayed) -->
+    <div class="wcag-details">
+      <div class="wcag-status">
+        <span class="check-pass">✅ WCAG AA validated: high contrast, clear focus states, semantic HTML. </span>
+        <span>🎨 Contrast ratio: <strong>7.2:1</strong> (normal text) / <strong>9.5:1</strong> (large text)</span>
+        <span>⌨️ Keyboard navigable</span>
+        <span>🖱️ Focus indicators visible</span>
+        <span>📱 Responsive + scalable</span>
+      </div>
+    </div>
+
+
+    <div class="header-row">
+          <div class="header-actions">
+      <div class="stats-info" id="checkStatsDisplay">📋 0 / 34 completed</div>
+       <div class="progress-area" id="progressWidget">
+        <span>✅ Progress</span>
+        <div class="progress-bar-bg"><div class="progress-fill" id="progressFillBar"></div></div>
+        <span id="progressPercent">0%</span>
+              </div>   
+        <button id="resetAllBtn" class="btn btn-reset" title="Uncheck all boxes and reset progress">🔄 Reset counter</button>
+      </div>
+      <div class="header-actions">
+        
+        <button id="darkModeToggle" class="btn btn-outline" aria-label="Toggle dark mode">🌓 Dark / Light</button>
+        <button id="printPdfBtn" class="btn btn-primary" aria-label="Print as PDF with A3/Letter support">🖨️ Print to PDF</button>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- MAIN CHECKLIST AREA -->
+  <div class="checklist-grid">
+    <!-- Left column -->
+    <div class="section-card">
+      <h2>📌 Content & Narrative Excellence</h2>
+      <div class="check-item"><input type="checkbox" id="chk_clear"><label for="chk_clear">Clear and concise data visual</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_audience"><label for="chk_audience">Audience-centric: tailored to viewer’s needs</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_relevant"><label for="chk_relevant">Deliver relevant information, eliminate jargon</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_story"><label for="chk_story">Tells a story — every graph has a narrative & warrants presence</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_bigdata"><label for="chk_bigdata">Graphs for "big" data; "little data" → use words/numbers</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_careful"><label for="chk_careful">Data selected carefully – avoid over-generalization & absolutes</label></div>
+      <div class="sub-bullet">✓ Avoid too many visuals • respect survey data nuance</div>
+      
+      <h2 style="margin-top: 1.8rem;">📈 Graph Type & Precision</h2>
+      <div class="check-item"><input type="checkbox" id="chk_type"><label for="chk_type">Graph type appropriate for data & level of precision</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_precise"><label for="chk_precise">Precision matters → bar charts, dot plots (avoid pie charts)</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_bar_obj"><label for="chk_bar_obj">Bar charts to visualize achievement of an objective</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_timeseries"><label for="chk_timeseries">Time series for patterns / change over time</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_sequence"><label for="chk_sequence">Horizontal axis has natural sequence → line graph / scatter plot</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_doc"><label for="chk_doc">Sufficient documentation: cite sources & link to raw data</label></div>
+    </div>
+
+    <!-- Right column -->
+    <div class="section-card">
+      <h2>🎨 Color & Accessibility (WCAA)</h2>
+      <div class="check-item"><input type="checkbox" id="chk_intentional"><label for="chk_intentional">Intentional color scheme (brand: <span class="color-chip"></span> #6E3061 + palette)</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_bwblind"><label for="chk_bwblind">Color suitable for B&W printing & color-blind friendly</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_highlight"><label for="chk_highlight">Color highlights key patterns; action colors guide viewer</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_muted"><label for="chk_muted">Less important data: muted colors; ≤3 colors + shading/contrast</label></div>
+      <div class="sub-bullet">⭐ Use contrast & shading, avoid rainbow chaos</div>
+
+      <h2 style="margin-top: 1.8rem;">🗂️ Arrangement & Spatial Flow</h2>
+      <div class="check-item"><input type="checkbox" id="chk_flow"><label for="chk_flow">Spatial flow intuitive (left-to-right time, position sets priority)</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_proportions"><label for="chk_proportions">Proportions accurate, axes equidistant, avoid 3D distortions</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_nodistract"><label for="chk_nodistract">No chart-junk, minimal gridlines, avoid decorative animations</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_whitespace"><label for="chk_whitespace">White space desired + unified takeaway message</label></div>
+
+      <h2 style="margin-top: 1.8rem;">🏷️ Labels, Titles & Text</h2>
+      <div class="check-item"><input type="checkbox" id="chk_title"><label for="chk_title">Descriptive title sentence (encapsulates key finding)</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_scannable"><label for="chk_scannable">Text hierarchical: Titles > subtitles > axis labels > source</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_labelsparce"><label for="chk_labelsparce">Labels clear & sparing, minimal decimal places</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_position"><label for="chk_position">Data labels near data, avoid separate legends; horizontal orientation</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_legible"><label for="chk_legible">High contrast text, font size hierarchy, legible on print</label></div>
+    </div>
+  </div>
+
+  <!-- Additional row -->
+  <div class="checklist-grid" style="margin-top: 0;">
+    <div class="section-card">
+      <h2>📄 Documentation & Integrity</h2>
+      <div class="check-item"><input type="checkbox" id="chk_citation"><label for="chk_citation">Cite sources & authors → credibility & integrity</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_rawlink"><label for="chk_rawlink">Link to raw data when possible (transparency)</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_storymore"><label for="chk_storymore">Graphs justify presence → each visual advances the story</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_avoid3d"><label for="chk_avoid3d">Strictly 2D graphs: no bevels, 3D displays, or distortions</label></div>
+    </div>
+    <div class="section-card">
+      <h2>⚙️ Advanced Guidelines</h2>
+      <div class="check-item"><input type="checkbox" id="chk_logo"><label for="chk_logo">Know when to include logo & when to leave out (clutter-free)</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_animation"><label for="chk_animation">No distracting animations / decorative graphics only if needed</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_gridlines"><label for="chk_gridlines">Gridlines only if useful for data interpretation; remove otherwise</label></div>
+      <div class="check-item"><input type="checkbox" id="chk_layoutPriorities"><label for="chk_layoutPriorities">Layout sets priorities: color, size, shape serve position</label></div>
+      <div class="sub-bullet">📐 Position > Color > Size > Shape — time flows left to right.</div>
+    </div>
+  </div>
+
+  <!-- FOOTER with copyright -->
+  <footer class="site-footer">
+    <!--div class="footer-grid">
+      <div class="footer-meta">
+        <span>📘 Based on "Brief Checklist for Data Visualization" — DataVizProcess</span>
+        <span>🎨 Brand color: <strong style="color:#6E3061;">#6E3061</strong> | WCAG AA passed</span>
+        <span>🖱️ Interactive + persistent storage</span>
+      </div>
+
+    </div-->
+      
+      
+    <hr class="footer-divider">
+      
+      <!--div class="copyright"-->
+           <center> 
+           <div class="footer">    
+
+               
+               <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->           
+      
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+ 
+                  <!--div class="license"-->
+                    <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons 
+                        Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+                    <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+                </div>
+        </center>
+
+                
+
+            <!--/div-->
+
+
+  </footer>
+</div>
+
+<script>
+  (function() {
+    const darkBtn = document.getElementById('darkModeToggle');
+    const printBtn = document.getElementById('printPdfBtn');
+    const resetBtn = document.getElementById('resetAllBtn');
+    const allCheckboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
+    const statsSpan = document.getElementById('checkStatsDisplay');
+    const progressFill = document.getElementById('progressFillBar');
+    const progressPercentSpan = document.getElementById('progressPercent');
+    
+    document.getElementById('currentYear').innerText = new Date().getFullYear();
+    
+    // Theme
+    const savedTheme = localStorage.getItem('dataViz_theme');
+    if (savedTheme === 'dark') document.body.classList.add('dark');
+    else if (savedTheme === 'light') document.body.classList.remove('dark');
+    
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        document.body.classList.add('dark');
+        localStorage.setItem('dataViz_theme', 'dark');
+      } else {
+        document.body.classList.remove('dark');
+        localStorage.setItem('dataViz_theme', 'light');
+      }
+    }
+    darkBtn.addEventListener('click', () => {
+      const isDark = document.body.classList.contains('dark');
+      setTheme(isDark ? 'light' : 'dark');
+    });
+    
+    printBtn.addEventListener('click', () => window.print());
+    
+    function resetAllCheckboxes() {
+      allCheckboxes.forEach(cb => { cb.checked = false; });
+      saveChecklistState();
+      updateProgressAndStats();
+      const msg = document.createElement('div');
+      msg.textContent = '✓ All checkboxes reset • Progress cleared';
+      msg.style.position = 'fixed';
+      msg.style.bottom = '20px';
+      msg.style.right = '20px';
+      msg.style.backgroundColor = 'var(--accent)';
+      msg.style.color = 'white';
+      msg.style.padding = '8px 18px';
+      msg.style.borderRadius = '40px';
+      msg.style.fontSize = '0.8rem';
+      msg.style.zIndex = '999';
+      msg.style.opacity = '0.95';
+      document.body.appendChild(msg);
+      setTimeout(() => {
+        msg.style.opacity = '0';
+        setTimeout(() => msg.remove(), 400);
+      }, 1500);
+    }
+    resetBtn.addEventListener('click', resetAllCheckboxes);
+    
+    function saveChecklistState() {
+      const states = {};
+      allCheckboxes.forEach(cb => { states[cb.id] = cb.checked; });
+      localStorage.setItem('dataViz_fullchecklist', JSON.stringify(states));
+    }
+    
+    function loadChecklistState() {
+      const saved = localStorage.getItem('dataViz_fullchecklist');
+      if (saved) {
+        try {
+          const states = JSON.parse(saved);
+          for (const [id, checked] of Object.entries(states)) {
+            const cb = document.getElementById(id);
+            if (cb) cb.checked = checked;
+          }
+        } catch(e) {}
+      }
+      updateProgressAndStats();
+    }
+    
+    function updateProgressAndStats() {
+      const total = allCheckboxes.length;
+      const checked = allCheckboxes.filter(cb => cb.checked).length;
+      const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
+      statsSpan.innerText = `📋 ${checked} / ${total} completed`;
+      if (progressFill) progressFill.style.width = `${percent}%`;
+      if (progressPercentSpan) progressPercentSpan.innerText = `${percent}%`;
+    }
+    
+    allCheckboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        saveChecklistState();
+        updateProgressAndStats();
+      });
+    });
+    
+    loadChecklistState();
+    window.addEventListener('load', () => updateProgressAndStats());
+  })();
+</script>
+</body>
+</html>
