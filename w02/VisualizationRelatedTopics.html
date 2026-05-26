@@ -807,53 +807,53 @@
     </footer>
 
     <script>
-         // Set current year in copyright
-        document.getElementById('currentYear').textContent = new Date().getFullYear();  
-        
-        
-        (function() {
-            // ── DOM REFERENCES ─────────────
-            const themeToggle = document.getElementById('theme-toggle');
-            const themeLabelText = document.getElementById('theme-label-text');
-            const htmlElement = document.documentElement;
-            const checkboxes = document.querySelectorAll('#decision-checklist input[type="checkbox"]');
-            const checklistItems = document.querySelectorAll('#decision-checklist li');
-            const resultDiv = document.getElementById('checklist-result');
-            const confidenceFill = document.getElementById('confidence-fill');
-            const resetBtn = document.getElementById('reset-checklist');
+    // Set current year in copyright
+    document.getElementById('currentYear').textContent = new Date().getFullYear();  
+    
+    (function() {
+        // ── DOM REFERENCES ─────────────
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeLabelText = document.getElementById('theme-label-text');
+        const htmlElement = document.documentElement;
+        const checkboxes = document.querySelectorAll('#decision-checklist input[type="checkbox"]');
+        const checklistItems = document.querySelectorAll('#decision-checklist li');
+        const resultDiv = document.getElementById('checklist-result');
+        const confidenceFill = document.getElementById('confidence-fill');
+        const resetBtn = document.getElementById('reset-checklist');
 
-            // ── DARK / LIGHT TOGGLE ──────────
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    htmlElement.setAttribute('data-theme', 'dark');
-                    themeToggle.checked = true;
-                    themeLabelText.textContent = '🌙 Dark';
-                } else {
-                    htmlElement.removeAttribute('data-theme');
-                    themeToggle.checked = false;
-                    themeLabelText.textContent = '☀️ Light';
-                }
+        // ── DARK / LIGHT TOGGLE ──────────
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                htmlElement.setAttribute('data-theme', 'dark');
+                themeToggle.checked = true;
+                themeLabelText.textContent = '🌙 Dark';
+            } else {
+                htmlElement.removeAttribute('data-theme');
+                themeToggle.checked = false;
+                themeLabelText.textContent = '☀️ Light';
             }
+        }
 
-            const savedTheme = localStorage.getItem('data-viz-theme');
-            applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
+        const savedTheme = localStorage.getItem('data-viz-theme');
+        applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
 
-            themeToggle.addEventListener('change', function() {
-                const newTheme = this.checked ? 'dark' : 'light';
-                applyTheme(newTheme);
-                localStorage.setItem('data-viz-theme', newTheme);
-            });
+        themeToggle.addEventListener('change', function() {
+            const newTheme = this.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem('data-viz-theme', newTheme);
+        });
 
-            // ── PRINT BUTTONS ────────────────
-            function printDocument() {
-                const originalTitle = document.title;
-                document.title = 'Data Visualization Reference Cards';
-                window.print();
-                document.title = originalTitle;
-            }
+        // ── PRINT FUNCTION (removed button references) ──
+        function printDocument() {
+            const originalTitle = document.title;
+            document.title = 'Data Visualization Reference Cards';
+            window.print();
+            document.title = originalTitle;
+        }
 
-            document.getElementById('print-letter-btn').addEventListener('click', printDocument);
-            document.getElementById('print-a3-btn').addEventListener('click', printDocument);
+
+            //document.getElementById('print-letter-btn').addEventListener('click', printDocument);
+           // document.getElementById('print-a3-btn').addEventListener('click', printDocument);
 
             // ── INTERACTIVE CHECKLIST ────────
             function getCheckedValues() {
