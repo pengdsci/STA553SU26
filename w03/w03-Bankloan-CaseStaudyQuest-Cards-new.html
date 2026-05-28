@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Bank Loan Risk | Practical Question Cards (Base R)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #512d6d;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
+            transition: background-color 0.25s ease, color 0.2s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            transition: background 0.2s;
+        }
+
+        .header {
+            background: #6E3061;
+            padding: 1.2rem 1.5rem;
+            color: white;
+            border-bottom: 4px solid #ffd966;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.92;
+            font-weight: 700;
+            border-left: 3px solid #ffd966;
+            padding-left: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 0.9rem 2rem;
+            background: #f9f4f7;
+            border-bottom: 1px solid #e2d0dc;
+            align-items: center;
+        }
+
+        .btn {
+            background: white;
+            border: 1px solid #c2a8bd;
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2d2a2c;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .btn:hover {
+            background: #e9dce5;
+            border-color: #6E3061;
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #6E3061;
+            border-color: #4f2444;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4f2444;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.8rem;
+            padding: 2rem 2rem;
+        }
+
+        @media (max-width: 760px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            body {
+                padding: 1rem;
+            }
+        }
+
+        .card {
+            background: #fefcff;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(110, 48, 97, 0.2);
+            transition: all 0.2s;
+            border: 1px solid #ecdde6;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-header {
+            background: #6E3061;
+            padding: 0.9rem 1.2rem;
+            border-bottom: 2px solid #dbbdce;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .card-header span {
+            background: rgba(255,255,240,0.2);
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: normal;
+            font-family: monospace;
+        }
+        .card-body {
+            padding: 1.2rem 1.2rem 1.4rem;
+            flex: 1;
+        }
+        .section {
+            margin-bottom: 0.9rem;
+        }
+        .section-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6E3061;
+            margin-bottom: 0.25rem;
+            border-left: 3px solid #ffd966;
+            padding-left: 0.5rem;
+        }
+        body.dark .section-title {
+            color: #ffd966;
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f9f0f5;
+            padding: 0.4rem 0.7rem;
+            border-radius: 14px;
+        }
+        body.dark .question-text {
+            background: #3a2e35;
+        }
+        .func-list {
+            background: #1e2a2f;
+            color: #d6deeb;
+            padding: 0.6rem 0.9rem;
+            border-radius: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin: 0.5rem 0;
+        }
+        .method-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        .method-badge {
+            background: #e2d0dc;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #2d2a2c;
+        }
+        body.dark .method-badge {
+            background: #4a3842;
+            color: #efeaed;
+        }
+        .check-row {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+            gap: 0.7rem;
+            border-top: 1px dashed #e2d0dc;
+            padding-top: 0.8rem;
+            font-size: 0.8rem;
+        }
+        .check-row input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #6E3061;
+        }
+        .badge {
+            background: #e2d0dc;
+            border-radius: 30px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        footer {
+            background: #f3eaf0;
+            padding: 1.2rem 2rem;
+            font-size: 0.8rem;
+            color: #3f2d38;
+            border-top: 1px solid #e1cfda;
+            /*display: flex; */
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        body.dark {
+            background-color: #2c1a27;
+        }
+        body.dark .container {
+            background: #1f1a1d;
+        }
+        body.dark .card {
+            background: #2b2428;
+            border-color: #4d3a44;
+        }
+        body.dark .card-header {
+            background: #6E3061;
+            color: white;
+        }
+        body.dark .card-body {
+            color: #efeaed;
+        }
+        body.dark .func-list {
+            background: #0e181c;
+            color: #bbd4f0;
+        }
+        body.dark .toolbar {
+            background: #2a2126;
+            border-bottom-color: #4b3942;
+        }
+        body.dark .btn {
+            background: #3f2f37;
+            border-color: #6E3061;
+            color: #f0e3ea;
+        }
+        body.dark .btn-primary {
+            background: #6E3061;
+            color: white;
+        }
+        body.dark footer {
+            background: #2c2228;
+            color: #cfc1ca;
+            border-top-color: #4a3842;
+        }
+        body.dark .badge {
+            background: #4a3842;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            body.dark .container, .container {
+                background: white;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .toolbar {
+                display: none;
+            }
+            .cards-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+                padding: 1rem;
+            }
+            .card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+            .check-row input {
+                opacity: 1;
+                border: 1px solid black;
+            }
+            footer {
+                background: #f5f5f5;
+                color: black;
+            }
+            body.dark .card-header, body.dark .card-body {
+                color: black;
+                background: #fff;
+            }
+            .func-list {
+                background: #f0f0f0;
+                color: #1e1e1e;
+                border: 1px solid #aaa;
+            }
+            .method-badge {
+                background: #ddd;
+                color: black;
+            }
+            .section-title {
+                color: #6E3061;
+            }
+            @page {
+                size: A3;
+            }
+            @page letter {
+                size: letter;
+            }
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        @media print and (max-width: 760px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        .site-meter {
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📋 Bank Loan Risk Analysis</h1>
+        <div class="subtitle"> Brainstorming on Analytical Prototyping for Loan Default Risk Monitoring and Mitigation </div>
+        <div style="font-size: 1.25rem; color: gold; font-weight: 500;  margin-top: 0.6rem; ">with an Emphasis on Visual Design for Subsequent Data and Modeling Storytelling</div>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn" id="darkModeToggle">🌓 Dark / Light Toggle</button>
+        <button class="btn btn-primary" id="printPdfBtn">🖨️ Print to PDF (A3/Letter ready)</button>
+        <!--span class="badge">📐 base R functions · no code examples</span-->
+    </div>
+
+    <div class="cards-grid">
+        <!-- CARD 0: Dataset summary (additional card) -->
+        <div class="card">
+            <div class="card-header">
+                📁 Dataset Overview <span>metadata</span>
+            </div>
+            <div class="card-body">
+                <div class="section">
+                    <div class="section-title">📌 Sample size</div>
+                    <div>1,000 loan records (as per PDF reference)</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">🔢 Variables & types</div>
+                    <div><strong>Numerical:</strong> Credit_score, Amount, Checking_amount, Saving_amount, Emp_duration, Age, Term</div>
+                    <div><strong>Categorical:</strong> Gender, Marital_status, Emp_status, Car_loan, Personal_loan, Home_loan, Education_loan</div>
+                    <div><strong>Binary target:</strong> Default (0/1)</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📅 Data collection context</div>
+                    <div>Hypothetical bank loan application records – includes credit bureau scores, loan characteristics, existing debt flags, and employment/demographic information. Suitable for prototyping early warning systems and portfolio segmentation.</div>
+                </div>
+                <div class="check-row">
+                    <input type="checkbox" id="card0Check"> <label for="card0Check">✔️ Dataset understood</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 1: Question 1 - Strongest predictors of default -->
+        <div class="card">
+            <div class="card-header">
+                🧠 Q1: What drives default most? <span>predictor strength</span>
+            </div>
+            <div class="card-body">
+                <div class="question-text">“Which customer attributes (credit score, loan amount, balances, tenure) are the strongest indicators of future default?”</div>
+                <div class="section">
+                    <div class="section-title">🎯 Motivation</div>
+                    <div>To build a simple, rule‑based early warning system. The bank needs to focus underwriting and monitoring on the top 3‑5 drivers, reducing complexity and improving interpretability.</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📊 Recommended visuals</div>
+                    <div>Correlation heatmap (numeric variables vs Default), box plots segmented by Default, bar chart of standardized coefficients (from logistic regression).</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">⚙️ Base R graphical functions</div>
+                    <div class="func-list">heatmap(), cor(), boxplot(), barplot(), plot()</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📐 Suggested analytical methods</div>
+                    <div class="method-list"><span class="method-badge">Logistic Regression</span><span class="method-badge">Random Forest</span><span class="method-badge">Correlation Analysis</span><span class="method-badge">ANOVA (for categorical comparisons)</span></div>
+                </div>
+                <div class="check-row">
+                    <input type="checkbox" id="card1Check"> <label for="card1Check">✔️ Top drivers identified</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: Question 2 - Demographic & employment influence -->
+        <div class="card">
+            <div class="card-header">
+                👥 Q2: How do demographics and job status affect risk? <span>segmentation</span>
+            </div>
+            <div class="card-body">
+                <div class="question-text">“Do age, employment duration, marital status, or self‑employment reveal distinct default patterns? Which segments need stricter policies?”</div>
+                <div class="section">
+                    <div class="section-title">🎯 Motivation</div>
+                    <div>Tailored risk tiers and income verification strategies. For instance, self‑employed or young professionals with short tenure may require additional scrutiny or different product offers.</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📊 Recommended visuals</div>
+                    <div>Stacked bar charts (normalized to 100%) for categorical variables, density overlays for Age and Emp_duration, grouped bar charts for average credit score by two dimensions.</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">⚙️ Base R graphical functions</div>
+                    <div class="func-list">barplot(..., beside = FALSE), density(), lines(), plot(), aggregate() + barplot(..., beside = TRUE)</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📐 Suggested analytical methods</div>
+                    <div class="method-list"><span class="method-badge">Chi‑square test of independence</span><span class="method-badge">t‑test / Wilcoxon test</span><span class="method-badge">Logistic regression with interaction terms</span></div>
+                </div>
+                <div class="check-row">
+                    <input type="checkbox" id="card2Check"> <label for="card2Check">✔️ High‑risk segments flagged</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 3: Question 3 - Existing debt & default intersection -->
+        <div class="card">
+            <div class="card-header">
+                🔗 Q3: Do overlapping loans raise default risk? <span>debt intersection</span>
+            </div>
+            <div class="card-body">
+                <div class="question-text">“How does the number and combination of existing loans (car, personal, home, education) affect default probability? Which pairings are most dangerous?”</div>
+                <div class="section">
+                    <div class="section-title">🎯 Motivation</div>
+                    <div>Refine credit policy by capping total exposure for risky combinations (e.g., personal + education loan) and identifying “thin‑file” risk (zero existing loans). Helps set exposure limits.</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📊 Recommended visuals</div>
+                    <div>Grouped bar chart of default rate by total number of active loans (0 to 4), heatmap crossing two binary loan types (e.g., Home_loan vs Car_loan) with default rate as color.</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">⚙️ Base R graphical functions</div>
+                    <div class="func-list">barplot(), image() or filled.contour(), table(), apply() for aggregation, legend()</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📐 Suggested analytical methods</div>
+                    <div class="method-list"><span class="method-badge">Multivariate frequency analysis</span><span class="method-badge">Upset or UpSet plot (alternative to Venn, first introduced in 2014))</span><span class="method-badge">Logistic regression with interaction terms</span></div>
+                </div>
+                <div class="check-row">
+                    <input type="checkbox" id="card3Check"> <label for="card3Check">✔️ Risky loan combinations identified</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 4: Question 4 - Optimizing loan terms & account balances -->
+        <div class="card">
+            <div class="card-header">
+                ⚖️ Q4: How to set loan terms and liquidity requirements? <span>product design</span>
+            </div>
+            <div class="card-body">
+                <div class="question-text">“Do high‑amount, long‑term loans produce a ‘danger zone’ of defaults? Do low checking/saving balances signal liquidity stress?”</div>
+                <div class="section">
+                    <div class="section-title">🎯 Motivation</div>
+                    <div>Design dynamic limits (amount × term) based on credit score and minimum balance requirements. The bank can reject or downgrade applications that fall into the danger zone unless offset by strong credit quality.</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📊 Recommended visuals</div>
+                    <div>Scatter plot Amount vs Term colored by Default; bubble plot with Credit_score as bubble size; side‑by‑side box plots for Checking_amount and Saving_amount by Default status.</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">⚙️ Base R graphical functions</div>
+                    <div class="func-list">plot(), points(), symbols() or plot(..., cex = ), boxplot(), legend()</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📐 Suggested analytical methods</div>
+                    <div class="method-list"><span class="method-badge">Bivariate outlier detection</span><span class="method-badge">Logistic regression (amount × term interaction)</span><span class="method-badge">Threshold optimisation</span></div>
+                </div>
+                <div class="check-row">
+                    <input type="checkbox" id="card4Check"> <label for="card4Check">✔️ Danger zone defined & liquidity rules set</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 5: Question 5 - Composite risk score & portfolio monitoring -->
+        <div class="card">
+            <div class="card-header">
+                📉 Q5: How to monitor portfolio risk over time? <span>score & threshold</span>
+            </div>
+            <div class="card-body">
+                <div class="question-text">“What is the overall risk distribution of the current portfolio? How to choose an intervention threshold and detect ‘risk creep’?”</div>
+                <div class="section">
+                    <div class="section-title">🎯 Motivation</div>
+                    <div>Implement a composite risk score (e.g., predicted probability from logistic model) for proactive account management. Track shifts in the density plot to catch deteriorating underwriting standards.</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📊 Recommended visuals</div>
+                    <div>Density plot of predicted default probabilities (full portfolio), gauge/bar chart of overall default rate vs benchmark (e.g., 5%), density overlay after simulated policy tightening.</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">⚙️ Base R graphical functions</div>
+                    <div class="func-list">density(), plot(), lines(), barplot(), abline(), quantile() for threshold, hist() (alternative)</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📐 Suggested analytical methods</div>
+                    <div class="method-list"><span class="method-badge">Logistic regression (probability scoring)</span><span class="method-badge">ROC / AUC evaluation</span><span class="method-badge">Calibration plot</span><span class="method-badge">Time‑series risk tracking (if temporal data available)</span></div>
+                </div>
+                <div class="check-row">
+                    <input type="checkbox" id="card5Check"> <label for="card5Check">✔️ Risk creep monitoring ready</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer>
+       <center> 
+       <div class="copyright">
+       <p>© 2019-<span id="currentYear"></span>  C. Peng @ West Chester University, USA. All rights reserved.</p>
+            <!-- Copyright Statement -->
+ 
+      <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=bdd86ca03bf3709e4523bf44ac939417956604f4'></script>
+      <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/832947/t/5"></script><a href='http://www.freevisitorcounters.com'><img src="img/blackdot.jpg" width="1" height="1"></a><br>
+    
+           <div class="license">
+              <p>📄 Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer"><font color = "red">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</font></a></p>
+              <p>You are free to share and adapt for non-commercial purposes with appropriate credit.</p>
+            </div>
+         </div>
+       </center> 
+ 
+    <script>
+         // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();  
+        
+    // Dark mode toggle
+    const toggleBtn = document.getElementById('darkModeToggle');
+    toggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+    });
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark');
+    }
+
+    // Print to PDF (respects @page A3/Letter)
+    const printBtn = document.getElementById('printPdfBtn');
+    printBtn.addEventListener('click', () => {
+        window.print();
+    });
+</script>
+</body>
+</html>
